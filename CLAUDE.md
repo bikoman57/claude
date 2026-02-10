@@ -30,11 +30,15 @@
 - Always create a PR for review — never push directly to main
 
 ## Architecture
-- This is a financial analysis agent platform, not a traditional app
-- Source code lives in `src/app/` — shared modules for data fetching, analysis, formatting
-- Claude Code agents in `.claude/agents/` do the actual analysis work
-- Skills in `.claude/skills/` are user-facing workflows (analyze stock, screen, report)
-- Agents send findings to the user via Telegram (notify for alerts, ask for decisions)
+- Leveraged ETF mean-reversion swing trading system
+- **Strategy**: Monitor underlying index drawdowns from ATH → signal to buy leveraged ETF → take profit at target
+- `src/app/etf/` — ETF universe, drawdown calc, signal state machine, persistence
+- `src/app/telegram/` — Telegram notifications and bidirectional messaging
+- `.claude/agents/` — drawdown-monitor, market-analyst, swing-screener
+- `.claude/skills/` — analyze-etf, scan-opportunities, market-report
+- CLI: `uv run python -m app.etf scan|drawdown|signals|active|stats|universe|enter|close`
+- Signal lifecycle: WATCH → ALERT → SIGNAL → ACTIVE → TARGET
+- Runtime state persisted in `data/signals.json` (gitignored)
 - Configuration via environment variables (see `.env`)
 - Keep modules small and focused; prefer composition over inheritance
 
@@ -44,6 +48,16 @@
 - `uv run python -m app.telegram setup-check` verifies configuration
 - Requires `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` in `.env`
 - Use `/telegram-notify`, `/telegram-ask` skills for agent integration
+
+## Telegram Bot Listener (Remote Control)
+- `uv run python -m app.telegram listen` starts the long-polling listener
+- `--timeout SECONDS` sets Claude command timeout (default: 600s)
+- `--claude PATH` overrides claude CLI path
+- Commands: `/analyze <TICKER>`, `/report`, `/screen [TICKERS]`, `/help`, `/status`
+- Free-form text is passed directly to `claude -p` for AI-powered handling
+- Only processes messages from the configured `TELEGRAM_CHAT_ID` (security)
+- Processes one command at a time; rejects concurrent with "still working" message
+- Auto-start via Windows Scheduled Task (see plan file for setup script)
 
 ## Token Discipline
 - IMPORTANT: Use subagents for any exploration that reads more than 3 files — keep main context clean

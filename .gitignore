@@ -44,5 +44,8 @@ Desktop.ini
 # Logs
 *.log
 
+# Runtime data
+data/
+
 # Claude local overrides
 CLAUDE.local.md

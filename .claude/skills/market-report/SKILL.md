@@ -1,78 +1,76 @@
 ---
 name: market-report
-description: Generate a daily or weekly market summary report with key movers and trends. Use when user says "market report", "market summary", "what happened today", "daily recap", or "weekly review".
+description: Generate a daily drawdown and position report for the leveraged ETF swing trading system. Use when user says "market report", "daily report", "drawdown report", "position report", "portfolio update", or "status".
 disable-model-invocation: true
 metadata:
   author: bikoman57
-  version: 1.0.0
+  version: 2.0.0
   category: financial-analysis
 ---
 
 # Market Report
 
-Generate a market summary report. $ARGUMENTS
+Generate a daily swing trading status report. $ARGUMENTS
 
 ## Instructions
 
-### Step 1: Fetch Index Data
-Get major index performance:
+### Step 1: Full Universe Scan
+```bash
+uv run python -m app.etf scan
+```
+
+### Step 2: Broad Market Context
 ```bash
 uv run python -c "
 import yfinance as yf
-for sym, name in [('SPY','S&P 500'),('QQQ','Nasdaq 100'),('DIA','Dow 30'),('IWM','Russell 2000'),('VIX','VIX')]:
+for sym, name in [('SPY','S&P 500'),('QQQ','Nasdaq-100'),('IWM','Russell 2000'),('^VIX','VIX')]:
     t = yf.Ticker(sym)
     h = t.history(period='5d')
     if len(h) >= 2:
         chg = (h['Close'].iloc[-1] / h['Close'].iloc[-2] - 1) * 100
-        print(f'{name} ({sym}): {h[\"Close\"].iloc[-1]:.2f} ({chg:+.2f}%)')
+        print(f'{name}: {h[\"Close\"].iloc[-1]:.2f} ({chg:+.2f}%)')
 "
 ```
 
-### Step 2: Sector Performance
-Check sector ETFs for rotation:
+### Step 3: Active Positions Update
 ```bash
-uv run python -c "
-import yfinance as yf
-sectors = {'XLK':'Tech','XLF':'Financials','XLV':'Healthcare','XLE':'Energy','XLI':'Industrials','XLC':'Comms','XLY':'Consumer Disc','XLP':'Consumer Staples','XLRE':'Real Estate','XLU':'Utilities','XLB':'Materials'}
-for sym, name in sectors.items():
-    t = yf.Ticker(sym)
-    h = t.history(period='5d')
-    if len(h) >= 2:
-        chg = (h['Close'].iloc[-1] / h['Close'].iloc[-2] - 1) * 100
-        print(f'{name}: {chg:+.2f}%')
-"
+uv run python -m app.etf active
 ```
-
-### Step 3: Run Signal Screen
-Use the `signal-screener` agent on major stocks to find notable movers.
 
 ### Step 4: Compile Report
 
 ```
-=== MARKET REPORT — [date] ===
+=== SWING TRADING REPORT — [date] ===
 
-INDICES:
-[index data from step 1]
+MARKET:
+[index data from step 2]
+VIX: [value] ([low/normal/elevated/extreme])
 
-SECTOR ROTATION:
-Leaders: [top 3 sectors]
-Laggards: [bottom 3 sectors]
+DRAWDOWN DASHBOARD:
+| Underlying | From ATH | Threshold | Signal |
+|------------|----------|-----------|--------|
+| QQQ        | -3.2%    | 5%        | WATCH  |
+| SOXX       | -9.1%    | 8%        | SIGNAL |
+...
 
-NOTABLE MOVERS:
-[signals/movers from step 3]
+ACTIVE POSITIONS: [count]
+| ETF  | Entry   | Current | P/L    | Target |
+|------|---------|---------|--------|--------|
+| SOXL | $32.50  | $34.80  | +7.1%  | +10%   |
 
-MARKET MOOD: [risk-on/risk-off/mixed] — [1-sentence reason based on VIX, breadth, sector rotation]
+ACTIONABLE:
+- [BUY signals / TAKE PROFIT signals / No action needed]
 
-⚠️ This is not financial advice.
+This is not financial advice.
 ```
 
 ### Step 5: Send via Telegram
 ```bash
-uv run python -m app.telegram notify --title "Market Report" "<report summary>"
+uv run python -m app.telegram notify --title "Daily Swing Report" "<report summary>"
 ```
 
 ## Troubleshooting
 
-**Weekend/holiday**: Markets are closed on weekends and holidays. yfinance will return stale data. Note this in the report.
+**Weekend/holiday**: Markets are closed. Note stale data in the report.
 
-**Missing sector data**: Some sector ETFs may have delayed data. Skip any that fail and note it.
+**Missing data**: Some tickers may have delayed data. Skip and note it.

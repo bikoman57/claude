@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import sys
+from pathlib import Path
 
 from app.telegram.client import TelegramClient
 from app.telegram.config import TelegramConfig
@@ -16,6 +18,7 @@ Usage:
   uv run python -m app.telegram notify <message> [--title TITLE]
   uv run python -m app.telegram ask <question> [--timeout SECONDS]
   uv run python -m app.telegram setup-check
+  uv run python -m app.telegram listen [--timeout SECONDS] [--claude PATH]
 """
 
 
@@ -87,6 +90,37 @@ async def cmd_setup_check() -> int:
     return 1
 
 
+async def cmd_listen(args: list[str]) -> int:
+    """Start the bot listener for incoming Telegram commands."""
+    from app.telegram.listener import start_listener
+
+    timeout = 600.0
+    claude_exe = "claude"
+    i = 0
+    while i < len(args):
+        if args[i] == "--timeout" and i + 1 < len(args):
+            timeout = float(args[i + 1])
+            i += 2
+        elif args[i] == "--claude" and i + 1 < len(args):
+            claude_exe = args[i + 1]
+            i += 2
+        else:
+            print(f"Unknown option: {args[i]}", file=sys.stderr)  # noqa: T201
+            return 1
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    )
+
+    await start_listener(
+        project_dir=str(Path.cwd()),
+        claude_executable=claude_exe,
+        command_timeout=timeout,
+    )
+    return 0
+
+
 def main() -> None:
     if len(sys.argv) < 2:
         print(USAGE, file=sys.stderr)  # noqa: T201
@@ -102,6 +136,8 @@ def main() -> None:
             exit_code = asyncio.run(cmd_ask(args))
         case "setup-check":
             exit_code = asyncio.run(cmd_setup_check())
+        case "listen":
+            exit_code = asyncio.run(cmd_listen(args))
         case _:
             print(f"Unknown command: {command}", file=sys.stderr)  # noqa: T201
             print(USAGE, file=sys.stderr)  # noqa: T201

@@ -15,7 +15,8 @@
       "Bash(git checkout*)",
       "Bash(git switch*)",
       "Bash(gh *)",
-      "Bash(uv run python -m app.telegram*)"
+      "Bash(uv run python -m app.telegram*)",
+      "Bash(uv run python -m app.etf*)"
     ],
     "deny": []
   }
