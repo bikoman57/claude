@@ -1,4 +1,4 @@
-# Project: Claude
+# Project: Financial Analysis Agents
 
 ## Build & Run
 - `uv sync` to install dependencies
@@ -30,9 +30,12 @@
 - Always create a PR for review — never push directly to main
 
 ## Architecture
-- Source code lives in `src/app/`
-- Entry point: `src/app/__main__.py`
-- Configuration via environment variables (see `.env.example`)
+- This is a financial analysis agent platform, not a traditional app
+- Source code lives in `src/app/` — shared modules for data fetching, analysis, formatting
+- Claude Code agents in `.claude/agents/` do the actual analysis work
+- Skills in `.claude/skills/` are user-facing workflows (analyze stock, screen, report)
+- Agents send findings to the user via Telegram (notify for alerts, ask for decisions)
+- Configuration via environment variables (see `.env`)
 - Keep modules small and focused; prefer composition over inheritance
 
 ## Telegram Integration

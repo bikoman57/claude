@@ -1,73 +1,89 @@
-# App
+# Financial Analysis Agents
 
-Production Python application.
+AI-powered financial analysis agents with real-time Telegram alerts. Claude Code agents analyze stocks, screen for signals, and report market conditions — notifying you on Telegram when they find something interesting.
 
-## Prerequisites
+## How It Works
 
-- Python 3.12+
-- [uv](https://docs.astral.sh/uv/) (recommended package manager)
+This is not a traditional app. The intelligence lives in **Claude Code agents and skills**:
 
-## Setup
+- **Agents** (`.claude/agents/`) do the analysis — market technicals, fundamentals, signal screening
+- **Skills** (`.claude/skills/`) are workflows you invoke — analyze a stock, screen the market, get a daily report
+- **Python modules** (`src/app/`) provide shared infrastructure — Telegram notifications, data formatting
+- **Telegram bot** sends you real-time alerts and waits for your decisions
+
+## Quick Start
 
 ```bash
-# Clone the repository
 git clone https://github.com/bikoman57/claude.git
 cd claude
-
-# Install dependencies
 uv sync
-
-# Copy environment variables
-cp .env.example .env
-# Edit .env with your values
 ```
 
-## Development
+Set up Telegram (one-time): run `/telegram-setup` in Claude Code.
 
-```bash
-# Run the application
-uv run python -m app
+## Usage
 
-# Run tests
-uv run pytest
+In Claude Code, use these skills:
 
-# Lint
-uv run ruff check .
+| Skill | What it does |
+|---|---|
+| `/analyze-stock AAPL` | Full analysis: technicals + fundamentals + signals |
+| `/screen-stocks` | Scan major stocks for trading signals |
+| `/market-report` | Daily market summary with sector rotation |
+| `/telegram-notify "message"` | Send alert to your phone |
+| `/telegram-ask "question"` | Ask you a question, wait for reply |
 
-# Format
-uv run ruff format .
+## Agents
 
-# Type check
-uv run mypy src/
-```
+| Agent | Purpose | Model |
+|---|---|---|
+| `market-analyst` | Price action, technicals, trends | sonnet |
+| `fundamentals-analyst` | Financials, valuation, earnings | sonnet |
+| `signal-screener` | Trading signals, unusual activity | sonnet |
+| `code-reviewer` | Code quality review | sonnet |
+| `security-reviewer` | Security vulnerability audit | sonnet |
+| `token-optimizer` | Token usage audit | haiku |
 
 ## Project Structure
 
 ```
 .
-├── CLAUDE.md                # Claude Code project conventions
+├── CLAUDE.md                          # Agent conventions
 ├── .claude/
-│   ├── settings.json        # Permission allowlists
-│   ├── skills/              # Reusable Claude workflows
-│   │   ├── fix-issue/       # /fix-issue <number>
-│   │   └── new-module/      # /new-module <name>
-│   └── agents/              # Specialized subagents
-│       ├── security-reviewer.md
-│       └── code-reviewer.md
-├── .github/workflows/
-│   └── ci.yml               # Lint, typecheck, test pipeline
-├── src/app/                  # Application source code
-│   ├── __init__.py
-│   └── __main__.py          # Entry point
-├── tests/                    # Test suite
-│   ├── conftest.py
-│   └── test_main.py
-├── pyproject.toml            # Project config (deps, ruff, pytest, mypy)
-└── .env.example              # Environment variable template
+│   ├── agents/                        # Analysis agents
+│   │   ├── market-analyst.md          # Technicals & price action
+│   │   ├── fundamentals-analyst.md    # Financials & valuation
+│   │   ├── signal-screener.md         # Signal screening
+│   │   ├── code-reviewer.md           # Code review
+│   │   ├── security-reviewer.md       # Security audit
+│   │   └── token-optimizer.md         # Token waste audit
+│   ├── skills/                        # User-facing workflows
+│   │   ├── analyze-stock/             # /analyze-stock <ticker>
+│   │   ├── screen-stocks/             # /screen-stocks [tickers]
+│   │   ├── market-report/             # /market-report
+│   │   ├── telegram-notify/           # /telegram-notify <msg>
+│   │   ├── telegram-ask/              # /telegram-ask <question>
+│   │   ├── telegram-setup/            # /telegram-setup
+│   │   ├── fix-issue/                 # /fix-issue <number>
+│   │   ├── new-module/                # /new-module <name>
+│   │   └── self-improve/              # /self-improve
+│   └── settings.json                  # Permission allowlists
+├── .github/workflows/ci.yml           # CI pipeline
+├── src/app/
+│   ├── telegram/                      # Telegram bot (notify + ask)
+│   └── __main__.py                    # Entry point
+├── tests/                             # 20 tests
+└── pyproject.toml                     # Dependencies & tooling
 ```
 
-## Git Workflow
+## Development
 
-- Branch from `main` using `feature/<name>`, `fix/<name>`, or `chore/<name>`
-- Open a PR for all changes -- never push directly to `main`
-- CI runs lint, typecheck, and tests on every PR
+```bash
+uv run pytest              # Run tests
+uv run ruff check .        # Lint
+uv run mypy src/           # Type check
+```
+
+## Disclaimer
+
+This project is for informational and educational purposes only. It is not financial advice. Always do your own research before making investment decisions.
