@@ -5,7 +5,11 @@ import sys
 from dataclasses import asdict
 
 from app.etf.drawdown import calculate_all_drawdowns, calculate_drawdown
-from app.etf.signals import SignalState, evaluate_signal
+from app.etf.signals import (
+    SignalState,
+    capture_signal_factors,
+    evaluate_signal,
+)
 from app.etf.stats import calculate_recovery_stats
 from app.etf.store import (
     get_active_signals,
@@ -15,8 +19,10 @@ from app.etf.store import (
 from app.etf.universe import (
     ETF_UNIVERSE,
     get_all_underlying_tickers,
+    get_mapping,
     get_mapping_by_underlying,
 )
+from app.history.outcomes import record_entry, record_exit
 
 USAGE = """\
 Usage:
@@ -27,7 +33,7 @@ Usage:
   uv run python -m app.etf stats <ticker> <pct>     Recovery stats
   uv run python -m app.etf universe                 Print ETF universe
   uv run python -m app.etf enter <ticker> <price>   Record entry
-  uv run python -m app.etf close <ticker>           Close position
+  uv run python -m app.etf close <ticker> [price]   Close position
 """
 
 
@@ -133,7 +139,7 @@ def cmd_stats(ticker: str, threshold: str) -> int:
 def cmd_enter(ticker: str, price: str) -> int:
     """Record a position entry: SIGNAL -> ACTIVE."""
     signals = load_signals()
-    found = False
+    found_sig = None
     for sig in signals:
         if (
             sig.leveraged_ticker == ticker.upper()
@@ -141,11 +147,10 @@ def cmd_enter(ticker: str, price: str) -> int:
         ):
             sig.state = SignalState.ACTIVE
             sig.leveraged_entry_price = float(price)
-            found = True
-            print(f"Entered {ticker.upper()} at ${price}")  # noqa: T201
+            found_sig = sig
             break
 
-    if not found:
+    if found_sig is None:
         print(  # noqa: T201
             f"Error: no SIGNAL found for {ticker.upper()}",
             file=sys.stderr,
@@ -153,10 +158,26 @@ def cmd_enter(ticker: str, price: str) -> int:
         return 1
 
     save_signals(signals)
+
+    # Record trade outcome for learning
+    mapping = get_mapping(ticker.upper())
+    factors: dict[str, str] = {}
+    if mapping is not None:
+        factors = capture_signal_factors(found_sig, mapping)
+    record_entry(
+        leveraged_ticker=ticker.upper(),
+        underlying_ticker=found_sig.underlying_ticker,
+        entry_price=float(price),
+        factors=factors,
+    )
+    print(  # noqa: T201
+        f"Entered {ticker.upper()} at ${price}"
+        " (outcome recorded)",
+    )
     return 0
 
 
-def cmd_close(ticker: str) -> int:
+def cmd_close(ticker: str, exit_price: str | None = None) -> int:
     """Close a position and remove from signals."""
     signals = load_signals()
     before = len(signals)
@@ -171,7 +192,24 @@ def cmd_close(ticker: str) -> int:
         return 1
 
     save_signals(signals)
-    print(f"Closed {ticker.upper()}")  # noqa: T201
+
+    # Record trade exit for learning
+    if exit_price is not None:
+        result = record_exit(ticker.upper(), float(exit_price))
+        if result and result.pl_pct is not None:
+            print(  # noqa: T201
+                f"Closed {ticker.upper()} at ${exit_price}"
+                f" (P/L: {result.pl_pct:+.1%})",
+            )
+        else:
+            print(  # noqa: T201
+                f"Closed {ticker.upper()} at ${exit_price}",
+            )
+    else:
+        print(  # noqa: T201
+            f"Closed {ticker.upper()}"
+            " (no exit price — outcome not recorded)",
+        )
     return 0
 
 
@@ -197,6 +235,8 @@ def main() -> None:
             exit_code = cmd_stats(sys.argv[2], sys.argv[3])
         case "enter" if len(sys.argv) >= 4:
             exit_code = cmd_enter(sys.argv[2], sys.argv[3])
+        case "close" if len(sys.argv) >= 4:
+            exit_code = cmd_close(sys.argv[2], sys.argv[3])
         case "close" if len(sys.argv) >= 3:
             exit_code = cmd_close(sys.argv[2])
         case _:

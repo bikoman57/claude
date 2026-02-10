@@ -1,16 +1,16 @@
 ---
 name: market-report
-description: Generate a daily drawdown and position report for the leveraged ETF swing trading system. Use when user says "market report", "daily report", "drawdown report", "position report", "portfolio update", or "status".
+description: Generate a quick drawdown and position report (lite version). For the full unified report with macro, SEC, and confidence scores, use /unified-report instead. Use when user says "market report", "quick report", "drawdown report", "position report", "portfolio update", or "status".
 disable-model-invocation: true
 metadata:
   author: bikoman57
-  version: 2.0.0
+  version: 3.0.0
   category: financial-analysis
 ---
 
-# Market Report
+# Market Report (Lite)
 
-Generate a daily swing trading status report. $ARGUMENTS
+Generate a quick swing trading status report. For the full unified report, use `/unified-report`. $ARGUMENTS
 
 ## Instructions
 
@@ -68,6 +68,12 @@ This is not financial advice.
 ```bash
 uv run python -m app.telegram notify --title "Daily Swing Report" "<report summary>"
 ```
+
+## Note
+
+This is the **lite** version focusing on drawdowns and positions only.
+For the full report with macro dashboard, SEC filings, confidence scores,
+and learning insights, use `/unified-report` instead.
 
 ## Troubleshooting
 

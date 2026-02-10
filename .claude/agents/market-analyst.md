@@ -46,6 +46,12 @@ Given an underlying index ticker or general market query:
    uv run python -m app.etf drawdown UNDERLYING_TICKER
    ```
 
+4. **Get Fed rates and yield curve**:
+   ```bash
+   uv run python -m app.macro rates
+   uv run python -m app.macro yields
+   ```
+
 ## Output Format
 
 ```
@@ -53,6 +59,8 @@ UNDERLYING: [ticker] | LEVERAGED: [leveraged_ticker]
 MOMENTUM: [bearish/neutral/bullish] — [reason]
 VOLATILITY: [low/normal/elevated/extreme] (VIX: [value])
 TREND: [correction/pullback/bear market/recovery]
+
+FED: [{trajectory}] | Yield Curve: [{normal/inverted/flat}]
 
 MEAN REVERSION ASSESSMENT:
 - Conditions favor entry: [yes/no/wait]

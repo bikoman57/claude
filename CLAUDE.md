@@ -30,15 +30,32 @@
 - Always create a PR for review — never push directly to main
 
 ## Architecture
-- Leveraged ETF mean-reversion swing trading system
+- Leveraged ETF mean-reversion swing trading system with orchestrated analysis
 - **Strategy**: Monitor underlying index drawdowns from ATH → signal to buy leveraged ETF → take profit at target
-- `src/app/etf/` — ETF universe, drawdown calc, signal state machine, persistence
+- **Orchestration**: Chief-analyst agent runs all CLI commands, cross-references across domains, produces ONE unified report
+
+### Modules
+- `src/app/etf/` — ETF universe, drawdown calc, signal state machine, confidence scoring, persistence
+- `src/app/macro/` — VIX, FRED (CPI/GDP/unemployment), Fed rates/FOMC, Treasury yield curve
+- `src/app/sec/` — SEC EDGAR filings, institutional 13F tracking, index holdings
+- `src/app/history/` — Analysis snapshots, trade outcomes, factor weight learning
 - `src/app/telegram/` — Telegram notifications and bidirectional messaging
-- `.claude/agents/` — drawdown-monitor, market-analyst, swing-screener
-- `.claude/skills/` — analyze-etf, scan-opportunities, market-report
-- CLI: `uv run python -m app.etf scan|drawdown|signals|active|stats|universe|enter|close`
+
+### CLI Commands
+- `uv run python -m app.etf scan|drawdown|signals|active|stats|universe|enter|close`
+- `uv run python -m app.macro dashboard|rates|yields|calendar`
+- `uv run python -m app.sec filings|institutional|recent`
+- `uv run python -m app.history outcomes|weights|summary|snapshots`
+
+### Agents & Skills
+- `.claude/agents/` — chief-analyst, drawdown-monitor, market-analyst, macro-analyst, sec-analyst, swing-screener
+- `.claude/skills/` — unified-report, analyze-etf, scan-opportunities, market-report
+
+### Data & State
 - Signal lifecycle: WATCH → ALERT → SIGNAL → ACTIVE → TARGET
-- Runtime state persisted in `data/signals.json` (gitignored)
+- Confidence scoring: 5 factors → HIGH/MEDIUM/LOW (drawdown, VIX, Fed, yields, SEC)
+- Factor weight learning: track trade outcomes, compute predictive weights over time
+- Runtime state persisted in `data/` (gitignored): signals.json, outcomes.json, history/
 - Configuration via environment variables (see `.env`)
 - Keep modules small and focused; prefer composition over inheritance
 

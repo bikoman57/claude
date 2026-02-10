@@ -66,6 +66,25 @@ def evaluate_signal(mapping: ETFMapping, drawdown: DrawdownResult) -> Signal:
     )
 
 
+def capture_signal_factors(
+    signal: Signal,
+    mapping: ETFMapping,
+) -> dict[str, str]:
+    """Capture basic factor assessments from signal data.
+
+    Returns a dict of factor name -> assessment string.
+    Only captures drawdown depth from CLI context.
+    The chief-analyst provides full factors programmatically.
+    """
+    from app.etf.confidence import assess_drawdown_depth
+
+    dd_result = assess_drawdown_depth(
+        signal.underlying_drawdown_pct,
+        mapping.drawdown_threshold,
+    )
+    return {"drawdown_depth": str(dd_result.assessment)}
+
+
 def evaluate_active_position(
     signal: Signal,
     leveraged_current_price: float,

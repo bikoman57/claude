@@ -23,7 +23,14 @@ You are a swing trade screener for leveraged ETFs. Your job is to identify entry
    uv run python -m app.etf stats UNDERLYING_TICKER THRESHOLD
    ```
 
-4. **For each active position**, fetch current leveraged ETF price:
+4. **Get macro + SEC context** for confidence scoring:
+   ```bash
+   uv run python -m app.macro dashboard
+   uv run python -m app.macro yields
+   uv run python -m app.sec recent
+   ```
+
+5. **For each active position**, fetch current leveraged ETF price:
    ```bash
    uv run python -c "
    import yfinance as yf
@@ -42,6 +49,7 @@ ENTRY SIGNALS: [count]
 [1] BUY [leveraged_ticker] — [underlying] down [X]% from ATH
     Entry price: $[price] | Target: +[Y]% ($[target])
     Avg recovery: [N] days | Recovery rate: [X]%
+    CONFIDENCE: [HIGH/MEDIUM/LOW] ([N]/5 factors)
 
 EXIT SIGNALS: [count]
 [1] TAKE PROFIT [leveraged_ticker] — up [X]% from entry

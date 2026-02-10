@@ -16,7 +16,10 @@
       "Bash(git switch*)",
       "Bash(gh *)",
       "Bash(uv run python -m app.telegram*)",
-      "Bash(uv run python -m app.etf*)"
+      "Bash(uv run python -m app.etf*)",
+      "Bash(uv run python -m app.history*)",
+      "Bash(uv run python -m app.macro*)",
+      "Bash(uv run python -m app.sec*)"
     ],
     "deny": []
   }

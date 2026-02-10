@@ -19,23 +19,32 @@ Scan all leveraged ETFs for mean-reversion opportunities. $ARGUMENTS
 uv run python -m app.etf scan
 ```
 
-### Step 2: Deep Dive on Signals
-For any ETF in SIGNAL or ALERT state, use the `swing-screener` subagent:
-> "Use the swing-screener agent to analyze entry signals from the latest scan. Focus on ETFs showing SIGNAL or ALERT states."
+### Step 2: Macro + SEC Context
+```bash
+uv run python -m app.macro dashboard
+uv run python -m app.macro yields
+uv run python -m app.sec recent
+```
 
-### Step 3: Check Active Positions
+### Step 3: Deep Dive on Signals
+For any ETF in SIGNAL or ALERT state, use the `swing-screener` subagent:
+> "Use the swing-screener agent to analyze entry signals from the latest scan. Focus on ETFs showing SIGNAL or ALERT states. Include confidence scores."
+
+### Step 4: Check Active Positions
 ```bash
 uv run python -m app.etf active
 ```
 
-### Step 4: Compile Report
+### Step 5: Compile Report
 
 ```
 === OPPORTUNITY SCAN ===
 Date: [today]
+Macro: VIX [val] [{regime}] | Fed [{trajectory}] | Yields [{curve}]
 
 ACTION REQUIRED:
 [SIGNAL] [ticker] — [underlying] down [X]% (threshold: [Y]%)
+  CONFIDENCE: [HIGH/MEDIUM/LOW] ([N]/5 factors)
 [TARGET] [ticker] — profit target hit, up [X]% from entry
 
 WATCHING:
@@ -49,7 +58,9 @@ ALL CLEAR: [count] ETFs in normal range
 This is not financial advice.
 ```
 
-### Step 5: Telegram Alert
+For the full cross-domain report, use `/unified-report` instead.
+
+### Step 6: Telegram Alert
 If there are any SIGNAL or TARGET states:
 ```bash
 uv run python -m app.telegram notify --title "Swing Signals" "<count> actionable: <tickers>"
