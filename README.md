@@ -103,6 +103,7 @@ uv run python -m app.strategy history                  # Saved backtest results
 # Daily scheduler
 uv run python -m app.scheduler daily      # Run all modules + send Telegram
 uv run python -m app.scheduler test-run   # Run all modules (no Telegram)
+uv run python -m app.scheduler publish    # Run all + publish HTML to GitHub Pages
 uv run python -m app.scheduler status     # Show last run status
 
 # History & learning
@@ -184,9 +185,11 @@ uv run python -m app.history snapshots   # List all snapshots
 │   │   ├── proposals.py               # Threshold optimization & proposals
 │   │   ├── store.py                   # Backtest result persistence
 │   │   └── __main__.py                # CLI entry point
-│   ├── scheduler/                     # Daily automation
+│   ├── scheduler/                     # Daily automation & publishing
 │   │   ├── runner.py                  # Module execution & status tracking
-│   │   ├── report.py                  # Report generation & Telegram delivery
+│   │   ├── report.py                  # Telegram report generation
+│   │   ├── html_report.py            # HTML report for GitHub Pages
+│   │   ├── publisher.py              # File I/O + git publish
 │   │   └── __main__.py                # CLI entry point
 │   ├── history/                       # Learning & tracking
 │   │   ├── recorder.py                # Analysis snapshots
@@ -195,7 +198,7 @@ uv run python -m app.history snapshots   # List all snapshots
 │   │   └── __main__.py                # CLI entry point
 │   ├── telegram/                      # Telegram bot (notify + ask + listen)
 │   └── __main__.py                    # App entry point
-├── tests/                             # 265 tests
+├── tests/                             # 287 tests
 ├── data/                              # Runtime state (gitignored)
 └── pyproject.toml                     # Dependencies & tooling
 ```
@@ -214,7 +217,7 @@ uv run python -m app.history snapshots   # List all snapshots
 ## Development
 
 ```bash
-uv run pytest              # Run tests (265 tests)
+uv run pytest              # Run tests (287 tests)
 uv run ruff check .        # Lint
 uv run mypy src/           # Type check
 ```

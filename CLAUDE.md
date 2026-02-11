@@ -45,7 +45,7 @@
 - `src/app/social/` — Reddit sentiment, Fed/SEC official statements, hawkish/dovish classification
 - `src/app/statistics/` — Sector rotation, market breadth, cross-asset correlations, risk indicators
 - `src/app/strategy/` — Backtesting engine, threshold optimization, strategy proposals
-- `src/app/scheduler/` — Daily runner (all modules), report generation, Telegram delivery
+- `src/app/scheduler/` — Daily runner, HTML report publishing (GitHub Pages), Telegram delivery
 
 ### CLI Commands
 - `uv run python -m app.etf scan|drawdown|signals|active|stats|universe|enter|close`
@@ -57,7 +57,7 @@
 - `uv run python -m app.social reddit|officials|summary`
 - `uv run python -m app.statistics sectors|breadth|risk|correlations|dashboard`
 - `uv run python -m app.strategy backtest|optimize|proposals|compare|history`
-- `uv run python -m app.scheduler daily|test-run|status`
+- `uv run python -m app.scheduler daily|test-run|publish|status`
 
 ### Agents & Skills
 - `.claude/agents/` — chief-analyst, drawdown-monitor, market-analyst, macro-analyst, sec-analyst, swing-screener, news-analyst, geopolitical-analyst, social-analyst, statistics-analyst, strategy-analyst

@@ -3,6 +3,7 @@
 Usage:
     python -m app.scheduler daily       Run all modules + send Telegram report
     python -m app.scheduler test-run    Run all modules (no Telegram)
+    python -m app.scheduler publish     Run all modules + publish HTML to GitHub Pages
     python -m app.scheduler status      Show last run status
 """
 
@@ -13,6 +14,7 @@ import json
 import sys
 from dataclasses import asdict
 
+from app.scheduler.publisher import git_publish, write_report
 from app.scheduler.report import build_report_text, send_daily_report
 from app.scheduler.runner import load_status, run_all_modules
 
@@ -63,6 +65,28 @@ def _cmd_status() -> int:
     return 0
 
 
+def _cmd_publish() -> int:
+    print("Running all modules...")  # noqa: T201
+    run = run_all_modules()
+    print(  # noqa: T201
+        f"Completed: {run.succeeded}/{run.total_modules} OK, "
+        f"{run.failed} failed",
+    )
+
+    print("\nGenerating HTML report...")  # noqa: T201
+    report_path = write_report(run)
+    print(f"Report written to {report_path}")  # noqa: T201
+
+    print("\nPublishing to GitHub Pages...")  # noqa: T201
+    pushed = git_publish()
+    if pushed:
+        print("Published successfully.")  # noqa: T201
+    else:
+        print("Failed to push (check git config).")  # noqa: T201
+
+    return 0
+
+
 def _print_setup_hint() -> None:
     print(  # noqa: T201
         "\nTo schedule daily runs via Windows Task Scheduler:"
@@ -85,6 +109,8 @@ def main() -> int:
             return _cmd_daily()
         case "test-run":
             return _cmd_test_run()
+        case "publish":
+            return _cmd_publish()
         case "status":
             return _cmd_status()
         case _:
