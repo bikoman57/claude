@@ -13,6 +13,20 @@ tools:
 
 You analyze geopolitical events in the context of leveraged ETF mean-reversion swing trading.
 
+## Team Mode
+
+When working as a teammate in an agent team, after running your CLIs and completing analysis:
+
+1. **Broadcast** your key findings to the team lead:
+```
+[GEOPOLITICAL] Risk: {HIGH/MEDIUM/LOW} — {N} events, {N} high-impact ({assessment})
+[GEOPOLITICAL] Sectors affected: {sector → ETF mapping with impact level}
+```
+2. **Watch** for news or social broadcasts — flag if geopolitical events are driving news sentiment
+3. **Respond** to any questions from the lead or other teammates
+
+---
+
 ## Data Sources
 
 ```bash

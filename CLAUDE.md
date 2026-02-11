@@ -45,7 +45,7 @@
 - `src/app/social/` — Reddit sentiment, Fed/SEC official statements, hawkish/dovish classification
 - `src/app/statistics/` — Sector rotation, market breadth, cross-asset correlations, risk indicators
 - `src/app/strategy/` — Backtesting engine, threshold optimization, strategy proposals
-- `src/app/scheduler/` — Daily runner, HTML report publishing (GitHub Pages), Telegram delivery
+- `src/app/scheduler/` — Daily runner, scheduled pre/post-market runs, HTML report publishing (GitHub Pages), Telegram delivery
 
 ### CLI Commands
 - `uv run python -m app.etf scan|drawdown|signals|active|stats|universe|enter|close`
@@ -57,11 +57,19 @@
 - `uv run python -m app.social reddit|officials|summary`
 - `uv run python -m app.statistics sectors|breadth|risk|correlations|dashboard`
 - `uv run python -m app.strategy backtest|optimize|proposals|compare|history`
-- `uv run python -m app.scheduler daily|test-run|publish|status`
+- `uv run python -m app.scheduler daily|test-run|publish|pre-market|post-market|status`
 
 ### Agents & Skills
-- `.claude/agents/` — chief-analyst, drawdown-monitor, market-analyst, macro-analyst, sec-analyst, swing-screener, news-analyst, geopolitical-analyst, social-analyst, statistics-analyst, strategy-analyst
-- `.claude/skills/` — unified-report, analyze-etf, scan-opportunities, market-report
+- `.claude/agents/` — chief-analyst, drawdown-monitor, market-analyst, macro-analyst, sec-analyst, swing-screener, news-analyst, geopolitical-analyst, social-analyst, statistics-analyst, strategy-analyst, strategy-researcher
+- `.claude/skills/` — unified-report, team-report, analyze-etf, scan-opportunities, market-report
+
+### Agent Teams (Experimental)
+- Requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in `.claude/settings.json` (already enabled)
+- `/team-report` — parallel daily report: chief-analyst spawns 8 domain teammates, all run simultaneously
+- `/unified-report` — sequential fallback: chief-analyst runs all modules one by one
+- All domain analysts are team-aware: they broadcast key findings using `[DOMAIN] METRIC: value (assessment)` format
+- In-process mode only (Windows/VS Code) — use Shift+Up/Down to navigate teammates
+- Higher token usage than solo mode, but significantly faster wall-clock time
 
 ### Data & State
 - Signal lifecycle: WATCH → ALERT → SIGNAL → ACTIVE → TARGET
@@ -88,6 +96,16 @@
 - Processes one command at a time; rejects concurrent with "still working" message
 - Auto-start via Windows Scheduled Task (see plan file for setup script)
 
+## Scheduled Runs (Windows Task Scheduler)
+- **Pre-market** (7:00 AM ET, weekdays): data pipeline + publish HTML + Claude agent analysis (~1 hour) + Telegram
+- **Post-market** (4:30 PM ET, weekdays): data pipeline + publish HTML + Claude agent analysis (~1 hour) + Telegram
+- Pre-market focuses on: overnight developments, entry signal assessment, strategy research, actionable price levels
+- Post-market focuses on: daily review, position P&L, signal state changes, strategy deep-dive, overnight positioning
+- Setup (run as Administrator): `powershell -ExecutionPolicy Bypass -File scripts\setup-scheduled-tasks.ps1`
+- Remove tasks: `powershell -ExecutionPolicy Bypass -File scripts\setup-scheduled-tasks.ps1 -Remove`
+- Logs stored in `data/logs/` (gitignored)
+- Manual test: `uv run python -m app.scheduler pre-market` or `post-market`
+
 ## Environment Variables
 - `TELEGRAM_BOT_TOKEN` — Telegram bot token (required for notifications)
 - `TELEGRAM_CHAT_ID` — Telegram chat ID (required for notifications)
@@ -95,6 +113,10 @@
 - `SEC_EDGAR_EMAIL` — Email for SEC EDGAR User-Agent (optional)
 - `REDDIT_CLIENT_ID` — Reddit OAuth client ID (optional, for social module)
 - `REDDIT_CLIENT_SECRET` — Reddit OAuth client secret (optional, for social module)
+- `CLAUDE_EXECUTABLE` — Path to Claude CLI (auto-discovered if on PATH)
+- `CLAUDE_ANALYSIS_TIMEOUT` — Seconds for Claude agent analysis (default: 3600)
+- `UV_EXECUTABLE` — Path to uv (default: `C:\Users\texcu\.local\bin\uv.exe`)
+- `SCHEDULER_PROJECT_DIR` — Override project directory path
 
 ## Token Discipline
 - IMPORTANT: Use subagents for any exploration that reads more than 3 files — keep main context clean

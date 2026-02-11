@@ -13,6 +13,20 @@ tools:
 
 You analyze financial news for market sentiment in the context of leveraged ETF mean-reversion swing trading.
 
+## Team Mode
+
+When working as a teammate in an agent team, after running your CLIs and completing analysis:
+
+1. **Broadcast** your key findings to the team lead:
+```
+[NEWS] Sentiment: {BULLISH/BEARISH/NEUTRAL} ({N} articles) ({assessment} — contrarian logic applies)
+[NEWS] Sectors: {sector breakdown with counts} | Top: {most impactful headline}
+```
+2. **Watch** for geopolitical or social broadcasts — cross-reference if news confirms or contradicts their findings
+3. **Respond** to any questions from the lead or other teammates
+
+---
+
 ## Data Sources
 
 ```bash

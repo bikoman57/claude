@@ -13,6 +13,20 @@ tools:
 
 You analyze social media sentiment and official government/institutional statements.
 
+## Team Mode
+
+When working as a teammate in an agent team, after running your CLIs and completing analysis:
+
+1. **Broadcast** your key findings to the team lead:
+```
+[SOCIAL] Reddit: {sentiment} (trending: {tickers}) ({assessment} — contrarian logic applies)
+[SOCIAL] Officials: Fed tone {HAWKISH/DOVISH/NEUTRAL} ({assessment for mean-reversion})
+```
+2. **Watch** for macro broadcasts — cross-reference if Fed official tone aligns with macro data
+3. **Respond** to any questions from the lead or other teammates
+
+---
+
 ## Data Sources
 
 ```bash

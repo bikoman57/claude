@@ -25,182 +25,319 @@ from app.etf.confidence import (
 from app.scheduler.runner import SchedulerRun
 
 _CSS = """\
+/* === Design tokens === */
+:root {
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #21262d;
+  --border-primary: #30363d;
+  --border-hover: #58a6ff;
+  --text-primary: #e6edf3;
+  --text-secondary: #c9d1d9;
+  --text-muted: #8b949e;
+  --accent: #58a6ff;
+  --success: #1a7f37;
+  --success-bright: #3fb950;
+  --success-bg: #0d2818;
+  --warning: #7d5600;
+  --warning-bright: #d29922;
+  --danger: #da3633;
+  --danger-bright: #f85149;
+  --danger-bg: #2d1214;
+  --info: #1f6feb;
+  --purple: #a371f7;
+  --neutral: #484f58;
+  --text-xs: 0.75em;
+  --text-sm: 0.85em;
+  --text-base: 1em;
+  --text-lg: 1.15em;
+  --text-xl: 1.35em;
+  --text-2xl: 1.5em;
+  --text-3xl: 1.8em;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+}
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   max-width: 1200px; margin: 0 auto; padding: 24px;
-  background: #0d1117; color: #c9d1d9; line-height: 1.6;
+  background: var(--bg-primary); color: var(--text-secondary); line-height: 1.6;
 }
-h1 { color: #e6edf3; font-size: 1.5em; font-weight: 600; }
-h2 { color: #e6edf3; margin-bottom: 12px; font-size: 1.1em; font-weight: 600;
-     text-transform: uppercase; letter-spacing: 0.05em; }
+h1 { color: var(--text-primary); font-size: var(--text-2xl); font-weight: 600; }
+h2 { color: var(--text-primary); margin-bottom: 12px; font-size: 1.1em;
+     font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* Skip navigation */
+.skip-nav { position: absolute; left: -9999px; top: auto;
+  width: 1px; height: 1px; overflow: hidden;
+  z-index: 1000; padding: 8px 16px;
+  background: var(--accent); color: var(--bg-primary);
+  font-weight: 600; border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  text-decoration: none; }
+.skip-nav:focus { position: fixed; left: 50%; transform: translateX(-50%);
+  top: 0; width: auto; height: auto; overflow: visible; }
+
+/* Utility classes */
+.mt-8 { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.text-muted { color: var(--text-muted); }
+
+/* Header */
 .header { display: flex; align-items: center; justify-content: space-between;
-          border-bottom: 1px solid #30363d; padding-bottom: 16px;
+          border-bottom: 1px solid var(--border-primary); padding-bottom: 16px;
           margin-bottom: 24px; flex-wrap: wrap; gap: 8px; }
 .header-status { font-size: 0.9em; }
 
 /* Executive summary */
-.exec-summary { background: #161b22; border: 1px solid #30363d;
-  border-left: 4px solid #58a6ff; border-radius: 8px; padding: 20px;
+.exec-summary { background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-left: 4px solid var(--accent); border-radius: var(--radius-md); padding: 20px;
   margin-bottom: 24px; }
 .exec-summary p { margin-bottom: 8px; }
-.exec-summary .headline { font-size: 1.15em; color: #e6edf3; font-weight: 600; }
-.exec-summary .detail { font-size: 0.95em; color: #8b949e; }
+.exec-summary .headline { font-size: var(--text-lg); color: var(--text-primary);
+  font-weight: 600; }
+.exec-summary .detail { font-size: 0.95em; color: var(--text-muted); }
 
 /* KPI strip */
 .kpi-strip { display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 12px; margin-bottom: 24px; }
-.kpi-card { background: #161b22; border: 1px solid #30363d;
-  border-radius: 8px; padding: 16px; border-top: 3px solid #30363d;
-  transition: transform 0.15s ease, box-shadow 0.15s ease; }
-.kpi-card:hover { transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-.kpi-label { font-size: 0.75em; color: #8b949e; text-transform: uppercase;
-  letter-spacing: 0.08em; margin-bottom: 4px; }
-.kpi-value { font-size: 1.8em; font-weight: 700; color: #e6edf3;
-  line-height: 1.2; }
-.kpi-sub { font-size: 0.85em; color: #8b949e; margin-top: 4px; }
-.kpi-bar-green { border-top-color: #238636; }
-.kpi-bar-yellow { border-top-color: #9e6a03; }
-.kpi-bar-red { border-top-color: #da3633; }
-.kpi-bar-gray { border-top-color: #484f58; }
+.kpi-card { background: var(--bg-secondary); border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md); padding: 16px;
+  border-top: 3px solid var(--border-primary); }
+.kpi-label { font-size: var(--text-xs); color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+.kpi-value { font-size: var(--text-3xl); font-weight: 700;
+  color: var(--text-primary); line-height: 1.2; }
+.kpi-sub { font-size: var(--text-sm); color: var(--text-muted); margin-top: 4px; }
+.kpi-bar-green { border-top-color: var(--success); }
+.kpi-bar-yellow { border-top-color: var(--warning); }
+.kpi-bar-red { border-top-color: var(--danger); }
+.kpi-bar-gray { border-top-color: var(--neutral); }
 
 /* Gauge bar */
-.gauge-track { height: 6px; background: #21262d; border-radius: 3px;
-  margin-top: 8px; overflow: hidden; }
-.gauge-fill { height: 100%; border-radius: 3px; transition: width 0.3s ease; }
-.gauge-fill-green { background: #238636; }
-.gauge-fill-yellow { background: #9e6a03; }
-.gauge-fill-red { background: #da3633; }
-.gauge-fill-gray { background: #484f58; }
+.gauge-track { height: 6px; background: var(--bg-tertiary);
+  border-radius: var(--radius-sm); margin-top: 8px; overflow: hidden; }
+.gauge-fill { height: 100%; border-radius: var(--radius-sm);
+  transition: width 0.3s ease; }
+.gauge-fill-green { background: var(--success); }
+.gauge-fill-yellow { background: var(--warning); }
+.gauge-fill-red { background: var(--danger); }
+.gauge-fill-gray { background: var(--neutral); }
 
-/* Cards */
-.card { background: #161b22; border: 1px solid #30363d; border-radius: 8px;
-  padding: 20px; margin-bottom: 24px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease; }
-.card:hover { transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+/* Cards — no hover transform (non-interactive, avoid false affordance) */
+.card { background: var(--bg-secondary); border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md); padding: 20px; margin-bottom: 24px; }
 
-/* Grid layouts */
-.grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+/* Grid layouts — golden ratio proportions */
+.grid-2col { display: grid; grid-template-columns: 1.618fr 1fr; gap: 24px; }
 
-/* Badges */
-.badge { display: inline-block; padding: 2px 10px; border-radius: 12px;
+/* Badges — WCAG AA contrast-safe colors */
+.badge { display: inline-block; padding: 2px 8px; border-radius: var(--radius-lg);
   font-size: 0.8em; font-weight: 600; letter-spacing: 0.03em; }
-.badge-green { background: #238636; color: #fff; }
-.badge-yellow { background: #9e6a03; color: #fff; }
-.badge-red { background: #da3633; color: #fff; }
-.badge-gray { background: #30363d; color: #8b949e; }
-.badge-blue { background: #1f6feb; color: #fff; }
+.badge-green { background: var(--success); color: #fff; }
+.badge-yellow { background: var(--warning); color: #fff; }
+.badge-red { background: var(--danger); color: #fff; }
+.badge-gray { background: var(--border-primary); color: var(--text-secondary); }
+.badge-blue { background: var(--info); color: #fff; }
 
 /* Tables */
 table { border-collapse: collapse; width: 100%; }
-th { text-align: left; padding: 10px 12px; color: #8b949e; font-weight: 600;
+th { text-align: left; padding: 8px 12px; color: var(--text-muted); font-weight: 600;
   font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em;
-  border-bottom: 2px solid #30363d; }
-td { padding: 10px 12px; border-bottom: 1px solid #21262d; }
+  border-bottom: 2px solid var(--border-primary); }
+td { padding: 8px 12px; border-bottom: 1px solid var(--bg-tertiary); }
 tbody tr:hover { background: #1c2128; }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
-.pct-up { color: #3fb950; }
-.pct-down { color: #f85149; }
+.pct-up { color: var(--success-bright); }
+.pct-down { color: var(--danger-bright); }
 
 /* Signal cards */
-.signal-card { background: #161b22; border: 1px solid #30363d;
-  border-radius: 8px; padding: 16px; margin-bottom: 12px;
-  border-left: 4px solid #30363d; }
-.signal-card-signal { border-left-color: #3fb950; }
-.signal-card-alert { border-left-color: #9e6a03; }
-.signal-card-active { border-left-color: #1f6feb; }
-.signal-card-watch { border-left-color: #484f58; }
-.signal-card-target { border-left-color: #a371f7; }
+.signal-card { background: var(--bg-secondary); border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md); padding: 16px; margin-bottom: 12px;
+  border-left: 4px solid var(--border-primary); }
+.signal-card-signal { border-left-color: var(--success-bright);
+  border-left-width: 6px; background: var(--success-bg);
+  box-shadow: 0 0 0 1px var(--success); padding: 20px; }
+.signal-card-signal .signal-ticker { font-size: var(--text-xl); }
+.signal-card-alert { border-left-color: var(--warning-bright); }
+.signal-card-active { border-left-color: var(--info); }
+.signal-card-watch { border-left-color: var(--neutral); }
+.signal-card-target { border-left-color: var(--purple); }
 .signal-header { display: flex; justify-content: space-between;
   align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
-.signal-ticker { font-size: 1.2em; font-weight: 700; color: #e6edf3; }
-.signal-details { font-size: 0.9em; color: #8b949e; }
+.signal-ticker { font-size: 1.2em; font-weight: 700; color: var(--text-primary); }
+.signal-details { font-size: 0.9em; color: var(--text-muted); }
 
-/* Confidence */
-.confidence-bar { display: flex; gap: 3px; margin-top: 6px; }
-.conf-dot { width: 12px; height: 12px; border-radius: 50%;
-  background: #21262d; }
-.conf-dot-favorable { background: #238636; }
-.conf-dot-unfavorable { background: #da3633; }
-.conf-dot-neutral { background: #484f58; }
+/* Confidence dots — with symbols for colorblind accessibility */
+.confidence-bar { display: flex; gap: 4px; margin-top: 8px; }
+.conf-dot { width: 16px; height: 16px; border-radius: 50%;
+  background: var(--bg-tertiary); display: flex; align-items: center;
+  justify-content: center; font-size: 9px; font-weight: 700; line-height: 1; }
+.conf-dot-favorable { background: var(--success); color: #fff; }
+.conf-dot-unfavorable { background: var(--danger); color: #fff; }
+.conf-dot-neutral { background: var(--neutral); color: var(--text-muted); }
 
 /* Factor table in details */
 .factor-table { width: 100%; margin-top: 8px; }
-.factor-table td { padding: 4px 8px; font-size: 0.85em;
-  border-bottom: 1px solid #21262d; }
-.factor-table .factor-name { color: #8b949e; }
+.factor-table td { padding: 4px 8px; font-size: var(--text-sm);
+  border-bottom: 1px solid var(--bg-tertiary); }
+.factor-table .factor-name { color: var(--text-muted); }
 
-/* Sentiment bar */
-.sentiment-bar { display: flex; height: 20px; border-radius: 4px;
+/* Sentiment bar — with patterns for colorblind accessibility */
+.sentiment-bar { display: flex; height: 24px; border-radius: var(--radius-sm);
   overflow: hidden; margin: 8px 0; }
-.sentiment-fill-bullish { background: #238636; }
-.sentiment-fill-bearish { background: #da3633; }
-.sentiment-fill-neutral { background: #484f58; }
-.sentiment-counts { display: flex; gap: 16px; font-size: 0.85em;
-  color: #8b949e; margin-top: 4px; }
-.sentiment-count-bullish { color: #3fb950; }
-.sentiment-count-bearish { color: #f85149; }
+.sentiment-fill-bullish { background: var(--success);
+  background-image: repeating-linear-gradient(
+    45deg, transparent, transparent 4px,
+    rgba(255,255,255,0.12) 4px, rgba(255,255,255,0.12) 8px); }
+.sentiment-fill-bearish { background: var(--danger);
+  background-image: repeating-linear-gradient(
+    -45deg, transparent, transparent 4px,
+    rgba(255,255,255,0.12) 4px, rgba(255,255,255,0.12) 8px); }
+.sentiment-fill-neutral { background: var(--neutral); }
+.sentiment-counts { display: flex; gap: 16px; font-size: var(--text-sm);
+  color: var(--text-muted); margin-top: 4px; }
+.sentiment-count-bullish { color: var(--success-bright); }
+.sentiment-count-bearish { color: var(--danger-bright); }
 
-/* Details/summary */
+/* Details/summary — with chevron indicator */
 details { margin-top: 8px; }
-summary { cursor: pointer; font-size: 0.85em; color: #58a6ff;
-  padding: 4px 0; }
+summary { cursor: pointer; font-size: var(--text-sm); color: var(--accent);
+  padding: 8px 0; min-height: 44px; display: flex; align-items: center;
+  gap: 8px; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary::before { content: "\25B6"; font-size: 0.65em;
+  transition: transform 0.15s ease; display: inline-block; }
+details[open] summary::before { transform: rotate(90deg); }
 summary:hover { text-decoration: underline; }
 details[open] summary { margin-bottom: 8px; }
 
 /* Sector badges */
-.sector-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.sector-badge { display: inline-block; padding: 2px 8px; border-radius: 10px;
-  font-size: 0.75em; background: #21262d; color: #8b949e; }
+.sector-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.sector-badge { display: inline-flex; align-items: center;
+  padding: 4px 12px; border-radius: var(--radius-lg);
+  font-size: var(--text-xs); background: var(--bg-tertiary);
+  color: var(--text-muted); min-height: 32px; }
 
 /* Indicators row */
 .ind-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
-.ind-item { display: flex; align-items: center; gap: 6px;
+.ind-item { display: flex; align-items: center; gap: 8px;
   font-size: 0.9em; }
-.ind-label { color: #8b949e; }
+.ind-label { color: var(--text-muted); }
 
 /* Module pills */
 .module-grid { display: flex; flex-wrap: wrap; gap: 8px; }
 .module-pill { display: inline-flex; align-items: center; gap: 4px;
-  padding: 4px 12px; border-radius: 16px; font-size: 0.8em;
-  font-weight: 500; }
-.module-pill-ok { background: #0d2818; color: #3fb950;
-  border: 1px solid #238636; }
-.module-pill-fail { background: #2d1214; color: #f85149;
-  border: 1px solid #da3633; }
-.pill-dur { color: #8b949e; font-size: 0.85em; }
+  padding: 8px 16px; border-radius: var(--radius-full); font-size: 0.8em;
+  font-weight: 500; min-height: 36px; }
+.module-pill-ok { background: var(--success-bg); color: var(--success-bright);
+  border: 1px solid var(--success); }
+.module-pill-fail { background: var(--danger-bg); color: var(--danger-bright);
+  border: 1px solid var(--danger); }
+.pill-dur { color: var(--text-muted); font-size: var(--text-sm); }
 
 /* Footer */
 .footer { margin-top: 32px; padding-top: 16px;
-  border-top: 1px solid #30363d; font-size: 0.85em; color: #8b949e;
-  display: flex; justify-content: space-between; flex-wrap: wrap;
-  gap: 8px; }
-a { color: #58a6ff; text-decoration: none; }
+  border-top: 1px solid var(--border-primary); font-size: var(--text-sm);
+  color: var(--text-muted); display: flex; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px; }
+a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
-.ok { color: #3fb950; }
-.fail { color: #f85149; }
+.ok { color: var(--success-bright); }
+.fail { color: var(--danger-bright); }
 
 /* Index page */
 .report-list { display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 12px; margin-top: 16px; }
-.report-card { background: #161b22; border: 1px solid #30363d;
-  border-radius: 8px; padding: 16px; text-align: center;
+.report-card { background: var(--bg-secondary); border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md); padding: 16px; text-align: center;
+  position: relative;
   transition: transform 0.15s ease, border-color 0.15s ease; }
 .report-card:hover { transform: translateY(-2px);
-  border-color: #58a6ff; }
+  border-color: var(--border-hover); }
 .report-card a { font-size: 1.1em; font-weight: 600; }
-.badge-latest { background: #1f6feb; color: #fff; font-size: 0.7em;
-  padding: 2px 8px; border-radius: 8px; margin-left: 6px; }
+.report-card a::after { content: ''; position: absolute;
+  inset: 0; z-index: 1; }
+.badge-latest { background: var(--info); color: #fff; font-size: 0.7em;
+  padding: 2px 8px; border-radius: var(--radius-md); margin-left: 8px; }
 
-@media (max-width: 768px) {
+/* Focus-visible for keyboard navigation */
+a:focus-visible, summary:focus-visible, .report-card:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Tablet breakpoint */
+@media (max-width: 1024px) {
   .grid-2col { grid-template-columns: 1fr; }
+  table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+
+/* Mobile breakpoint */
+@media (max-width: 768px) {
   .header { flex-direction: column; align-items: flex-start; }
   .kpi-strip { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
   .kpi-value { font-size: 1.4em; }
+}
+
+/* Accessibility: respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Light mode support */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f6f8fa;
+    --bg-tertiary: #e1e4e8;
+    --border-primary: #d0d7de;
+    --border-hover: #0969da;
+    --text-primary: #1f2328;
+    --text-secondary: #1f2328;
+    --text-muted: #656d76;
+    --accent: #0969da;
+    --success: #1a7f37;
+    --success-bright: #1a7f37;
+    --success-bg: #dafbe1;
+    --warning: #9a6700;
+    --warning-bright: #9a6700;
+    --danger: #cf222e;
+    --danger-bright: #cf222e;
+    --danger-bg: #ffebe9;
+    --info: #0969da;
+    --purple: #8250df;
+    --neutral: #6e7781;
+  }
+  tbody tr:hover { background: #f0f3f6; }
+  .badge-gray { color: var(--text-muted); }
+}
+
+/* Print stylesheet */
+@media print {
+  body { background: #fff; color: #000; max-width: 100%;
+    font-size: 11pt; }
+  .card, .signal-card, .kpi-card, .exec-summary, .report-card {
+    background: #fff; border-color: #ccc; box-shadow: none;
+    break-inside: avoid; }
+  .skip-nav { display: none; }
+  details[open] > summary { display: none; }
+  details > *:not(summary) { display: block !important; }
+  details:not([open]) { display: block; }
+  details:not([open]) > *:not(summary) { display: block !important; }
+  details:not([open]) > summary { display: none; }
+  .badge { border: 1px solid currentColor; }
+  a { color: #000; text-decoration: underline; }
+  .footer { page-break-before: auto; }
+  .report-card:hover { transform: none; }
 }
 """
 
@@ -234,6 +371,22 @@ _BADGE_MAP: dict[str, str] = {
     "TARGET": "badge-green",
 }
 
+# Confidence uses separate color mapping: HIGH=good, LOW=bad for trades
+_CONFIDENCE_BADGE_MAP: dict[str, str] = {
+    "HIGH": "badge-green",
+    "MEDIUM": "badge-yellow",
+    "LOW": "badge-red",
+}
+
+# Signal state display priority: actionable states first
+_STATE_PRIORITY: dict[str, int] = {
+    "SIGNAL": 0,
+    "ACTIVE": 1,
+    "ALERT": 2,
+    "TARGET": 3,
+    "WATCH": 4,
+}
+
 _KPI_BAR_MAP: dict[str, str] = {
     "badge-green": "kpi-bar-green",
     "badge-yellow": "kpi-bar-yellow",
@@ -254,6 +407,12 @@ _GAUGE_FILL_MAP: dict[str, str] = {
 def _badge(level: str) -> str:
     """Return an HTML badge span for a risk/sentiment level."""
     cls = _BADGE_MAP.get(level.upper(), "badge-gray")
+    return f'<span class="badge {cls}">{html.escape(level)}</span>'
+
+
+def _confidence_badge(level: str) -> str:
+    """Return a badge for confidence level (HIGH=green, LOW=red)."""
+    cls = _CONFIDENCE_BADGE_MAP.get(level.upper(), "badge-gray")
     return f'<span class="badge {cls}">{html.escape(level)}</span>'
 
 
@@ -301,27 +460,40 @@ def _fmt_price(value: object) -> str:
     return f"${value:,.2f}"
 
 
-def _gauge_bar(pct: float, level: str) -> str:
+def _gauge_bar(pct: float, level: str, label: str = "") -> str:
     """Render a horizontal gauge bar filled to pct (0-100)."""
     clamped = max(0.0, min(100.0, pct))
     fill_cls = _gauge_fill_class(level)
+    aria = (
+        f' role="progressbar" aria-valuenow="{clamped:.0f}"'
+        ' aria-valuemin="0" aria-valuemax="100"'
+    )
+    if label:
+        aria += f' aria-label="{html.escape(label)}"'
     return (
-        '<div class="gauge-track">'
+        f'<div class="gauge-track"{aria}>'
         f'<div class="gauge-fill {fill_cls}" style="width:{clamped:.0f}%">'
         "</div></div>"
     )
 
 
-def _html_page(title: str, body: str) -> str:
+def _html_page(title: str, body: str, *, description: str = "") -> str:
     """Wrap body content in a full HTML5 page with inline CSS."""
+    desc_tag = ""
+    if description:
+        desc_tag = f'<meta name="description" content="{html.escape(description)}">\n'
     return (
         "<!DOCTYPE html>\n"
-        '<html lang="en">\n<head>\n'
+        '<html lang="en" dir="ltr">\n<head>\n'
         '<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+        '<meta name="theme-color" content="#0d1117">\n'
+        f"{desc_tag}"
         f"<title>{html.escape(title)}</title>\n"
         f"<style>{_CSS}</style>\n"
-        f"</head>\n<body>\n{body}\n</body>\n</html>\n"
+        "</head>\n<body>\n"
+        '<a href="#main-content" class="skip-nav">Skip to main content</a>\n'
+        f"{body}\n</body>\n</html>\n"
     )
 
 
@@ -400,8 +572,15 @@ def _compute_signal_confidence(
     return compute_confidence(factors)
 
 
+_DOT_SYMBOLS: dict[FactorAssessment, str] = {
+    FactorAssessment.FAVORABLE: "+",
+    FactorAssessment.UNFAVORABLE: "-",
+    FactorAssessment.NEUTRAL: "~",
+}
+
+
 def _render_confidence_dots(score: ConfidenceScore) -> str:
-    """Render confidence as colored dots."""
+    """Render confidence as colored dots with symbols for accessibility."""
     dots: list[str] = []
     for f in score.factors:
         if f.assessment == FactorAssessment.FAVORABLE:
@@ -411,8 +590,11 @@ def _render_confidence_dots(score: ConfidenceScore) -> str:
         else:
             cls = "conf-dot-neutral"
         title = f"{html.escape(f.name)}: {html.escape(f.reason)}"
+        symbol = _DOT_SYMBOLS.get(f.assessment, "~")
+        aria_label = f"{html.escape(f.name)}: {html.escape(str(f.assessment.name))}"
         dots.append(
-            f'<span class="conf-dot {cls}" title="{title}"></span>',
+            f'<span class="conf-dot {cls}" title="{title}" '
+            f'role="img" aria-label="{aria_label}">{symbol}</span>',
         )
     return f'<div class="confidence-bar">{"".join(dots)}</div>'
 
@@ -452,7 +634,7 @@ def _kpi_card(
     if sub:
         parts.append(f'<div class="kpi-sub">{sub}</div>')
     if gauge_pct is not None:
-        parts.append(_gauge_bar(gauge_pct, level))
+        parts.append(_gauge_bar(gauge_pct, level, label=f"{label} gauge"))
     parts.append("</div>")
     return "\n".join(parts)
 
@@ -486,26 +668,29 @@ def _section_kpi_strip(outputs: dict[str, str]) -> str:
     rates = _parse_output(outputs.get("macro.rates", ""))
     if isinstance(macro, dict):
         fed = "N/A"
-        rate_sub = ""
+        rate_display = "--"
+        rate_sub_parts: list[str] = []
         if isinstance(rates, dict):
             fed = str(rates.get("trajectory", "N/A"))
             current_rate = rates.get("current_rate", None)
             if isinstance(current_rate, (int, float)):
-                rate_sub = f"{current_rate:.2f}%"
+                rate_display = f"{current_rate:.2f}%"
+            rate_sub_parts.append(_badge(fed))
         elif isinstance(macro, dict):
             fed_rate = macro.get("fed_funds_rate", None)
             if isinstance(fed_rate, (int, float)):
-                rate_sub = f"{fed_rate:.2f}%"
-        cards.append(_kpi_card("Fed", _badge(fed), fed, rate_sub))
+                rate_display = f"{fed_rate:.2f}%"
+        cards.append(
+            _kpi_card("Fed", rate_display, fed, " ".join(rate_sub_parts)),
+        )
 
     # Yield curve — spread scale -2 to +2
     yields = _parse_output(outputs.get("macro.yields", ""))
     if isinstance(yields, dict):
         curve = str(yields.get("curve_status", "N/A"))
         spread = yields.get("spread_3m_10y", None)
-        spread_sub = (
-            f"Spread: {spread:+.2f}%" if isinstance(spread, (int, float)) else ""
-        )
+        spread_display = f"{spread:+.2f}%" if isinstance(spread, (int, float)) else "--"
+        spread_sub = _badge(curve)
         gauge = (
             ((float(spread) + 2.0) / 4.0) * 100.0
             if isinstance(spread, (int, float))
@@ -514,7 +699,7 @@ def _section_kpi_strip(outputs: dict[str, str]) -> str:
         cards.append(
             _kpi_card(
                 "Yield Curve",
-                _badge(curve),
+                spread_display,
                 curve,
                 spread_sub,
                 gauge_pct=gauge,
@@ -526,12 +711,13 @@ def _section_kpi_strip(outputs: dict[str, str]) -> str:
     if isinstance(geo, dict):
         risk = str(geo.get("risk_level", "N/A"))
         events = geo.get("total_events", 0)
+        events_display = html.escape(str(events))
         cards.append(
             _kpi_card(
                 "Geopolitical",
-                _badge(risk),
+                events_display,
                 risk,
-                f"{html.escape(str(events))} events",
+                f"{_badge(risk)} {html.escape(str(events))} events",
             )
         )
 
@@ -540,12 +726,13 @@ def _section_kpi_strip(outputs: dict[str, str]) -> str:
     if isinstance(news, dict):
         sentiment = str(news.get("sentiment", "N/A"))
         articles = news.get("total_articles", 0)
+        articles_display = html.escape(str(articles))
         cards.append(
             _kpi_card(
                 "News",
-                _badge(sentiment),
+                articles_display,
                 sentiment,
-                f"{html.escape(str(articles))} articles",
+                f"{_badge(sentiment)} {html.escape(str(articles))} articles",
             )
         )
 
@@ -642,85 +829,128 @@ def _section_executive_summary(
 # --- ETF signal cards ---
 
 
+def _render_signal_card(
+    outputs: dict[str, str],
+    sig: dict[str, object],
+) -> str:
+    """Render a single ETF signal card with confidence drill-down."""
+    ticker = html.escape(str(sig.get("leveraged_ticker", "?")))
+    underlying = html.escape(str(sig.get("underlying_ticker", "")))
+    state = str(sig.get("state", "?"))
+    state_lower = state.lower()
+    dd = sig.get("underlying_drawdown_pct", 0)
+    dd_str = _fmt_pct(dd)
+    ath = sig.get("underlying_ath")
+    current = sig.get("underlying_current")
+    pl = sig.get("current_pl_pct")
+    entry_price = sig.get("leveraged_entry_price")
+    target_pct = sig.get("profit_target_pct", 0.10)
+
+    # Compute confidence
+    confidence = _compute_signal_confidence(outputs, sig)
+
+    # Card wrapper
+    card_cls = f"signal-card signal-card-{state_lower}"
+    parts: list[str] = [f'<div class="{card_cls}">']
+
+    # Header row: ticker, state, confidence (uses context-aware badge)
+    parts.append('<div class="signal-header">')
+    parts.append(
+        f'<span><span class="signal-ticker">{ticker}</span> '
+        f"({underlying}) &mdash; {_badge(state)}</span>",
+    )
+    conf_badge = _confidence_badge(str(confidence.level))
+    parts.append(
+        f"<span>Confidence: {conf_badge} "
+        f"({confidence.favorable_count}/{confidence.total_factors})"
+        "</span>",
+    )
+    parts.append("</div>")
+
+    # Details row
+    detail_parts = [f"Drawdown: {html.escape(dd_str)}"]
+    if isinstance(ath, (int, float)):
+        detail_parts.append(f"ATH: {_fmt_price(ath)}")
+    if isinstance(current, (int, float)):
+        detail_parts.append(f"Current: {_fmt_price(current)}")
+    if isinstance(entry_price, (int, float)):
+        detail_parts.append(f"Entry: {_fmt_price(entry_price)}")
+    if isinstance(target_pct, (int, float)):
+        detail_parts.append(f"Target: {_fmt_pct(target_pct)}")
+    if isinstance(pl, (int, float)):
+        pl_cls = _pct_class(pl)
+        detail_parts.append(
+            f'P&L: <span class="{pl_cls}">{_fmt_pct(pl, signed=True)}</span>',
+        )
+
+    parts.append(
+        '<div class="signal-details">' + " &bull; ".join(detail_parts) + "</div>",
+    )
+
+    # Confidence dots
+    parts.append(_render_confidence_dots(confidence))
+
+    # Drill-down: factor breakdown
+    parts.append("<details>")
+    parts.append("<summary>View 9-factor analysis</summary>")
+    parts.append(_render_factor_table(confidence))
+    parts.append("</details>")
+
+    parts.append("</div>")
+    return "\n".join(parts)
+
+
 def _section_etf_signals(
     outputs: dict[str, str],
     signals: list[dict[str, object]],
 ) -> str:
-    """Render ETF signals as individual cards with confidence drill-down."""
+    """Render ETF signals sorted by priority with progressive disclosure."""
     if not signals:
         return ""
-    cards: list[str] = []
-    for sig in signals[:10]:
+
+    # Sort signals: SIGNAL first, then ACTIVE, ALERT, TARGET, WATCH
+    sorted_signals = sorted(
+        signals[:10],
+        key=lambda s: _STATE_PRIORITY.get(str(s.get("state", "")), 99),
+    )
+
+    # Group cards by state for progressive disclosure
+    actionable: list[str] = []  # SIGNAL, ACTIVE
+    approaching: list[str] = []  # ALERT
+    monitoring: list[str] = []  # WATCH, TARGET
+
+    for sig in sorted_signals:
         if not isinstance(sig, dict):
             continue
-        ticker = html.escape(str(sig.get("leveraged_ticker", "?")))
-        underlying = html.escape(str(sig.get("underlying_ticker", "")))
-        state = str(sig.get("state", "?"))
-        state_lower = state.lower()
-        dd = sig.get("underlying_drawdown_pct", 0)
-        dd_str = _fmt_pct(dd)
-        ath = sig.get("underlying_ath", None)
-        current = sig.get("underlying_current", None)
-        pl = sig.get("current_pl_pct", None)
-        entry_price = sig.get("leveraged_entry_price", None)
-        target_pct = sig.get("profit_target_pct", 0.10)
+        state = str(sig.get("state", ""))
+        card = _render_signal_card(outputs, sig)
+        if state in ("SIGNAL", "ACTIVE"):
+            actionable.append(card)
+        elif state == "ALERT":
+            approaching.append(card)
+        else:
+            monitoring.append(card)
 
-        # Compute confidence
-        confidence = _compute_signal_confidence(outputs, sig)
+    result_parts: list[str] = []
+    result_parts.append("<h2>Entry Signals &amp; Active Positions</h2>\n")
 
-        # Card wrapper
-        card_cls = f"signal-card signal-card-{state_lower}"
-        parts: list[str] = [f'<div class="{card_cls}">']
+    # Actionable cards always fully visible
+    result_parts.extend(actionable)
 
-        # Header row: ticker, state, confidence
-        parts.append('<div class="signal-header">')
-        parts.append(
-            f'<span><span class="signal-ticker">{ticker}</span> '
-            f"({underlying}) &mdash; {_badge(state)}</span>",
+    # Alert cards visible but grouped
+    if approaching:
+        result_parts.extend(approaching)
+
+    # Watch/monitoring cards collapsed by default
+    if monitoring:
+        result_parts.append(
+            f"<details>\n<summary>{len(monitoring)} ETF(s) in monitoring state"
+            "</summary>\n",
         )
-        conf_badge = _badge(str(confidence.level))
-        parts.append(
-            f"<span>Confidence: {conf_badge} "
-            f"({confidence.favorable_count}/{confidence.total_factors})"
-            "</span>",
-        )
-        parts.append("</div>")
+        result_parts.extend(monitoring)
+        result_parts.append("</details>\n")
 
-        # Details row
-        detail_parts = [f"Drawdown: {html.escape(dd_str)}"]
-        if isinstance(ath, (int, float)):
-            detail_parts.append(f"ATH: {_fmt_price(ath)}")
-        if isinstance(current, (int, float)):
-            detail_parts.append(f"Current: {_fmt_price(current)}")
-        if isinstance(entry_price, (int, float)):
-            detail_parts.append(f"Entry: {_fmt_price(entry_price)}")
-        if isinstance(target_pct, (int, float)):
-            detail_parts.append(f"Target: {_fmt_pct(target_pct)}")
-        if isinstance(pl, (int, float)):
-            pl_cls = _pct_class(pl)
-            detail_parts.append(
-                f'P&L: <span class="{pl_cls}">{_fmt_pct(pl, signed=True)}</span>',
-            )
-
-        parts.append(
-            '<div class="signal-details">' + " &bull; ".join(detail_parts) + "</div>",
-        )
-
-        # Confidence dots
-        parts.append(_render_confidence_dots(confidence))
-
-        # Drill-down: factor breakdown
-        parts.append("<details>")
-        parts.append("<summary>View 9-factor analysis</summary>")
-        parts.append(_render_factor_table(confidence))
-        parts.append("</details>")
-
-        parts.append("</div>")
-        cards.append("\n".join(parts))
-
-    if not cards:
-        return ""
-    return "<h2>Entry Signals &amp; Active Positions</h2>\n" + "\n".join(cards) + "\n"
+    return "\n".join(result_parts)
 
 
 # --- Sentiment section ---
@@ -752,7 +982,9 @@ def _section_sentiment(outputs: dict[str, str]) -> str:
 
         parts.append(f"<p>News Sentiment: {_badge(sentiment)}</p>")
         parts.append(
-            '<div class="sentiment-bar">'
+            '<div class="sentiment-bar" role="img" '
+            f'aria-label="Sentiment: {bullish} bullish, '
+            f'{bearish} bearish, {neutral} neutral">'
             f'<div class="sentiment-fill-bullish" style="width:{b_pct:.1f}%"></div>'
             f'<div class="sentiment-fill-bearish" style="width:{r_pct:.1f}%"></div>'
             f'<div class="sentiment-fill-neutral" style="width:{n_pct:.1f}%"></div>'
@@ -766,15 +998,20 @@ def _section_sentiment(outputs: dict[str, str]) -> str:
             "</div>",
         )
 
-        # Headlines drill-down
+        # Headlines drill-down (deduplicated)
         headlines = news.get("top_headlines", [])
         if isinstance(headlines, list) and headlines:
             parts.append("<details>")
             parts.append("<summary>Top headlines</summary>")
             parts.append("<ul>")
+            seen_titles: set[str] = set()
             for h in headlines[:8]:
                 if isinstance(h, dict):
-                    title = html.escape(str(h.get("title", "")))
+                    raw_title = str(h.get("title", ""))
+                    if raw_title in seen_titles:
+                        continue
+                    seen_titles.add(raw_title)
+                    title = html.escape(raw_title)
                     h_sent = str(h.get("sentiment", ""))
                     h_badge = _badge(h_sent) if h_sent else ""
                     parts.append(f"<li>{title} {h_badge}</li>")
@@ -807,13 +1044,13 @@ def _section_sentiment(outputs: dict[str, str]) -> str:
             policy = str(officials.get("policy_direction", ""))
             stmts = officials.get("total_statements", 0)
             parts.append(
-                f'<p style="margin-top:12px">Officials Tone: {_badge(tone)}',
+                f'<p class="mt-12">Officials Tone: {_badge(tone)}',
             )
             if policy and policy != "N/A":
                 parts.append(f" &nbsp; Policy: {_badge(policy)}")
             if isinstance(stmts, (int, float)) and stmts > 0:
                 parts.append(
-                    f' <span style="color:#8b949e">({int(stmts)} statements)</span>',
+                    f' <span class="text-muted">({int(stmts)} statements)</span>',
                 )
             parts.append("</p>")
 
@@ -873,7 +1110,7 @@ def _section_market_conditions(outputs: dict[str, str]) -> str:
             if isinstance(decoupled, list) and decoupled:
                 pairs = ", ".join(html.escape(str(p)) for p in decoupled[:4])
                 parts.append(
-                    f'<p style="margin-top:8px">'
+                    f'<p class="mt-8">'
                     f'<span class="badge badge-yellow">DECOUPLING</span> '
                     f"{pairs}</p>",
                 )
@@ -923,8 +1160,9 @@ def _section_strategy(outputs: dict[str, str]) -> str:
         "<h2>Strategy Backtest Results</h2>\n"
         '<div class="card">\n<table>\n'
         "<thead><tr>"
-        "<th>ETF</th><th>Proposal</th>"
-        "<th>Sharpe</th><th>Win Rate</th><th>Return</th>"
+        '<th scope="col">ETF</th><th scope="col">Proposal</th>'
+        '<th scope="col">Sharpe</th><th scope="col">Win Rate</th>'
+        '<th scope="col">Return</th>'
         "</tr></thead>\n<tbody>\n" + "\n".join(rows) + "\n</tbody></table>\n</div>\n"
     )
 
@@ -945,10 +1183,18 @@ def _section_module_status(run: SchedulerRun) -> str:
             f"{icon} {name} "
             f'<span class="pill-dur">{dur}</span></span>',
         )
+    # Collapsed by default — operational detail, not trading-relevant
+    status_cls = "badge-green" if run.failed == 0 else "badge-red"
     return (
-        "<h2>Module Status</h2>\n"
+        "<details>\n"
+        "<summary>"
+        '<h2 style="display:inline">Module Status</h2> '
+        f'<span class="badge {status_cls}">'
+        f"{run.succeeded}/{run.total_modules}</span>"
+        "</summary>\n"
         '<div class="card">\n'
         '<div class="module-grid">\n' + "\n".join(pills) + "\n</div>\n</div>\n"
+        "</details>\n"
     )
 
 
@@ -983,51 +1229,54 @@ def build_html_report(
     strategy = _section_strategy(outputs)
     modules = _section_module_status(run)
 
-    # Header
+    # Header — semantic <header> element
     header = (
-        '<div class="header">\n'
+        '<header class="header">\n'
         "<h1>Daily Swing Trading Dashboard &mdash; "
         f"{html.escape(report_date)}</h1>\n"
         '<div class="header-status">'
         f'<span class="ok">{run.succeeded}</span>/{run.total_modules} OK'
         f' &nbsp; <span class="fail">{run.failed}</span> failed'
-        "</div>\n</div>\n"
+        "</div>\n</header>\n"
     )
 
-    # Mid-section: two-column grid for sentiment + market conditions
+    # Mid-section: golden-ratio grid (conditions first for F-pattern scan)
     mid = ""
     if sentiment or conditions:
         if sentiment and conditions:
             mid = (
                 '<div class="grid-2col">\n'
-                f"<div>{sentiment}</div>\n"
                 f"<div>{conditions}</div>\n"
+                f"<div>{sentiment}</div>\n"
                 "</div>\n"
             )
         else:
-            mid = sentiment + conditions
+            mid = conditions + sentiment
 
     footer = (
-        '<div class="footer">\n'
+        '<footer class="footer">\n'
         f"<span>Generated {html.escape(report_date)} &mdash; "
         "not financial advice.</span>\n"
         '<span><a href="../index.html">All Reports</a></span>\n'
-        "</div>\n"
+        "</footer>\n"
     )
 
     body_parts = [
         header,
+        '<main id="main-content">\n',
         exec_summary,
         kpi,
         signal_cards,
         mid,
         strategy,
         modules,
+        "</main>\n",
         footer,
     ]
     return _html_page(
         title=f"Dashboard {report_date}",
         body="\n".join(p for p in body_parts if p),
+        description=f"Daily leveraged ETF swing trading dashboard for {report_date}",
     )
 
 
@@ -1052,14 +1301,18 @@ def build_index_html(report_dates: list[str]) -> str:
     )
 
     body = (
-        '<div class="header">\n'
+        '<header class="header">\n'
         "<h1>Leveraged ETF Swing Trading Reports</h1>\n"
         f'<div class="header-status">'
         f"{len(report_dates)} report(s)</div>\n"
-        "</div>\n"
-        f"{list_html}\n"
-        '<div class="footer">\n'
+        "</header>\n"
+        f'<main id="main-content">\n{list_html}\n</main>\n'
+        '<footer class="footer">\n'
         '<span>Powered by <a href="https://github.com/bikoman57/claude">'
-        "fin-agents</a></span>\n</div>"
+        "fin-agents</a></span>\n</footer>"
     )
-    return _html_page(title="Trading Reports", body=body)
+    return _html_page(
+        title="Trading Reports",
+        body=body,
+        description="Leveraged ETF swing trading dashboard reports",
+    )
