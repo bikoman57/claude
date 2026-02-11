@@ -36,8 +36,7 @@ def cmd_rates() -> int:
     fred_key = os.environ.get("FRED_API_KEY", "")
     if not fred_key:
         print(  # noqa: T201
-            "FRED_API_KEY not set."
-            " Set it for Fed rate data.",
+            "FRED_API_KEY not set. Set it for Fed rate data.",
             file=sys.stderr,
         )
         return 1

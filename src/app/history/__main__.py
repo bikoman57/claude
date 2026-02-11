@@ -34,8 +34,7 @@ def cmd_weights() -> int:
     completed = get_completed_outcomes()
     if not completed:
         print(  # noqa: T201
-            "No completed trades yet."
-            " Weights need at least one closed trade.",
+            "No completed trades yet. Weights need at least one closed trade.",
         )
         return 0
     weights = calculate_weights(completed)
@@ -63,7 +62,10 @@ def cmd_summary() -> int:
         avg_pl = sum(pls) / len(pls) * 100 if pls else 0.0
         weights = calculate_weights(completed)
         insights = format_learning_insights(
-            weights, len(completed), wins, avg_pl,
+            weights,
+            len(completed),
+            wins,
+            avg_pl,
         )
         print(insights)  # noqa: T201
     else:

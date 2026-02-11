@@ -110,9 +110,7 @@ def build_geopolitical_summary(
     top_n: int = 5,
 ) -> GeopoliticalSummary:
     """Build an aggregated geopolitical risk summary."""
-    high_count = sum(
-        1 for e in events if e.impact == GeopoliticalImpact.HIGH
-    )
+    high_count = sum(1 for e in events if e.impact == GeopoliticalImpact.HIGH)
 
     if high_count >= 3:
         risk = "HIGH"
@@ -132,8 +130,11 @@ def build_geopolitical_summary(
     sorted_events = sorted(
         events,
         key=lambda e: (
-            0 if e.impact == GeopoliticalImpact.HIGH else 1
-            if e.impact == GeopoliticalImpact.MEDIUM else 2,
+            0
+            if e.impact == GeopoliticalImpact.HIGH
+            else 1
+            if e.impact == GeopoliticalImpact.MEDIUM
+            else 2,
             e.tone,
         ),
     )

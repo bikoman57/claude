@@ -77,13 +77,25 @@ def test_build_officials_summary_hawkish():
 
     stmts = [
         OfficialStatement(
-            "Federal Reserve", "", "Inflation above target", "", "HAWKISH",
+            "Federal Reserve",
+            "",
+            "Inflation above target",
+            "",
+            "HAWKISH",
         ),
         OfficialStatement(
-            "Federal Reserve", "", "Tighten policy", "", "HAWKISH",
+            "Federal Reserve",
+            "",
+            "Tighten policy",
+            "",
+            "HAWKISH",
         ),
         OfficialStatement(
-            "Federal Reserve", "", "Patience needed", "", "DOVISH",
+            "Federal Reserve",
+            "",
+            "Patience needed",
+            "",
+            "DOVISH",
         ),
     ]
     summary = build_officials_summary(stmts)

@@ -79,7 +79,8 @@ def fetch_fed_speeches() -> list[OfficialStatement]:
             link_el = entry.find(f"{_ATOM_NAMESPACE}link")
             link = link_el.get("href", "") if link_el is not None else ""
             summary = entry.findtext(
-                f"{_ATOM_NAMESPACE}summary", "",
+                f"{_ATOM_NAMESPACE}summary",
+                "",
             ).strip()
             tone = classify_fed_tone(f"{title} {summary}")
             statements.append(

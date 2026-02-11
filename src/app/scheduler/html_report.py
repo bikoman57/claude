@@ -429,11 +429,7 @@ def _render_factor_table(score: ConfidenceScore) -> str:
             f"<td>{badge}</td>"
             f"<td>{reason}</td></tr>",
         )
-    return (
-        '<table class="factor-table"><tbody>'
-        + "\n".join(rows)
-        + "</tbody></table>"
-    )
+    return '<table class="factor-table"><tbody>' + "\n".join(rows) + "</tbody></table>"
 
 
 # --- KPI card helpers ---
@@ -470,18 +466,21 @@ def _section_kpi_strip(outputs: dict[str, str]) -> str:
     if isinstance(macro, dict):
         vix_val = macro.get("vix", None)
         vix_regime = str(macro.get("vix_regime", "N/A"))
-        vix_display = (
-            f"{vix_val:.1f}" if isinstance(vix_val, (int, float)) else "N/A"
-        )
+        vix_display = f"{vix_val:.1f}" if isinstance(vix_val, (int, float)) else "N/A"
         gauge = (
             (float(vix_val) / 50.0) * 100.0
             if isinstance(vix_val, (int, float))
             else None
         )
-        cards.append(_kpi_card(
-            "VIX", vix_display, vix_regime, _badge(vix_regime),
-            gauge_pct=gauge,
-        ))
+        cards.append(
+            _kpi_card(
+                "VIX",
+                vix_display,
+                vix_regime,
+                _badge(vix_regime),
+                gauge_pct=gauge,
+            )
+        )
 
     # Fed trajectory — from macro.rates
     rates = _parse_output(outputs.get("macro.rates", ""))
@@ -505,51 +504,54 @@ def _section_kpi_strip(outputs: dict[str, str]) -> str:
         curve = str(yields.get("curve_status", "N/A"))
         spread = yields.get("spread_3m_10y", None)
         spread_sub = (
-            f"Spread: {spread:+.2f}%"
-            if isinstance(spread, (int, float))
-            else ""
+            f"Spread: {spread:+.2f}%" if isinstance(spread, (int, float)) else ""
         )
         gauge = (
             ((float(spread) + 2.0) / 4.0) * 100.0
             if isinstance(spread, (int, float))
             else None
         )
-        cards.append(_kpi_card(
-            "Yield Curve", _badge(curve), curve, spread_sub,
-            gauge_pct=gauge,
-        ))
+        cards.append(
+            _kpi_card(
+                "Yield Curve",
+                _badge(curve),
+                curve,
+                spread_sub,
+                gauge_pct=gauge,
+            )
+        )
 
     # Geopolitical
     geo = _parse_output(outputs.get("geopolitical.summary", ""))
     if isinstance(geo, dict):
         risk = str(geo.get("risk_level", "N/A"))
         events = geo.get("total_events", 0)
-        cards.append(_kpi_card(
-            "Geopolitical",
-            _badge(risk),
-            risk,
-            f"{html.escape(str(events))} events",
-        ))
+        cards.append(
+            _kpi_card(
+                "Geopolitical",
+                _badge(risk),
+                risk,
+                f"{html.escape(str(events))} events",
+            )
+        )
 
     # News sentiment — with article counts
     news = _parse_output(outputs.get("news.summary", ""))
     if isinstance(news, dict):
         sentiment = str(news.get("sentiment", "N/A"))
         articles = news.get("total_articles", 0)
-        cards.append(_kpi_card(
-            "News",
-            _badge(sentiment),
-            sentiment,
-            f"{html.escape(str(articles))} articles",
-        ))
+        cards.append(
+            _kpi_card(
+                "News",
+                _badge(sentiment),
+                sentiment,
+                f"{html.escape(str(articles))} articles",
+            )
+        )
 
     if not cards:
         return ""
-    return (
-        '<div class="kpi-strip">\n'
-        + "\n".join(cards)
-        + "\n</div>\n"
-    )
+    return '<div class="kpi-strip">\n' + "\n".join(cards) + "\n</div>\n"
 
 
 # --- Executive summary ---
@@ -562,23 +564,19 @@ def _section_executive_summary(
     """Generate a narrative executive summary."""
     # Count signals by state
     signal_count = sum(
-        1 for s in signals
-        if isinstance(s.get("state"), str) and s["state"] == "SIGNAL"
+        1 for s in signals if isinstance(s.get("state"), str) and s["state"] == "SIGNAL"
     )
     alert_count = sum(
-        1 for s in signals
-        if isinstance(s.get("state"), str) and s["state"] == "ALERT"
+        1 for s in signals if isinstance(s.get("state"), str) and s["state"] == "ALERT"
     )
     active_count = sum(
-        1 for s in signals
-        if isinstance(s.get("state"), str) and s["state"] == "ACTIVE"
+        1 for s in signals if isinstance(s.get("state"), str) and s["state"] == "ACTIVE"
     )
 
     # Compute a representative confidence for the best signal
     best_confidence: ConfidenceScore | None = None
     signal_etfs = [
-        s for s in signals
-        if isinstance(s.get("state"), str) and s["state"] == "SIGNAL"
+        s for s in signals if isinstance(s.get("state"), str) and s["state"] == "SIGNAL"
     ]
     if signal_etfs:
         best_confidence = _compute_signal_confidence(outputs, signal_etfs[0])
@@ -604,9 +602,7 @@ def _section_executive_summary(
             stance = "are mixed for"
         else:
             stance = "oppose"
-        conf_str = (
-            f"{best_confidence.favorable_count}/{best_confidence.total_factors}"
-        )
+        conf_str = f"{best_confidence.favorable_count}/{best_confidence.total_factors}"
         headline = (
             f"Market conditions {stance} mean-reversion entries. "
             f"{signal_count} ETF(s) at actionable SIGNAL level "
@@ -640,11 +636,7 @@ def _section_executive_summary(
 
     if not lines:
         return ""
-    return (
-        '<div class="exec-summary">\n'
-        + "\n".join(lines)
-        + "\n</div>\n"
-    )
+    return '<div class="exec-summary">\n' + "\n".join(lines) + "\n</div>\n"
 
 
 # --- ETF signal cards ---
@@ -707,14 +699,11 @@ def _section_etf_signals(
         if isinstance(pl, (int, float)):
             pl_cls = _pct_class(pl)
             detail_parts.append(
-                f'P&L: <span class="{pl_cls}">'
-                f"{_fmt_pct(pl, signed=True)}</span>",
+                f'P&L: <span class="{pl_cls}">{_fmt_pct(pl, signed=True)}</span>',
             )
 
         parts.append(
-            '<div class="signal-details">'
-            + " &bull; ".join(detail_parts)
-            + "</div>",
+            '<div class="signal-details">' + " &bull; ".join(detail_parts) + "</div>",
         )
 
         # Confidence dots
@@ -731,11 +720,7 @@ def _section_etf_signals(
 
     if not cards:
         return ""
-    return (
-        "<h2>Entry Signals &amp; Active Positions</h2>\n"
-        + "\n".join(cards)
-        + "\n"
-    )
+    return "<h2>Entry Signals &amp; Active Positions</h2>\n" + "\n".join(cards) + "\n"
 
 
 # --- Sentiment section ---
@@ -836,9 +821,7 @@ def _section_sentiment(outputs: dict[str, str]) -> str:
         return ""
     return (
         "<h2>Sentiment Analysis</h2>\n"
-        '<div class="card">\n'
-        + "\n".join(parts)
-        + "\n</div>\n"
+        '<div class="card">\n' + "\n".join(parts) + "\n</div>\n"
     )
 
 
@@ -871,8 +854,7 @@ def _section_market_conditions(outputs: dict[str, str]) -> str:
                     if isinstance(chg, (int, float)):
                         cls = _pct_class(chg)
                         chg_str = (
-                            f' <span class="{cls}">'
-                            f"{_fmt_pct(chg, signed=True)}</span>"
+                            f' <span class="{cls}">{_fmt_pct(chg, signed=True)}</span>'
                         )
                     indicators.append(
                         f'<span class="ind-item">'
@@ -881,9 +863,7 @@ def _section_market_conditions(outputs: dict[str, str]) -> str:
                     )
             if indicators:
                 parts.append(
-                    '<div class="ind-row">'
-                    + "".join(indicators)
-                    + "</div>",
+                    '<div class="ind-row">' + "".join(indicators) + "</div>",
                 )
 
         # Correlations
@@ -891,9 +871,7 @@ def _section_market_conditions(outputs: dict[str, str]) -> str:
         if isinstance(corr, dict):
             decoupled = corr.get("decoupled_pairs", [])
             if isinstance(decoupled, list) and decoupled:
-                pairs = ", ".join(
-                    html.escape(str(p)) for p in decoupled[:4]
-                )
+                pairs = ", ".join(html.escape(str(p)) for p in decoupled[:4])
                 parts.append(
                     f'<p style="margin-top:8px">'
                     f'<span class="badge badge-yellow">DECOUPLING</span> '
@@ -904,9 +882,7 @@ def _section_market_conditions(outputs: dict[str, str]) -> str:
         return ""
     return (
         "<h2>Market Conditions</h2>\n"
-        '<div class="card">\n'
-        + "\n".join(parts)
-        + "\n</div>\n"
+        '<div class="card">\n' + "\n".join(parts) + "\n</div>\n"
     )
 
 
@@ -927,17 +903,11 @@ def _section_strategy(outputs: dict[str, str]) -> str:
         ticker = html.escape(str(p.get("leveraged_ticker", "?")))
         reason = html.escape(str(p.get("improvement_reason", "")))
         sharpe = p.get("backtest_sharpe", None)
-        sharpe_str = (
-            f"{sharpe:.2f}" if isinstance(sharpe, (int, float)) else "N/A"
-        )
+        sharpe_str = f"{sharpe:.2f}" if isinstance(sharpe, (int, float)) else "N/A"
         wr = p.get("backtest_win_rate", None)
         wr_str = _fmt_pct(wr) if isinstance(wr, (int, float)) else "N/A"
         ret = p.get("backtest_total_return", None)
-        ret_str = (
-            _fmt_pct(ret, signed=True)
-            if isinstance(ret, (int, float))
-            else "N/A"
-        )
+        ret_str = _fmt_pct(ret, signed=True) if isinstance(ret, (int, float)) else "N/A"
         ret_cls = _pct_class(ret)
 
         rows.append(
@@ -955,9 +925,7 @@ def _section_strategy(outputs: dict[str, str]) -> str:
         "<thead><tr>"
         "<th>ETF</th><th>Proposal</th>"
         "<th>Sharpe</th><th>Win Rate</th><th>Return</th>"
-        "</tr></thead>\n<tbody>\n"
-        + "\n".join(rows)
-        + "\n</tbody></table>\n</div>\n"
+        "</tr></thead>\n<tbody>\n" + "\n".join(rows) + "\n</tbody></table>\n</div>\n"
     )
 
 
@@ -980,9 +948,7 @@ def _section_module_status(run: SchedulerRun) -> str:
     return (
         "<h2>Module Status</h2>\n"
         '<div class="card">\n'
-        '<div class="module-grid">\n'
-        + "\n".join(pills)
-        + "\n</div>\n</div>\n"
+        '<div class="module-grid">\n' + "\n".join(pills) + "\n</div>\n</div>\n"
     )
 
 
@@ -1050,8 +1016,14 @@ def build_html_report(
     )
 
     body_parts = [
-        header, exec_summary, kpi, signal_cards,
-        mid, strategy, modules, footer,
+        header,
+        exec_summary,
+        kpi,
+        signal_cards,
+        mid,
+        strategy,
+        modules,
+        footer,
     ]
     return _html_page(
         title=f"Dashboard {report_date}",
@@ -1076,11 +1048,7 @@ def build_index_html(report_dates: list[str]) -> str:
         )
 
     list_html = (
-        '<div class="report-list">\n'
-        + "\n".join(cards)
-        + "\n</div>"
-        if cards
-        else ""
+        '<div class="report-list">\n' + "\n".join(cards) + "\n</div>" if cards else ""
     )
 
     body = (

@@ -100,18 +100,18 @@ def test_compute_confidence_high():
 
 
 def test_compute_confidence_medium():
-    factors = [_fav(f"f{i}") for i in range(5)] + [
-        _neutral(f"n{i}") for i in range(4)
-    ]
+    factors = [_fav(f"f{i}") for i in range(5)] + [_neutral(f"n{i}") for i in range(4)]
     score = compute_confidence(factors)
     assert score.level == ConfidenceLevel.MEDIUM
     assert score.favorable_count == 5
 
 
 def test_compute_confidence_low():
-    factors = [_fav("f1")] + [
-        _unfav(f"u{i}") for i in range(4)
-    ] + [_neutral(f"n{i}") for i in range(4)]
+    factors = (
+        [_fav("f1")]
+        + [_unfav(f"u{i}") for i in range(4)]
+        + [_neutral(f"n{i}") for i in range(4)]
+    )
     score = compute_confidence(factors)
     assert score.level == ConfidenceLevel.LOW
     assert score.favorable_count == 1

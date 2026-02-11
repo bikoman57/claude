@@ -48,7 +48,8 @@ def _make_result() -> BacktestResult:
 
 def test_save_and_load(tmp_path, monkeypatch):
     monkeypatch.setattr(
-        "app.strategy.store._DATA_DIR", tmp_path / "backtests",
+        "app.strategy.store._DATA_DIR",
+        tmp_path / "backtests",
     )
     result = _make_result()
     path = save_backtest(result)
@@ -67,14 +68,16 @@ def test_save_and_load(tmp_path, monkeypatch):
 
 def test_list_backtests_empty(tmp_path, monkeypatch):
     monkeypatch.setattr(
-        "app.strategy.store._DATA_DIR", tmp_path / "backtests",
+        "app.strategy.store._DATA_DIR",
+        tmp_path / "backtests",
     )
     assert list_backtests() == []
 
 
 def test_list_backtests_filter(tmp_path, monkeypatch):
     monkeypatch.setattr(
-        "app.strategy.store._DATA_DIR", tmp_path / "backtests",
+        "app.strategy.store._DATA_DIR",
+        tmp_path / "backtests",
     )
 
     result = _make_result()
@@ -108,7 +111,8 @@ def test_save_creates_directory(tmp_path, monkeypatch):
 
 def test_roundtrip_preserves_none_sharpe(tmp_path, monkeypatch):
     monkeypatch.setattr(
-        "app.strategy.store._DATA_DIR", tmp_path / "backtests",
+        "app.strategy.store._DATA_DIR",
+        tmp_path / "backtests",
     )
     config = BacktestConfig(
         underlying_ticker="SPY",

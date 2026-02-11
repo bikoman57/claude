@@ -12,7 +12,8 @@ from app.statistics.breadth import (
 
 
 def _mock_history(
-    prices: list[float], volumes: list[int] | None = None,
+    prices: list[float],
+    volumes: list[int] | None = None,
 ) -> pd.DataFrame:
     if volumes is None:
         volumes = [1000] * len(prices)
@@ -78,7 +79,8 @@ def test_detect_volume_spikes(mock_ticker_cls):
     # Normal volumes then a spike on last day
     volumes = [1000, 1000, 1000, 1000, 1000, 5000]
     mock_t.history.return_value = _mock_history(
-        [100.0] * 6, volumes,
+        [100.0] * 6,
+        volumes,
     )
     mock_ticker_cls.return_value = mock_t
 
@@ -93,7 +95,8 @@ def test_detect_no_volume_spikes(mock_ticker_cls):
     mock_t = MagicMock()
     volumes = [1000, 1000, 1000, 1000, 1000, 1000]
     mock_t.history.return_value = _mock_history(
-        [100.0] * 6, volumes,
+        [100.0] * 6,
+        volumes,
     )
     mock_ticker_cls.return_value = mock_t
 

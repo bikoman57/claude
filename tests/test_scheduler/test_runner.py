@@ -36,7 +36,8 @@ def test_scheduler_run_dataclass():
 
 def test_run_module_success():
     result = run_module(
-        "test", [sys.executable, "-c", "print('hello')"],
+        "test",
+        [sys.executable, "-c", "print('hello')"],
     )
     assert result.success is True
     assert "hello" in result.output
@@ -45,7 +46,8 @@ def test_run_module_success():
 
 def test_run_module_failure():
     result = run_module(
-        "test", [sys.executable, "-c", "raise SystemExit(1)"],
+        "test",
+        [sys.executable, "-c", "raise SystemExit(1)"],
     )
     assert result.success is False
 

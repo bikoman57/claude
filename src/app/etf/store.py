@@ -7,9 +7,7 @@ from pathlib import Path
 from app.etf.signals import Signal, SignalState
 
 _DEFAULT_STORE_PATH = (
-    Path(__file__).resolve().parent.parent.parent.parent
-    / "data"
-    / "signals.json"
+    Path(__file__).resolve().parent.parent.parent.parent / "data" / "signals.json"
 )
 
 

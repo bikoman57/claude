@@ -23,8 +23,7 @@ def _cmd_daily() -> int:
     print("Running all modules...")  # noqa: T201
     run = run_all_modules()
     print(  # noqa: T201
-        f"Completed: {run.succeeded}/{run.total_modules} OK, "
-        f"{run.failed} failed",
+        f"Completed: {run.succeeded}/{run.total_modules} OK, {run.failed} failed",
     )
 
     print("\nSending Telegram report...")  # noqa: T201
@@ -45,8 +44,7 @@ def _cmd_test_run() -> int:
     print("Running all modules (test mode, no Telegram)...")  # noqa: T201
     run = run_all_modules()
     print(  # noqa: T201
-        f"Completed: {run.succeeded}/{run.total_modules} OK, "
-        f"{run.failed} failed",
+        f"Completed: {run.succeeded}/{run.total_modules} OK, {run.failed} failed",
     )
 
     report = build_report_text(run)
@@ -69,8 +67,7 @@ def _cmd_publish() -> int:
     print("Running all modules...")  # noqa: T201
     run = run_all_modules()
     print(  # noqa: T201
-        f"Completed: {run.succeeded}/{run.total_modules} OK, "
-        f"{run.failed} failed",
+        f"Completed: {run.succeeded}/{run.total_modules} OK, {run.failed} failed",
     )
 
     print("\nGenerating HTML report...")  # noqa: T201

@@ -75,9 +75,7 @@ def optimize_single_etf(
             best = r
             continue
         r_sharpe = r.sharpe_ratio if r.sharpe_ratio is not None else -999.0
-        b_sharpe = (
-            best.sharpe_ratio if best.sharpe_ratio is not None else -999.0
-        )
+        b_sharpe = best.sharpe_ratio if best.sharpe_ratio is not None else -999.0
         if r_sharpe > b_sharpe:
             best = r
 
@@ -85,12 +83,8 @@ def optimize_single_etf(
         mapping=mapping,
         results=tuple(results),
         best_result=best,
-        best_threshold=(
-            best.config.entry_threshold if best is not None else None
-        ),
-        best_target=(
-            best.config.profit_target if best is not None else None
-        ),
+        best_threshold=(best.config.entry_threshold if best is not None else None),
+        best_target=(best.config.profit_target if best is not None else None),
     )
 
 

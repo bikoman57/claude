@@ -98,7 +98,9 @@ def analyze_sector_rotation() -> SectorRotation:
             strengths.append(s)
 
     sorted_strengths = sorted(
-        strengths, key=lambda s: s.relative_to_spy, reverse=True,
+        strengths,
+        key=lambda s: s.relative_to_spy,
+        reverse=True,
     )
 
     leaders = tuple(sorted_strengths[:3]) if sorted_strengths else ()

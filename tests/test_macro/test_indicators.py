@@ -28,7 +28,8 @@ def test_fetch_vix(mock_ticker_cls):
     mock_ticker = MagicMock()
     dates = pd.date_range("2025-01-01", periods=3, freq="D")
     mock_ticker.history.return_value = pd.DataFrame(
-        {"Close": [22.5, 23.0, 21.8]}, index=dates,
+        {"Close": [22.5, 23.0, 21.8]},
+        index=dates,
     )
     mock_ticker_cls.return_value = mock_ticker
 

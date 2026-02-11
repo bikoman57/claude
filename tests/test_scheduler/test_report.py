@@ -52,17 +52,23 @@ def test_build_report_empty_run():
 
 
 def test_build_report_with_modules():
-    macro_data = json.dumps({
-        "vix_regime": "ELEVATED",
-    })
-    rates_data = json.dumps({
-        "trajectory": "CUTTING",
-    })
-    run = _make_run([
-        _ok("macro.dashboard", macro_data),
-        _ok("macro.rates", rates_data),
-        _ok("etf.signals", "[]"),
-    ])
+    macro_data = json.dumps(
+        {
+            "vix_regime": "ELEVATED",
+        }
+    )
+    rates_data = json.dumps(
+        {
+            "trajectory": "CUTTING",
+        }
+    )
+    run = _make_run(
+        [
+            _ok("macro.dashboard", macro_data),
+            _ok("macro.rates", rates_data),
+            _ok("etf.signals", "[]"),
+        ]
+    )
     text = build_report_text(run)
     assert "MARKET OVERVIEW" in text
     assert "ELEVATED" in text
@@ -76,10 +82,12 @@ def test_build_report_with_failures():
 
 
 def test_build_report_geopolitical():
-    geo_data = json.dumps({
-        "risk_level": "HIGH",
-        "total_events": 5,
-    })
+    geo_data = json.dumps(
+        {
+            "risk_level": "HIGH",
+            "total_events": 5,
+        }
+    )
     run = _make_run([_ok("geopolitical.summary", geo_data)])
     text = build_report_text(run)
     assert "GEOPOLITICAL" in text
@@ -87,10 +95,12 @@ def test_build_report_geopolitical():
 
 
 def test_build_report_news():
-    news_data = json.dumps({
-        "sentiment": "BEARISH",
-        "total_articles": 42,
-    })
+    news_data = json.dumps(
+        {
+            "sentiment": "BEARISH",
+            "total_articles": 42,
+        }
+    )
     run = _make_run([_ok("news.summary", news_data)])
     text = build_report_text(run)
     assert "NEWS" in text
@@ -98,13 +108,15 @@ def test_build_report_news():
 
 
 def test_build_report_etf_signals():
-    signals = json.dumps([
-        {
-            "leveraged_ticker": "TQQQ",
-            "state": "SIGNAL",
-            "underlying_drawdown_pct": 0.072,
-        },
-    ])
+    signals = json.dumps(
+        [
+            {
+                "leveraged_ticker": "TQQQ",
+                "state": "SIGNAL",
+                "underlying_drawdown_pct": 0.072,
+            },
+        ]
+    )
     run = _make_run([_ok("etf.signals", signals)])
     text = build_report_text(run)
     assert "ENTRY SIGNALS" in text
@@ -112,12 +124,14 @@ def test_build_report_etf_signals():
 
 
 def test_build_report_strategy():
-    proposals = json.dumps([
-        {
-            "leveraged_ticker": "SOXL",
-            "improvement_reason": "Better Sharpe at 10%",
-        },
-    ])
+    proposals = json.dumps(
+        [
+            {
+                "leveraged_ticker": "SOXL",
+                "improvement_reason": "Better Sharpe at 10%",
+            },
+        ]
+    )
     run = _make_run([_ok("strategy.proposals", proposals)])
     text = build_report_text(run)
     assert "STRATEGY INSIGHTS" in text

@@ -50,9 +50,7 @@ def test_calculate_weights_single_factor_dominates():
         _make_outcome(False, {"drawdown_depth": "UNFAVORABLE"}),
     ]
     weights = calculate_weights(outcomes)
-    drawdown_w = next(
-        w for w in weights if w.name == "drawdown_depth"
-    )
+    drawdown_w = next(w for w in weights if w.name == "drawdown_depth")
     # Drawdown should have highest weight
     assert drawdown_w.weight > 0.5
     assert drawdown_w.favorable_wins == 2

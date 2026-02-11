@@ -98,9 +98,7 @@ def evaluate_active_position(
     signal.leveraged_current_price = leveraged_current_price
     signal.current_pl_pct = pl_pct
     signal.state = (
-        SignalState.TARGET
-        if pl_pct >= signal.profit_target_pct
-        else SignalState.ACTIVE
+        SignalState.TARGET if pl_pct >= signal.profit_target_pct else SignalState.ACTIVE
     )
     signal.updated_at = datetime.now(tz=UTC).isoformat(
         timespec="seconds",

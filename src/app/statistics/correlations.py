@@ -73,8 +73,7 @@ def fetch_risk_indicators() -> RiskIndicators:
             vix_hist = vix.history(period="5d")
             if len(vix_hist) >= 2:
                 vix_change = (
-                    float(vix_hist["Close"].iloc[-1])
-                    - float(vix_hist["Close"].iloc[0])
+                    float(vix_hist["Close"].iloc[-1]) - float(vix_hist["Close"].iloc[0])
                 ) / float(vix_hist["Close"].iloc[0])
                 if vix_change > 0.05:
                     flight = True

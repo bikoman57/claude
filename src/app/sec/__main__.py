@@ -67,8 +67,7 @@ def cmd_institutional() -> int:
         return 0
     for f in filings:
         print(  # noqa: T201
-            f"  {f.filer_name}: {f.form_type}"
-            f" filed {f.filed_date}",
+            f"  {f.filer_name}: {f.form_type} filed {f.filed_date}",
         )
     return 0
 
@@ -87,7 +86,9 @@ def cmd_recent() -> int:
     for h in holdings:
         try:
             filings = fetch_recent_filings(
-                cik=h.cik, ticker=h.ticker, email=email,
+                cik=h.cik,
+                ticker=h.ticker,
+                email=email,
             )
             all_filings.extend(filings)
         except Exception:  # noqa: S110
@@ -98,12 +99,12 @@ def cmd_recent() -> int:
         print("No recent filings found.")  # noqa: T201
         return 0
     all_filings.sort(
-        key=lambda f: f.filed_date, reverse=True,
+        key=lambda f: f.filed_date,
+        reverse=True,
     )
     for f in all_filings[:20]:
         print(  # noqa: T201
-            f"  [{f.materiality}] {f.ticker}"
-            f" {f.form_type} {f.filed_date}",
+            f"  [{f.materiality}] {f.ticker} {f.form_type} {f.filed_date}",
         )
     return 0
 

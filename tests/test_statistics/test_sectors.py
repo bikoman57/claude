@@ -57,9 +57,7 @@ def test_rotation_risk_off():
         SectorStrength("XLV", "Healthcare", 140, 0.01, 0.02, 0.04, 0.02),
         SectorStrength("XLI", "Industrials", 110, 0.01, 0.01, 0.03, 0.01),
     )
-    laggards = (
-        SectorStrength("XLK", "Tech", 180, -0.01, -0.02, -0.03, -0.05),
-    )
+    laggards = (SectorStrength("XLK", "Tech", 180, -0.01, -0.02, -0.03, -0.05),)
     from app.statistics.sectors import SectorRotation
 
     rotation = SectorRotation(

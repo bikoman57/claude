@@ -203,9 +203,7 @@ class TestRunClaude:
 
 
 class TestDispatch:
-    async def test_help_sends_command_list(
-        self, dispatcher: CommandDispatcher
-    ) -> None:
+    async def test_help_sends_command_list(self, dispatcher: CommandDispatcher) -> None:
         with patch.object(
             dispatcher.client, "send_message", new_callable=AsyncMock
         ) as mock_send:
@@ -254,9 +252,7 @@ class TestDispatch:
             patch.object(dispatcher, "_run_claude", return_value=result) as mock_run,
         ):
             mock_send.return_value = {"ok": True}
-            await dispatcher.dispatch(
-                ParsedCommand.parse("what's going on with NVDA?")
-            )
+            await dispatcher.dispatch(ParsedCommand.parse("what's going on with NVDA?"))
 
         # Claude should receive the raw text
         mock_run.assert_called_once_with("what's going on with NVDA?")

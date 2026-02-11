@@ -36,10 +36,7 @@ def build_report_text(run: SchedulerRun) -> str:
     lines.append("")
 
     # Module status summary
-    status = (
-        f"Modules: {run.succeeded}/{run.total_modules} OK"
-        f" | Failed: {run.failed}"
-    )
+    status = f"Modules: {run.succeeded}/{run.total_modules} OK | Failed: {run.failed}"
     lines.append(escape_markdown(status))
     lines.append("")
 
@@ -124,11 +121,10 @@ def build_report_text(run: SchedulerRun) -> str:
                     ticker = sig.get("leveraged_ticker", "?")
                     state = sig.get("state", "?")
                     dd = sig.get(
-                        "underlying_drawdown_pct", 0,
+                        "underlying_drawdown_pct",
+                        0,
                     )
-                    dd_str = (
-                        f"{dd:.1%}" if isinstance(dd, float) else str(dd)
-                    )
+                    dd_str = f"{dd:.1%}" if isinstance(dd, float) else str(dd)
                     signal_lines.append(
                         f"{ticker}: {state} (dd: {dd_str})",
                     )

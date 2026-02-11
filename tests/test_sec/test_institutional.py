@@ -37,7 +37,8 @@ def test_fetch_institutional_filings(mock_client_cls, _mock_sleep):
     mock_client_cls.return_value.__enter__.return_value = mock_ctx
 
     filings = fetch_institutional_filings(
-        "test@test.com", days=730,
+        "test@test.com",
+        days=730,
     )
     # Each of 5 filers returns 1 13F (10-K filtered out)
     assert len(filings) == 5

@@ -61,7 +61,9 @@ def fetch_fred_latest(
         params["units"] = units
     with httpx.Client() as client:
         resp = client.get(
-            _FRED_BASE, params=params, timeout=10.0,
+            _FRED_BASE,
+            params=params,
+            timeout=10.0,
         )
         resp.raise_for_status()
         data = resp.json()
@@ -87,7 +89,9 @@ def fetch_fred_history(
     }
     with httpx.Client() as client:
         resp = client.get(
-            _FRED_BASE, params=params, timeout=10.0,
+            _FRED_BASE,
+            params=params,
+            timeout=10.0,
         )
         resp.raise_for_status()
         data = resp.json()

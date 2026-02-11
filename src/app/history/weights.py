@@ -51,7 +51,8 @@ def calculate_weights(
 
         for outcome in completed:
             assessment = outcome.factors_at_entry.get(
-                factor, "NEUTRAL",
+                factor,
+                "NEUTRAL",
             )
             if assessment == "FAVORABLE":
                 fav_total += 1
@@ -63,9 +64,7 @@ def calculate_weights(
                     unfav_wins += 1
 
         fav_rate = fav_wins / fav_total if fav_total > 0 else 0.5
-        unfav_rate = (
-            unfav_wins / unfav_total if unfav_total > 0 else 0.5
-        )
+        unfav_rate = unfav_wins / unfav_total if unfav_total > 0 else 0.5
         score = max(fav_rate - unfav_rate, 0.0)
         raw_scores.append(
             (factor, fav_wins, fav_total, unfav_wins, unfav_total, score),

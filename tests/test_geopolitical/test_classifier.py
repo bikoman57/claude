@@ -88,8 +88,7 @@ def test_summary_sector_counts():
 
 def test_summary_top_n():
     events = [
-        classify_event(f"Event {i}", "", "MILITARY", -1.0, 10, "")
-        for i in range(10)
+        classify_event(f"Event {i}", "", "MILITARY", -1.0, 10, "") for i in range(10)
     ]
     summary = build_geopolitical_summary(events, top_n=3)
     assert len(summary.top_events) == 3

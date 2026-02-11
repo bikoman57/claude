@@ -70,9 +70,7 @@ def fetch_recent_filings(
     accessions = recent.get("accessionNumber", [])
     docs = recent.get("primaryDocument", [])
 
-    cutoff = (
-        datetime.now(tz=UTC) - timedelta(days=days)
-    ).strftime("%Y-%m-%d")
+    cutoff = (datetime.now(tz=UTC) - timedelta(days=days)).strftime("%Y-%m-%d")
 
     filings: list[Filing] = []
     for i, form in enumerate(forms):
@@ -87,8 +85,7 @@ def fetch_recent_filings(
         acc_nodash = accession.replace("-", "")
         cik_raw = cik.lstrip("0") or "0"
         filing_url = (
-            "https://www.sec.gov/Archives/edgar/data"
-            f"/{cik_raw}/{acc_nodash}/{doc}"
+            f"https://www.sec.gov/Archives/edgar/data/{cik_raw}/{acc_nodash}/{doc}"
         )
         filings.append(
             Filing(

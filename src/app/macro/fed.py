@@ -42,9 +42,7 @@ def classify_trajectory(rates: list[float]) -> str:
     if len(rates) < 2:
         return "UNKNOWN"
     recent = rates[-3:] if len(rates) >= 3 else rates
-    changes = [
-        recent[i] - recent[i - 1] for i in range(1, len(recent))
-    ]
+    changes = [recent[i] - recent[i - 1] for i in range(1, len(recent))]
     if all(c > 0 for c in changes):
         return "HIKING"
     if all(c < 0 for c in changes):
@@ -83,8 +81,6 @@ def build_fed_summary(
     return FedSummary(
         current_rate=current_rate,
         trajectory=trajectory,
-        next_fomc=(
-            next_meeting.isoformat() if next_meeting else None
-        ),
+        next_fomc=(next_meeting.isoformat() if next_meeting else None),
         days_to_fomc=days,
     )

@@ -48,9 +48,13 @@ def test_classify_materiality_8k_default():
 
 
 def test_classify_materiality_8k_high():
-    assert classify_materiality(
-        "8-K", "earnings announcement",
-    ) == "HIGH"
+    assert (
+        classify_materiality(
+            "8-K",
+            "earnings announcement",
+        )
+        == "HIGH"
+    )
 
 
 def test_classify_materiality_other():

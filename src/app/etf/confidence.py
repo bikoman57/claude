@@ -241,11 +241,7 @@ def compute_confidence(
 
     HIGH: 7+/9 favorable, MEDIUM: 4-6, LOW: 0-3.
     """
-    favorable = sum(
-        1
-        for f in factors
-        if f.assessment == FactorAssessment.FAVORABLE
-    )
+    favorable = sum(1 for f in factors if f.assessment == FactorAssessment.FAVORABLE)
     total = len(factors)
 
     if favorable >= 7:

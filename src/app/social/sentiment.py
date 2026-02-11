@@ -3,27 +3,60 @@ from __future__ import annotations
 import re
 
 HAWKISH_KEYWORDS: list[str] = [
-    "inflation", "tighten", "restrictive", "rate increase",
-    "strong labor", "above target", "vigilant", "price stability",
-    "overheating", "persistent inflation",
+    "inflation",
+    "tighten",
+    "restrictive",
+    "rate increase",
+    "strong labor",
+    "above target",
+    "vigilant",
+    "price stability",
+    "overheating",
+    "persistent inflation",
 ]
 
 DOVISH_KEYWORDS: list[str] = [
-    "accommodation", "easing", "rate cut", "slowdown",
-    "below target", "supportive", "patience", "downside risk",
-    "soft landing", "gradual",
+    "accommodation",
+    "easing",
+    "rate cut",
+    "slowdown",
+    "below target",
+    "supportive",
+    "patience",
+    "downside risk",
+    "soft landing",
+    "gradual",
 ]
 
 BULLISH_KEYWORDS: list[str] = [
-    "rally", "surge", "moon", "bullish", "calls", "buy",
-    "diamond hands", "to the moon", "rocket", "gains",
-    "beat expectations", "upgrade", "outperform",
+    "rally",
+    "surge",
+    "moon",
+    "bullish",
+    "calls",
+    "buy",
+    "diamond hands",
+    "to the moon",
+    "rocket",
+    "gains",
+    "beat expectations",
+    "upgrade",
+    "outperform",
 ]
 
 BEARISH_KEYWORDS: list[str] = [
-    "crash", "puts", "bearish", "short", "sell",
-    "recession", "collapse", "panic", "bag holder",
-    "downgrade", "warning", "layoffs",
+    "crash",
+    "puts",
+    "bearish",
+    "short",
+    "sell",
+    "recession",
+    "collapse",
+    "panic",
+    "bag holder",
+    "downgrade",
+    "warning",
+    "layoffs",
 ]
 
 _TICKER_PATTERN = re.compile(r"\$([A-Z]{1,5})\b")

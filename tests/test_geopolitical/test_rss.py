@@ -49,7 +49,7 @@ def test_fetch_geopolitical_feed(mock_client_cls):
 @patch("app.geopolitical.rss.httpx.Client")
 def test_fetch_empty_feed(mock_client_cls):
     mock_resp = MagicMock()
-    mock_resp.text = '<rss><channel><title>E</title></channel></rss>'
+    mock_resp.text = "<rss><channel><title>E</title></channel></rss>"
     mock_ctx = MagicMock()
     mock_ctx.get.return_value = mock_resp
     mock_client_cls.return_value.__enter__.return_value = mock_ctx

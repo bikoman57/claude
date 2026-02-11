@@ -5,11 +5,7 @@ from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
-_HISTORY_DIR = (
-    Path(__file__).resolve().parent.parent.parent.parent
-    / "data"
-    / "history"
-)
+_HISTORY_DIR = Path(__file__).resolve().parent.parent.parent.parent / "data" / "history"
 
 
 @dataclass(frozen=True, slots=True)

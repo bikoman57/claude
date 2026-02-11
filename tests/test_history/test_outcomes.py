@@ -13,7 +13,9 @@ from app.history.outcomes import (
 def test_record_entry(tmp_path):
     path = tmp_path / "outcomes.json"
     outcome = record_entry(
-        "TQQQ", "QQQ", 45.00,
+        "TQQQ",
+        "QQQ",
+        45.00,
         factors={"vix_regime": "FAVORABLE"},
         path=path,
     )

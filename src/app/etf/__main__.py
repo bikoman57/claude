@@ -114,11 +114,7 @@ def cmd_active() -> int:
         print("No active positions.")  # noqa: T201
         return 0
     for sig in active:
-        pl = (
-            f"{sig.current_pl_pct:+.1%}"
-            if sig.current_pl_pct is not None
-            else "n/a"
-        )
+        pl = f"{sig.current_pl_pct:+.1%}" if sig.current_pl_pct is not None else "n/a"
         print(  # noqa: T201
             f"{sig.leveraged_ticker}:"
             f" entry ${sig.leveraged_entry_price}"
@@ -141,10 +137,7 @@ def cmd_enter(ticker: str, price: str) -> int:
     signals = load_signals()
     found_sig = None
     for sig in signals:
-        if (
-            sig.leveraged_ticker == ticker.upper()
-            and sig.state == SignalState.SIGNAL
-        ):
+        if sig.leveraged_ticker == ticker.upper() and sig.state == SignalState.SIGNAL:
             sig.state = SignalState.ACTIVE
             sig.leveraged_entry_price = float(price)
             found_sig = sig
@@ -171,8 +164,7 @@ def cmd_enter(ticker: str, price: str) -> int:
         factors=factors,
     )
     print(  # noqa: T201
-        f"Entered {ticker.upper()} at ${price}"
-        " (outcome recorded)",
+        f"Entered {ticker.upper()} at ${price} (outcome recorded)",
     )
     return 0
 
@@ -181,9 +173,7 @@ def cmd_close(ticker: str, exit_price: str | None = None) -> int:
     """Close a position and remove from signals."""
     signals = load_signals()
     before = len(signals)
-    signals = [
-        s for s in signals if s.leveraged_ticker != ticker.upper()
-    ]
+    signals = [s for s in signals if s.leveraged_ticker != ticker.upper()]
     if len(signals) == before:
         print(  # noqa: T201
             f"Error: no position found for {ticker.upper()}",
@@ -198,8 +188,7 @@ def cmd_close(ticker: str, exit_price: str | None = None) -> int:
         result = record_exit(ticker.upper(), float(exit_price))
         if result and result.pl_pct is not None:
             print(  # noqa: T201
-                f"Closed {ticker.upper()} at ${exit_price}"
-                f" (P/L: {result.pl_pct:+.1%})",
+                f"Closed {ticker.upper()} at ${exit_price} (P/L: {result.pl_pct:+.1%})",
             )
         else:
             print(  # noqa: T201
@@ -207,8 +196,7 @@ def cmd_close(ticker: str, exit_price: str | None = None) -> int:
             )
     else:
         print(  # noqa: T201
-            f"Closed {ticker.upper()}"
-            " (no exit price — outcome not recorded)",
+            f"Closed {ticker.upper()} (no exit price — outcome not recorded)",
         )
     return 0
 

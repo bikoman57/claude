@@ -41,9 +41,7 @@ def fetch_institutional_filings(
     days: int = 90,
 ) -> list[InstitutionalFiling]:
     """Fetch recent 13F filings from tracked institutions."""
-    cutoff = (
-        datetime.now(tz=UTC) - timedelta(days=days)
-    ).strftime("%Y-%m-%d")
+    cutoff = (datetime.now(tz=UTC) - timedelta(days=days)).strftime("%Y-%m-%d")
     headers = {"User-Agent": f"fin-agents {email}"}
     filings: list[InstitutionalFiling] = []
 
@@ -51,7 +49,9 @@ def fetch_institutional_filings(
         url = f"{_EDGAR_BASE}/CIK{filer.cik}.json"
         with httpx.Client() as client:
             resp = client.get(
-                url, headers=headers, timeout=10.0,
+                url,
+                headers=headers,
+                timeout=10.0,
             )
             resp.raise_for_status()
             data = resp.json()
@@ -68,15 +68,12 @@ def fetch_institutional_filings(
             filed_date = dates[i] if i < len(dates) else ""
             if filed_date < cutoff:
                 continue
-            accession = (
-                accessions[i] if i < len(accessions) else ""
-            )
+            accession = accessions[i] if i < len(accessions) else ""
             doc = docs[i] if i < len(docs) else ""
             acc_nodash = accession.replace("-", "")
             cik_raw = filer.cik.lstrip("0") or "0"
             filing_url = (
-                "https://www.sec.gov/Archives/edgar/data"
-                f"/{cik_raw}/{acc_nodash}/{doc}"
+                f"https://www.sec.gov/Archives/edgar/data/{cik_raw}/{acc_nodash}/{doc}"
             )
             filings.append(
                 InstitutionalFiling(

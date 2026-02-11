@@ -149,7 +149,9 @@ def test_run_backtest_end_of_period(mock_ticker_cls):
     mock_ticker_cls.return_value = mock_t
 
     config = _make_config(
-        entry_threshold=0.05, profit_target=0.50, stop_loss=0.50,
+        entry_threshold=0.05,
+        profit_target=0.50,
+        stop_loss=0.50,
     )
     result = run_backtest(config)
 

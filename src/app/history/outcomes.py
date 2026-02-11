@@ -6,9 +6,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 _OUTCOMES_PATH = (
-    Path(__file__).resolve().parent.parent.parent.parent
-    / "data"
-    / "outcomes.json"
+    Path(__file__).resolve().parent.parent.parent.parent / "data" / "outcomes.json"
 )
 
 
@@ -80,17 +78,12 @@ def record_exit(
     """Record a trade exit. Returns updated outcome or None if not found."""
     outcomes = load_outcomes(path)
     for outcome in outcomes:
-        if (
-            outcome.leveraged_ticker == leveraged_ticker
-            and outcome.exit_date is None
-        ):
+        if outcome.leveraged_ticker == leveraged_ticker and outcome.exit_date is None:
             outcome.exit_date = datetime.now(tz=UTC).isoformat(
                 timespec="seconds",
             )
             outcome.exit_price = exit_price
-            outcome.pl_pct = (
-                (exit_price - outcome.entry_price) / outcome.entry_price
-            )
+            outcome.pl_pct = (exit_price - outcome.entry_price) / outcome.entry_price
             outcome.win = outcome.pl_pct > 0
             save_outcomes(outcomes, path)
             return outcome

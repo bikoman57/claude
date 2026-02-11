@@ -99,10 +99,12 @@ def _cmd_optimize(args: list[str]) -> int:
 
 def _cmd_proposals() -> int:
     summary = generate_proposals()
-    print(json.dumps(  # noqa: T201
-        [asdict(p) for p in summary.proposals],
-        indent=2,
-    ))
+    print(
+        json.dumps(  # noqa: T201
+            [asdict(p) for p in summary.proposals],
+            indent=2,
+        )
+    )
     return 0
 
 
@@ -120,21 +122,19 @@ def _cmd_compare(args: list[str]) -> int:
     breakdown = optimize_single_etf(mapping)
     rows = []
     for r in breakdown.results:
-        rows.append({
-            "threshold": r.config.entry_threshold,
-            "target": r.config.profit_target,
-            "trades": len(r.trades),
-            "total_return": round(r.total_return, 4),
-            "sharpe": (
-                round(r.sharpe_ratio, 3)
-                if r.sharpe_ratio is not None
-                else None
-            ),
-            "win_rate": (
-                round(r.win_rate, 3) if r.win_rate is not None else None
-            ),
-            "max_drawdown": round(r.max_drawdown, 4),
-        })
+        rows.append(
+            {
+                "threshold": r.config.entry_threshold,
+                "target": r.config.profit_target,
+                "trades": len(r.trades),
+                "total_return": round(r.total_return, 4),
+                "sharpe": (
+                    round(r.sharpe_ratio, 3) if r.sharpe_ratio is not None else None
+                ),
+                "win_rate": (round(r.win_rate, 3) if r.win_rate is not None else None),
+                "max_drawdown": round(r.max_drawdown, 4),
+            }
+        )
 
     rows.sort(
         key=lambda x: x["sharpe"] if x["sharpe"] is not None else -999,
@@ -155,15 +155,9 @@ def _cmd_history(args: list[str]) -> int:
         result = load_backtest(f)
         cfg = result.config
         sharpe = (
-            f"{result.sharpe_ratio:.3f}"
-            if result.sharpe_ratio is not None
-            else "N/A"
+            f"{result.sharpe_ratio:.3f}" if result.sharpe_ratio is not None else "N/A"
         )
-        wr = (
-            f"{result.win_rate:.1%}"
-            if result.win_rate is not None
-            else "N/A"
-        )
+        wr = f"{result.win_rate:.1%}" if result.win_rate is not None else "N/A"
         print(  # noqa: T201
             f"{f.name}: {cfg.underlying_ticker} "
             f"threshold={cfg.entry_threshold:.0%} "
