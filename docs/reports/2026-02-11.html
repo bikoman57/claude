@@ -52,7 +52,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: var(--font-sans);
-  max-width: 1100px; margin: 0 auto; padding: 0 32px;
+  max-width: 1400px; margin: 0 auto; padding: 0 40px;
   background: var(--bg-primary); color: var(--text-secondary); line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 }
@@ -78,13 +78,13 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
 .text-muted { color: var(--text-muted); }
 
 /* Masthead */
-.masthead { background: var(--bg-dark); color: #fff; padding: 20px 32px;
-  margin: 0 -32px 0; display: flex; justify-content: space-between;
+.masthead { background: var(--bg-dark); color: #fff; padding: 20px 40px;
+  margin: 0 -40px 0; display: flex; justify-content: space-between;
   align-items: center; }
 .masthead h1 { color: #fff; }
 .masthead-meta { font-size: 13px; opacity: 0.7; text-align: right; }
 .masthead-rule { height: 4px; background: var(--accent);
-  margin: 0 -32px 0; }
+  margin: 0 -40px 0; }
 
 /* Header / datebar */
 .header { display: flex; align-items: center; justify-content: space-between;
@@ -241,6 +241,71 @@ details[open] summary { margin-bottom: 8px; }
 .module-pill-fail { background: var(--danger-bg); color: var(--danger); }
 .pill-dur { color: var(--text-muted); font-size: var(--text-sm); }
 
+/* Section icons */
+.section-icon { display: inline-flex; align-items: center; gap: 8px; }
+.section-icon svg { width: 20px; height: 20px; vertical-align: middle;
+  fill: var(--accent); flex-shrink: 0; }
+.kpi-icon { display: inline-block; margin-bottom: 6px; }
+.kpi-icon svg { width: 16px; height: 16px; fill: var(--text-muted); }
+
+/* Headline list — visible by default */
+.headline-list { list-style: none; margin-top: 12px; padding: 0; }
+.headline-list li { padding: 10px 0;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+.headline-list li:last-child { border-bottom: none; }
+.hl-marker { font-family: var(--font-mono); font-size: 9px; font-weight: 700;
+  padding: 2px 6px; border-radius: 2px; margin-right: 8px;
+  text-transform: uppercase; display: inline-block; }
+.hl-bull { background: var(--success-bg); color: var(--success); }
+.hl-bear { background: var(--danger-bg); color: var(--danger); }
+.hl-neu { background: var(--bg-tertiary); color: var(--text-muted); }
+
+/* Commodity tiles */
+.commodity-tiles { display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 8px; margin-top: 12px; }
+.commodity-tile { text-align: center; padding: 14px;
+  background: var(--bg-tertiary); }
+.commodity-name { font-family: var(--font-mono); font-size: 10px;
+  color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: 0.08em; }
+.commodity-price { font-family: var(--font-serif); font-size: 20px;
+  font-weight: 700; color: var(--text-primary); margin-top: 2px; }
+.commodity-chg { font-family: var(--font-mono); font-size: 12px;
+  font-weight: 600; }
+
+/* Geopolitical events */
+.geo-events { margin-top: 12px; }
+.geo-event { padding: 10px 0;
+  border-bottom: 1px solid var(--border-light); }
+.geo-event:last-child { border-bottom: none; }
+.geo-title { font-size: 14px; color: var(--text-secondary); }
+.geo-meta { font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-muted); margin-top: 4px;
+  display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* Standfirst highlight */
+.highlight { background: linear-gradient(transparent 60%, var(--accent-light) 60%);
+  padding: 0 2px; }
+
+/* Lede kicker */
+.kicker { font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em;
+  margin-bottom: 8px; }
+
+/* Trade count warning */
+.trade-count { font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-muted); }
+.trade-count-warn { color: var(--warning); }
+
+/* Sidebar card */
+.sidebar-card { background: var(--bg-secondary);
+  border: 1px solid var(--border-primary); padding: 20px;
+  margin-bottom: 20px; }
+.sidebar-title { font-family: var(--font-serif); font-size: 16px;
+  font-weight: 700; margin-bottom: 12px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-primary); }
+
 /* Footer */
 .footer { margin-top: 40px; padding: 20px 0;
   border-top: 3px solid var(--text-primary); font-size: 12px;
@@ -285,6 +350,7 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
   body { padding: 0 16px; }
   .masthead { margin: 0 -16px 0; padding: 16px; }
   .masthead-rule { margin: 0 -16px 0; }
+  .commodity-tiles { grid-template-columns: repeat(2, 1fr); }
   .header { flex-direction: column; align-items: flex-start; }
   .kpi-strip { grid-template-columns: repeat(2, 1fr); }
   .kpi-value { font-size: 1.4em; }
@@ -337,41 +403,42 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 <main id="main-content">
 
 <div class="exec-summary">
+<div class="kicker">Market Overview</div>
 <p class="headline">Market conditions are mixed for mean-reversion entries. 2 ETF(s) at actionable SIGNAL level with MEDIUM confidence (5/9).</p>
-<p class="detail">Key support: Deep drawdown: 25.6%</p>
+<p class="detail"><span class="highlight">LABU (-25.6% drawdown)</span> and <span class="highlight">UCO (-14.0% drawdown)</span> at actionable levels. Key support: Deep drawdown: 25.6%.</p>
 </div>
 
 <div class="kpi-strip">
 <div class="kpi-card kpi-bar-yellow">
-<div class="kpi-label">VIX</div>
+<span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg></span><div class="kpi-label">VIX</div>
 <div class="kpi-value">17.6</div>
 <div class="kpi-sub"><span class="badge badge-yellow">NORMAL</span></div>
 <div class="gauge-track" role="progressbar" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100" aria-label="VIX gauge"><div class="gauge-fill gauge-fill-yellow" style="width:35%"></div></div>
 </div>
 <div class="kpi-card kpi-bar-green">
-<div class="kpi-label">Fed</div>
+<span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="12" x2="6" y2="12.01"/><line x1="18" y1="12" x2="18" y2="12.01"/><circle cx="12" cy="12" r="2"/></svg></span><div class="kpi-label">Fed</div>
 <div class="kpi-value">3.64%</div>
 <div class="kpi-sub"><span class="badge badge-green">CUTTING</span></div>
 </div>
 <div class="kpi-card kpi-bar-yellow">
-<div class="kpi-label">Yield Curve</div>
+<span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></span><div class="kpi-label">Yield Curve</div>
 <div class="kpi-value">+0.57%</div>
 <div class="kpi-sub"><span class="badge badge-yellow">NORMAL</span></div>
 <div class="gauge-track" role="progressbar" aria-valuenow="64" aria-valuemin="0" aria-valuemax="100" aria-label="Yield Curve gauge"><div class="gauge-fill gauge-fill-yellow" style="width:64%"></div></div>
 </div>
 <div class="kpi-card kpi-bar-green">
-<div class="kpi-label">Geopolitical</div>
-<div class="kpi-value">0</div>
-<div class="kpi-sub"><span class="badge badge-green">LOW</span> 0 events</div>
+<span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 014 10 15 15 0 01-4 10 15 15 0 01-4-10 15 15 0 014-10z"/></svg></span><div class="kpi-label">Geopolitical</div>
+<div class="kpi-value">130</div>
+<div class="kpi-sub"><span class="badge badge-green">LOW</span> 130 events</div>
 </div>
 <div class="kpi-card kpi-bar-red">
-<div class="kpi-label">News</div>
-<div class="kpi-value">134</div>
-<div class="kpi-sub"><span class="badge badge-red">BEARISH</span> 134 articles</div>
+<span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2"/><line x1="10" y1="6" x2="18" y2="6"/><line x1="10" y1="10" x2="18" y2="10"/><line x1="10" y1="14" x2="14" y2="14"/></svg></span><div class="kpi-label">News</div>
+<div class="kpi-value">133</div>
+<div class="kpi-sub"><span class="badge badge-red">BEARISH</span> 133 articles</div>
 </div>
 </div>
 
-<h2>Entry Signals &amp; Active Positions</h2>
+<h2><span class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span> Entry Signals &amp; Active Positions</h2>
 
 <div class="signal-card signal-card-signal">
 <div class="signal-header">
@@ -539,26 +606,24 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 </details>
 
 <div class="grid-2col">
-<div><h2>Sentiment Analysis</h2>
+<div><h2><span class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2"/><line x1="10" y1="6" x2="18" y2="6"/><line x1="10" y1="10" x2="18" y2="10"/><line x1="10" y1="14" x2="14" y2="14"/></svg></span> Sentiment Analysis</h2>
 <div class="card">
 <p>News Sentiment: <span class="badge badge-red">BEARISH</span></p>
-<div class="sentiment-bar" role="img" aria-label="Sentiment: 13 bullish, 28 bearish, 93 neutral"><div class="sentiment-fill-bullish" style="width:9.7%"></div><div class="sentiment-fill-bearish" style="width:20.9%"></div><div class="sentiment-fill-neutral" style="width:69.4%"></div></div>
-<div class="sentiment-counts"><span class="sentiment-count-bullish">13 bullish</span><span class="sentiment-count-bearish">28 bearish</span><span>93 neutral</span></div>
-<details>
-<summary>Top headlines</summary>
-<ul>
-<li>French software maker Dassault Systèmes plunges 18%, on track for worst day ever <span class="badge badge-red">BEARISH</span></li>
-<li>UBS downgrades U.S. tech sector despite a recovery. It gave 3 reasons why <span class="badge badge-red">BEARISH</span></li>
-<li>Is the AI bubble popping itself? Software&#x27;s break from the tech stock boom raises concerns <span class="badge badge-red">BEARISH</span></li>
-<li>Lloyds Banking Group to close another 95 branches <span class="badge badge-gray">NEUTRAL</span></li>
-<li>US jobs see surprise growth in January after weak 2025 <span class="badge badge-green">BULLISH</span></li>
+<div class="sentiment-bar" role="img" aria-label="Sentiment: 14 bullish, 27 bearish, 92 neutral"><div class="sentiment-fill-bullish" style="width:10.5%"></div><div class="sentiment-fill-bearish" style="width:20.3%"></div><div class="sentiment-fill-neutral" style="width:69.2%"></div></div>
+<div class="sentiment-counts"><span class="sentiment-count-bullish">14 bullish</span><span class="sentiment-count-bearish">27 bearish</span><span>92 neutral</span></div>
+<p class="mt-12"><strong>Top headlines</strong></p>
+<ul class="headline-list">
+<li><span class="hl-marker hl-bear">Bear</span>French software maker Dassault Systèmes plunges 18%, on track for worst day ever</li>
+<li><span class="hl-marker hl-bear">Bear</span>UBS downgrades U.S. tech sector despite a recovery. It gave 3 reasons why</li>
+<li><span class="hl-marker hl-bear">Bear</span>Is the AI bubble popping itself? Software&#x27;s break from the tech stock boom raises concerns</li>
+<li><span class="hl-marker hl-neu">Neu</span>Lloyds Banking Group to close another 95 branches</li>
+<li><span class="hl-marker hl-bull">Bull</span>US jobs see surprise growth in January after weak 2025</li>
 </ul>
-</details>
 <div class="sector-badges">
-<span class="sector-badge">tech (38)</span>
+<span class="sector-badge">tech (37)</span>
 <span class="sector-badge">finance (15)</span>
-<span class="sector-badge">healthcare (6)</span>
-<span class="sector-badge">semiconductors (6)</span>
+<span class="sector-badge">healthcare (5)</span>
+<span class="sector-badge">semiconductors (5)</span>
 <span class="sector-badge">energy (4)</span>
 </div>
 <p class="mt-12">Officials Tone: <span class="badge badge-yellow">HAWKISH</span>
@@ -567,27 +632,62 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 </p>
 </div>
 </div>
-<div><h2>Market Conditions</h2>
+<div><h2><span class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/><path d="M17 7l-5 5-5-5"/></svg></span> Market Conditions</h2>
 <div class="card">
 <p>Risk Assessment: <span class="badge badge-gray">NEUTRAL</span></p>
-<div class="ind-row"><span class="ind-item"><span class="ind-label">Gold:</span> $467.63 <span class="pct-up">+5.8%</span></span><span class="ind-item"><span class="ind-label">Oil:</span> $78.89 <span class="pct-up">+2.9%</span></span><span class="ind-item"><span class="ind-label">DXY:</span> $96.92 <span class="pct-down">-0.9%</span></span></div>
+<div class="commodity-tiles"><div class="commodity-tile"><div class="commodity-name">Gold</div><div class="commodity-price">$467.63</div><div class="commodity-chg pct-up">+5.8%</div></div><div class="commodity-tile"><div class="commodity-name">Oil</div><div class="commodity-price">$78.89</div><div class="commodity-chg pct-up">+2.9%</div></div><div class="commodity-tile"><div class="commodity-name">DXY</div><div class="commodity-price">$96.93</div><div class="commodity-chg pct-down">-0.9%</div></div></div>
+<div class="ind-row"><span class="ind-item"><span class="ind-label">Gold:</span> $467.63 <span class="pct-up">+5.8%</span></span><span class="ind-item"><span class="ind-label">Oil:</span> $78.89 <span class="pct-up">+2.9%</span></span><span class="ind-item"><span class="ind-label">DXY:</span> $96.93 <span class="pct-down">-0.9%</span></span></div>
 </div>
 </div>
 </div>
 
-<h2>Strategy Backtest Results</h2>
+<h2><span class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 014 10 15 15 0 01-4 10 15 15 0 01-4-10 15 15 0 014-10z"/></svg></span> Geopolitical Risk</h2>
+<div class="card">
+<p>Risk Level: <span class="badge badge-green">LOW</span> &mdash; 130 events tracked (0 high-impact)</p>
+<div class="sector-badges">
+<span class="sector-badge">energy (100)</span>
+<span class="sector-badge">defense (50)</span>
+<span class="sector-badge">finance (50)</span>
+<span class="sector-badge">general (30)</span>
+</div>
+<p class="mt-8"><span class="badge badge-gray">MILITARY (50)</span> <span class="badge badge-gray">SANCTIONS (50)</span> <span class="badge badge-gray">ELECTIONS (30)</span></p>
+<div class="geo-events">
+<div class="geo-event">
+<div class="geo-title"><span class="badge badge-green">LOW</span> REVIEW : The Foreigner  walks the line of truth  with humour and compassion</div>
+<div class="geo-meta">MILITARY</div>
+</div>
+<div class="geo-event">
+<div class="geo-title"><span class="badge badge-green">LOW</span> Μαξίμ Ναούμοφ : Έχασε τους γονείς του σε αεροπορική τραγωδία το 2025 , αποθεώθηκε στο ντεμπούτο του στους Χειμερινούς Ολυμπιακούς Αγώνες ( Βίντεο ) </div>
+<div class="geo-meta">MILITARY</div>
+</div>
+<div class="geo-event">
+<div class="geo-title"><span class="badge badge-green">LOW</span> Çin , nükleer testler yaptıklarına ilişkin ABDnin iddiasını reddetti</div>
+<div class="geo-meta">MILITARY</div>
+</div>
+<div class="geo-event">
+<div class="geo-title"><span class="badge badge-green">LOW</span> Канцелярия премьер - министра просит убрать слово « бойня » из закона о памяти 7 октября</div>
+<div class="geo-meta">MILITARY</div>
+</div>
+<div class="geo-event">
+<div class="geo-title"><span class="badge badge-green">LOW</span> EUA avaliam ataque ao Irã e preparam envio de novo porta - aviões</div>
+<div class="geo-meta">MILITARY</div>
+</div>
+</div>
+</div>
+
+<h2><span class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg></span> Strategy Backtest Results</h2>
 <div class="card">
 <table>
-<thead><tr><th scope="col">ETF</th><th scope="col">Proposal</th><th scope="col">Sharpe</th><th scope="col">Win Rate</th><th scope="col">Return</th></tr></thead>
+<thead><tr><th scope="col">ETF</th><th scope="col">Proposal</th><th scope="col">Sharpe</th><th scope="col">Win Rate</th><th scope="col">Return</th><th scope="col">Trades</th></tr></thead>
 <tbody>
-<tr><td><strong>TQQQ</strong></td><td>Backtest (Sharpe=3.30): entry 10% vs current 5%</td><td class="num">3.30</td><td class="num">100.0%</td><td class="num pct-up">+71.3%</td></tr>
-<tr><td><strong>UPRO</strong></td><td>Backtest (Sharpe=2.81): entry 10% vs current 5%</td><td class="num">2.81</td><td class="num">100.0%</td><td class="num pct-up">+42.4%</td></tr>
-<tr><td><strong>SOXL</strong></td><td>Backtest (Sharpe=1.36): entry 15% vs current 8%</td><td class="num">1.36</td><td class="num">80.0%</td><td class="num pct-up">+87.9%</td></tr>
-<tr><td><strong>TNA</strong></td><td>Backtest (Sharpe=2.10): entry 5% vs current 7%, target 15% vs current 10%</td><td class="num">2.10</td><td class="num">80.0%</td><td class="num pct-up">+128.1%</td></tr>
-<tr><td><strong>TECL</strong></td><td>Backtest (Sharpe=2.53): entry 12% vs current 7%</td><td class="num">2.53</td><td class="num">100.0%</td><td class="num pct-up">+72.4%</td></tr>
-<tr><td><strong>FAS</strong></td><td>Backtest (Sharpe=9.51): target 15% vs current 10%</td><td class="num">9.51</td><td class="num">100.0%</td><td class="num pct-up">+61.2%</td></tr>
-<tr><td><strong>LABU</strong></td><td>Backtest (Sharpe=8.46): entry 15% vs current 10%, target 8% vs current 10%</td><td class="num">8.46</td><td class="num">100.0%</td><td class="num pct-up">+39.5%</td></tr>
-<tr><td><strong>UCO</strong></td><td>Backtest (Sharpe=54.39): entry 15% vs current 10%</td><td class="num">54.39</td><td class="num">100.0%</td><td class="num pct-up">+51.3%</td></tr>
+<tr><td><strong>TQQQ</strong></td><td>Backtest (Sharpe=3.30): entry 10% vs current 5%</td><td class="num">3.30</td><td class="num">100.0%</td><td class="num pct-up">+71.3%</td><td></td></tr>
+<tr><td><strong>UPRO</strong></td><td>Backtest (Sharpe=2.81): entry 10% vs current 5%</td><td class="num">2.81</td><td class="num">100.0%</td><td class="num pct-up">+42.4%</td><td></td></tr>
+<tr><td><strong>SOXL</strong></td><td>Backtest (Sharpe=1.36): entry 15% vs current 8%</td><td class="num">1.36</td><td class="num">80.0%</td><td class="num pct-up">+87.9%</td><td></td></tr>
+<tr><td><strong>TNA</strong></td><td>Backtest (Sharpe=2.10): entry 5% vs current 7%, target 15% vs current 10%</td><td class="num">2.10</td><td class="num">80.0%</td><td class="num pct-up">+128.1%</td><td></td></tr>
+<tr><td><strong>TECL</strong></td><td>Backtest (Sharpe=2.53): entry 12% vs current 7%</td><td class="num">2.53</td><td class="num">100.0%</td><td class="num pct-up">+72.4%</td><td></td></tr>
+<tr><td><strong>FAS</strong></td><td>Backtest (Sharpe=9.51): target 15% vs current 10%</td><td class="num">9.51</td><td class="num">100.0%</td><td class="num pct-up">+61.2%</td><td></td></tr>
+<tr><td><strong>LABU</strong></td><td>Backtest (Sharpe=8.46): entry 15% vs current 10%, target 8% vs current 10%</td><td class="num">8.46</td><td class="num">100.0%</td><td class="num pct-up">+39.5%</td><td></td></tr>
+<tr><td><strong>UCO</strong></td><td>Backtest (Sharpe=54.39): entry 15% vs current 10%</td><td class="num">54.39</td><td class="num">100.0%</td><td class="num pct-up">+51.3%</td><td></td></tr>
 </tbody></table>
 </div>
 
@@ -595,19 +695,19 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 <summary><h2 style="display:inline">Module Status</h2> <span class="badge badge-green">15/15</span></summary>
 <div class="card">
 <div class="module-grid">
-<span class="module-pill module-pill-ok">&#10003; etf.signals <span class="pill-dur">0.8s</span></span>
+<span class="module-pill module-pill-ok">&#10003; etf.signals <span class="pill-dur">2.6s</span></span>
 <span class="module-pill module-pill-ok">&#10003; etf.active <span class="pill-dur">0.8s</span></span>
-<span class="module-pill module-pill-ok">&#10003; macro.dashboard <span class="pill-dur">3.7s</span></span>
+<span class="module-pill module-pill-ok">&#10003; macro.dashboard <span class="pill-dur">5.3s</span></span>
 <span class="module-pill module-pill-ok">&#10003; macro.yields <span class="pill-dur">1.8s</span></span>
-<span class="module-pill module-pill-ok">&#10003; macro.rates <span class="pill-dur">1.6s</span></span>
-<span class="module-pill module-pill-ok">&#10003; macro.calendar <span class="pill-dur">0.8s</span></span>
-<span class="module-pill module-pill-ok">&#10003; sec.recent <span class="pill-dur">10.3s</span></span>
-<span class="module-pill module-pill-ok">&#10003; sec.institutional <span class="pill-dur">2.4s</span></span>
-<span class="module-pill module-pill-ok">&#10003; geopolitical.summary <span class="pill-dur">20.0s</span></span>
-<span class="module-pill module-pill-ok">&#10003; social.summary <span class="pill-dur">0.8s</span></span>
-<span class="module-pill module-pill-ok">&#10003; news.summary <span class="pill-dur">2.2s</span></span>
-<span class="module-pill module-pill-ok">&#10003; statistics.dashboard <span class="pill-dur">2.4s</span></span>
-<span class="module-pill module-pill-ok">&#10003; strategy.proposals <span class="pill-dur">14.7s</span></span>
+<span class="module-pill module-pill-ok">&#10003; macro.rates <span class="pill-dur">3.5s</span></span>
+<span class="module-pill module-pill-ok">&#10003; macro.calendar <span class="pill-dur">0.9s</span></span>
+<span class="module-pill module-pill-ok">&#10003; sec.recent <span class="pill-dur">11.5s</span></span>
+<span class="module-pill module-pill-ok">&#10003; sec.institutional <span class="pill-dur">2.5s</span></span>
+<span class="module-pill module-pill-ok">&#10003; geopolitical.summary <span class="pill-dur">35.3s</span></span>
+<span class="module-pill module-pill-ok">&#10003; social.summary <span class="pill-dur">0.9s</span></span>
+<span class="module-pill module-pill-ok">&#10003; news.summary <span class="pill-dur">2.3s</span></span>
+<span class="module-pill module-pill-ok">&#10003; statistics.dashboard <span class="pill-dur">2.3s</span></span>
+<span class="module-pill module-pill-ok">&#10003; strategy.proposals <span class="pill-dur">15.0s</span></span>
 <span class="module-pill module-pill-ok">&#10003; history.weights <span class="pill-dur">0.1s</span></span>
 <span class="module-pill module-pill-ok">&#10003; history.summary <span class="pill-dur">0.1s</span></span>
 </div>
