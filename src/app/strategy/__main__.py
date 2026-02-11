@@ -99,8 +99,8 @@ def _cmd_optimize(args: list[str]) -> int:
 
 def _cmd_proposals() -> int:
     summary = generate_proposals()
-    print(
-        json.dumps(  # noqa: T201
+    print(  # noqa: T201
+        json.dumps(
             [asdict(p) for p in summary.proposals],
             indent=2,
         )
