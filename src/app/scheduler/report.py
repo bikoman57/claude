@@ -49,12 +49,15 @@ def build_report_text(run: SchedulerRun) -> str:
         if result.success and result.output.strip():
             outputs[result.name] = result.output.strip()
 
-    # Market overview from macro dashboard
+    # Market overview from macro dashboard + rates
     if "macro.dashboard" in outputs:
         data = _parse_output(outputs["macro.dashboard"])
         if isinstance(data, dict):
             vix = data.get("vix_regime", "N/A")
-            fed = data.get("fed_trajectory", "N/A")
+            fed = "N/A"
+            rates = _parse_output(outputs.get("macro.rates", ""))
+            if isinstance(rates, dict):
+                fed = str(rates.get("trajectory", "N/A"))
             section = f"VIX: {vix} | Fed: {fed}"
             lines.append(_section("MARKET OVERVIEW", section))
             lines.append("")
@@ -78,7 +81,7 @@ def build_report_text(run: SchedulerRun) -> str:
             officials = data.get("officials", {})
             tone = "N/A"
             if isinstance(officials, dict):
-                tone = officials.get("overall_tone", "N/A")
+                tone = officials.get("fed_tone", "N/A")
             section = f"Officials tone: {tone}"
             lines.append(
                 _section("SOCIAL & OFFICIALS", section),
@@ -89,7 +92,7 @@ def build_report_text(run: SchedulerRun) -> str:
     if "news.summary" in outputs:
         data = _parse_output(outputs["news.summary"])
         if isinstance(data, dict):
-            sentiment = data.get("overall_sentiment", "N/A")
+            sentiment = data.get("sentiment", "N/A")
             count = data.get("total_articles", 0)
             section = f"Sentiment: {sentiment} ({count} articles)"
             lines.append(
@@ -112,8 +115,8 @@ def build_report_text(run: SchedulerRun) -> str:
             lines.append("")
 
     # ETF signals
-    if "etf.scan" in outputs:
-        data = _parse_output(outputs["etf.scan"])
+    if "etf.signals" in outputs:
+        data = _parse_output(outputs["etf.signals"])
         if isinstance(data, list) and data:
             signal_lines = []
             for sig in data[:5]:

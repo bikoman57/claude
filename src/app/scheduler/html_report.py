@@ -1,4 +1,4 @@
-"""HTML report generation for GitHub Pages — dashboard layout."""
+"""HTML report generation for GitHub Pages — narrative dashboard layout."""
 
 from __future__ import annotations
 
@@ -6,6 +6,22 @@ import html
 import json
 from datetime import UTC, datetime
 
+from app.etf.confidence import (
+    ConfidenceLevel,
+    ConfidenceScore,
+    FactorAssessment,
+    FactorResult,
+    assess_drawdown_depth,
+    assess_fed_regime,
+    assess_geopolitical_risk,
+    assess_market_statistics,
+    assess_news_sentiment,
+    assess_sec_sentiment,
+    assess_social_sentiment,
+    assess_vix_regime,
+    assess_yield_curve,
+    compute_confidence,
+)
 from app.scheduler.runner import SchedulerRun
 
 _CSS = """\
@@ -22,6 +38,14 @@ h2 { color: #e6edf3; margin-bottom: 12px; font-size: 1.1em; font-weight: 600;
           border-bottom: 1px solid #30363d; padding-bottom: 16px;
           margin-bottom: 24px; flex-wrap: wrap; gap: 8px; }
 .header-status { font-size: 0.9em; }
+
+/* Executive summary */
+.exec-summary { background: #161b22; border: 1px solid #30363d;
+  border-left: 4px solid #58a6ff; border-radius: 8px; padding: 20px;
+  margin-bottom: 24px; }
+.exec-summary p { margin-bottom: 8px; }
+.exec-summary .headline { font-size: 1.15em; color: #e6edf3; font-weight: 600; }
+.exec-summary .detail { font-size: 0.95em; color: #8b949e; }
 
 /* KPI strip */
 .kpi-strip { display: grid;
@@ -42,6 +66,15 @@ h2 { color: #e6edf3; margin-bottom: 12px; font-size: 1.1em; font-weight: 600;
 .kpi-bar-red { border-top-color: #da3633; }
 .kpi-bar-gray { border-top-color: #484f58; }
 
+/* Gauge bar */
+.gauge-track { height: 6px; background: #21262d; border-radius: 3px;
+  margin-top: 8px; overflow: hidden; }
+.gauge-fill { height: 100%; border-radius: 3px; transition: width 0.3s ease; }
+.gauge-fill-green { background: #238636; }
+.gauge-fill-yellow { background: #9e6a03; }
+.gauge-fill-red { background: #da3633; }
+.gauge-fill-gray { background: #484f58; }
+
 /* Cards */
 .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px;
   padding: 20px; margin-bottom: 24px;
@@ -59,6 +92,7 @@ h2 { color: #e6edf3; margin-bottom: 12px; font-size: 1.1em; font-weight: 600;
 .badge-yellow { background: #9e6a03; color: #fff; }
 .badge-red { background: #da3633; color: #fff; }
 .badge-gray { background: #30363d; color: #8b949e; }
+.badge-blue { background: #1f6feb; color: #fff; }
 
 /* Tables */
 table { border-collapse: collapse; width: 100%; }
@@ -70,6 +104,57 @@ tbody tr:hover { background: #1c2128; }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
 .pct-up { color: #3fb950; }
 .pct-down { color: #f85149; }
+
+/* Signal cards */
+.signal-card { background: #161b22; border: 1px solid #30363d;
+  border-radius: 8px; padding: 16px; margin-bottom: 12px;
+  border-left: 4px solid #30363d; }
+.signal-card-signal { border-left-color: #3fb950; }
+.signal-card-alert { border-left-color: #9e6a03; }
+.signal-card-active { border-left-color: #1f6feb; }
+.signal-card-watch { border-left-color: #484f58; }
+.signal-card-target { border-left-color: #a371f7; }
+.signal-header { display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
+.signal-ticker { font-size: 1.2em; font-weight: 700; color: #e6edf3; }
+.signal-details { font-size: 0.9em; color: #8b949e; }
+
+/* Confidence */
+.confidence-bar { display: flex; gap: 3px; margin-top: 6px; }
+.conf-dot { width: 12px; height: 12px; border-radius: 50%;
+  background: #21262d; }
+.conf-dot-favorable { background: #238636; }
+.conf-dot-unfavorable { background: #da3633; }
+.conf-dot-neutral { background: #484f58; }
+
+/* Factor table in details */
+.factor-table { width: 100%; margin-top: 8px; }
+.factor-table td { padding: 4px 8px; font-size: 0.85em;
+  border-bottom: 1px solid #21262d; }
+.factor-table .factor-name { color: #8b949e; }
+
+/* Sentiment bar */
+.sentiment-bar { display: flex; height: 20px; border-radius: 4px;
+  overflow: hidden; margin: 8px 0; }
+.sentiment-fill-bullish { background: #238636; }
+.sentiment-fill-bearish { background: #da3633; }
+.sentiment-fill-neutral { background: #484f58; }
+.sentiment-counts { display: flex; gap: 16px; font-size: 0.85em;
+  color: #8b949e; margin-top: 4px; }
+.sentiment-count-bullish { color: #3fb950; }
+.sentiment-count-bearish { color: #f85149; }
+
+/* Details/summary */
+details { margin-top: 8px; }
+summary { cursor: pointer; font-size: 0.85em; color: #58a6ff;
+  padding: 4px 0; }
+summary:hover { text-decoration: underline; }
+details[open] summary { margin-bottom: 8px; }
+
+/* Sector badges */
+.sector-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.sector-badge { display: inline-block; padding: 2px 8px; border-radius: 10px;
+  font-size: 0.75em; background: #21262d; color: #8b949e; }
 
 /* Indicators row */
 .ind-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
@@ -142,6 +227,11 @@ _BADGE_MAP: dict[str, str] = {
     "CUTTING": "badge-green",
     "DOVISH": "badge-green",
     "FAVORABLE": "badge-green",
+    "SIGNAL": "badge-green",
+    "ACTIVE": "badge-blue",
+    "ALERT": "badge-yellow",
+    "WATCH": "badge-gray",
+    "TARGET": "badge-green",
 }
 
 _KPI_BAR_MAP: dict[str, str] = {
@@ -149,6 +239,15 @@ _KPI_BAR_MAP: dict[str, str] = {
     "badge-yellow": "kpi-bar-yellow",
     "badge-red": "kpi-bar-red",
     "badge-gray": "kpi-bar-gray",
+    "badge-blue": "kpi-bar-gray",
+}
+
+_GAUGE_FILL_MAP: dict[str, str] = {
+    "badge-green": "gauge-fill-green",
+    "badge-yellow": "gauge-fill-yellow",
+    "badge-red": "gauge-fill-red",
+    "badge-gray": "gauge-fill-gray",
+    "badge-blue": "gauge-fill-gray",
 }
 
 
@@ -162,6 +261,12 @@ def _kpi_bar_class(level: str) -> str:
     """Return the KPI card border-top color class for a level."""
     badge_cls = _BADGE_MAP.get(level.upper(), "badge-gray")
     return _KPI_BAR_MAP.get(badge_cls, "kpi-bar-gray")
+
+
+def _gauge_fill_class(level: str) -> str:
+    """Return gauge fill color class for a level."""
+    badge_cls = _BADGE_MAP.get(level.upper(), "badge-gray")
+    return _GAUGE_FILL_MAP.get(badge_cls, "gauge-fill-gray")
 
 
 def _parse_output(
@@ -196,6 +301,17 @@ def _fmt_price(value: object) -> str:
     return f"${value:,.2f}"
 
 
+def _gauge_bar(pct: float, level: str) -> str:
+    """Render a horizontal gauge bar filled to pct (0-100)."""
+    clamped = max(0.0, min(100.0, pct))
+    fill_cls = _gauge_fill_class(level)
+    return (
+        '<div class="gauge-track">'
+        f'<div class="gauge-fill {fill_cls}" style="width:{clamped:.0f}%">'
+        "</div></div>"
+    )
+
+
 def _html_page(title: str, body: str) -> str:
     """Wrap body content in a full HTML5 page with inline CSS."""
     return (
@@ -209,6 +325,117 @@ def _html_page(title: str, body: str) -> str:
     )
 
 
+# --- Confidence computation from module outputs ---
+
+
+def _compute_signal_confidence(
+    outputs: dict[str, str],
+    signal: dict[str, object],
+) -> ConfidenceScore:
+    """Compute confidence for a single ETF signal using all available data."""
+    factors: list[FactorResult] = []
+
+    # 1. Drawdown depth
+    dd = signal.get("underlying_drawdown_pct", 0)
+    threshold = signal.get("profit_target_pct", 0.10)
+    if isinstance(dd, (int, float)) and isinstance(threshold, (int, float)):
+        factors.append(assess_drawdown_depth(dd, max(threshold, 0.05)))
+
+    # 2. VIX regime
+    macro = _parse_output(outputs.get("macro.dashboard", ""))
+    vix_regime = "UNKNOWN"
+    if isinstance(macro, dict):
+        vix_regime = str(macro.get("vix_regime", "UNKNOWN"))
+    factors.append(assess_vix_regime(vix_regime))
+
+    # 3. Fed regime
+    rates = _parse_output(outputs.get("macro.rates", ""))
+    trajectory = "UNKNOWN"
+    if isinstance(rates, dict):
+        trajectory = str(rates.get("trajectory", "UNKNOWN"))
+    factors.append(assess_fed_regime(trajectory))
+
+    # 4. Yield curve
+    yields = _parse_output(outputs.get("macro.yields", ""))
+    curve = "UNKNOWN"
+    if isinstance(yields, dict):
+        curve = str(yields.get("curve_status", "UNKNOWN"))
+    factors.append(assess_yield_curve(curve))
+
+    # 5. SEC filings
+    factors.append(assess_sec_sentiment(0))
+
+    # 6. Geopolitical
+    geo = _parse_output(outputs.get("geopolitical.summary", ""))
+    geo_risk = "UNKNOWN"
+    if isinstance(geo, dict):
+        geo_risk = str(geo.get("risk_level", "UNKNOWN"))
+    factors.append(assess_geopolitical_risk(geo_risk))
+
+    # 7. Social sentiment
+    social = _parse_output(outputs.get("social.summary", ""))
+    social_tone = "NEUTRAL"
+    if isinstance(social, dict):
+        officials = social.get("officials", {})
+        if isinstance(officials, dict):
+            social_tone = str(officials.get("fed_tone", "NEUTRAL"))
+    factors.append(assess_social_sentiment(social_tone))
+
+    # 8. News sentiment
+    news = _parse_output(outputs.get("news.summary", ""))
+    news_sent = "NEUTRAL"
+    if isinstance(news, dict):
+        news_sent = str(news.get("sentiment", "NEUTRAL"))
+    factors.append(assess_news_sentiment(news_sent))
+
+    # 9. Market statistics
+    stats = _parse_output(outputs.get("statistics.dashboard", ""))
+    mkt_assess = "NEUTRAL"
+    if isinstance(stats, dict):
+        risk_ind = stats.get("risk_indicators", {})
+        if isinstance(risk_ind, dict):
+            mkt_assess = str(risk_ind.get("risk_assessment", "NEUTRAL"))
+    factors.append(assess_market_statistics(mkt_assess))
+
+    return compute_confidence(factors)
+
+
+def _render_confidence_dots(score: ConfidenceScore) -> str:
+    """Render confidence as colored dots."""
+    dots: list[str] = []
+    for f in score.factors:
+        if f.assessment == FactorAssessment.FAVORABLE:
+            cls = "conf-dot-favorable"
+        elif f.assessment == FactorAssessment.UNFAVORABLE:
+            cls = "conf-dot-unfavorable"
+        else:
+            cls = "conf-dot-neutral"
+        title = f"{html.escape(f.name)}: {html.escape(f.reason)}"
+        dots.append(
+            f'<span class="conf-dot {cls}" title="{title}"></span>',
+        )
+    return f'<div class="confidence-bar">{"".join(dots)}</div>'
+
+
+def _render_factor_table(score: ConfidenceScore) -> str:
+    """Render a detailed factor breakdown table."""
+    rows: list[str] = []
+    for f in score.factors:
+        name = html.escape(f.name.replace("_", " ").title())
+        reason = html.escape(f.reason)
+        badge = _badge(str(f.assessment))
+        rows.append(
+            f'<tr><td class="factor-name">{name}</td>'
+            f"<td>{badge}</td>"
+            f"<td>{reason}</td></tr>",
+        )
+    return (
+        '<table class="factor-table"><tbody>'
+        + "\n".join(rows)
+        + "</tbody></table>"
+    )
+
+
 # --- KPI card helpers ---
 
 
@@ -217,8 +444,9 @@ def _kpi_card(
     value: str,
     level: str,
     sub: str = "",
+    gauge_pct: float | None = None,
 ) -> str:
-    """Render a single KPI metric card."""
+    """Render a single KPI metric card with optional gauge bar."""
     bar = _kpi_bar_class(level)
     parts = [
         f'<div class="kpi-card {bar}">',
@@ -227,15 +455,17 @@ def _kpi_card(
     ]
     if sub:
         parts.append(f'<div class="kpi-sub">{sub}</div>')
+    if gauge_pct is not None:
+        parts.append(_gauge_bar(gauge_pct, level))
     parts.append("</div>")
     return "\n".join(parts)
 
 
 def _section_kpi_strip(outputs: dict[str, str]) -> str:
-    """Render the top KPI metric strip from multiple module outputs."""
+    """Render the top KPI metric strip with gauge bars."""
     cards: list[str] = []
 
-    # VIX
+    # VIX — scale 0-50
     macro = _parse_output(outputs.get("macro.dashboard", ""))
     if isinstance(macro, dict):
         vix_val = macro.get("vix", None)
@@ -243,20 +473,33 @@ def _section_kpi_strip(outputs: dict[str, str]) -> str:
         vix_display = (
             f"{vix_val:.1f}" if isinstance(vix_val, (int, float)) else "N/A"
         )
+        gauge = (
+            (float(vix_val) / 50.0) * 100.0
+            if isinstance(vix_val, (int, float))
+            else None
+        )
         cards.append(_kpi_card(
             "VIX", vix_display, vix_regime, _badge(vix_regime),
+            gauge_pct=gauge,
         ))
 
-    # Fed trajectory
+    # Fed trajectory — from macro.rates
+    rates = _parse_output(outputs.get("macro.rates", ""))
     if isinstance(macro, dict):
-        fed = str(macro.get("fed_trajectory", "N/A"))
-        rate = macro.get("fed_funds_rate", None)
-        rate_sub = (
-            f"{rate:.2f}%" if isinstance(rate, (int, float)) else ""
-        )
+        fed = "N/A"
+        rate_sub = ""
+        if isinstance(rates, dict):
+            fed = str(rates.get("trajectory", "N/A"))
+            current_rate = rates.get("current_rate", None)
+            if isinstance(current_rate, (int, float)):
+                rate_sub = f"{current_rate:.2f}%"
+        elif isinstance(macro, dict):
+            fed_rate = macro.get("fed_funds_rate", None)
+            if isinstance(fed_rate, (int, float)):
+                rate_sub = f"{fed_rate:.2f}%"
         cards.append(_kpi_card("Fed", _badge(fed), fed, rate_sub))
 
-    # Yield curve
+    # Yield curve — spread scale -2 to +2
     yields = _parse_output(outputs.get("macro.yields", ""))
     if isinstance(yields, dict):
         curve = str(yields.get("curve_status", "N/A"))
@@ -266,7 +509,15 @@ def _section_kpi_strip(outputs: dict[str, str]) -> str:
             if isinstance(spread, (int, float))
             else ""
         )
-        cards.append(_kpi_card("Yield Curve", _badge(curve), curve, spread_sub))
+        gauge = (
+            ((float(spread) + 2.0) / 4.0) * 100.0
+            if isinstance(spread, (int, float))
+            else None
+        )
+        cards.append(_kpi_card(
+            "Yield Curve", _badge(curve), curve, spread_sub,
+            gauge_pct=gauge,
+        ))
 
     # Geopolitical
     geo = _parse_output(outputs.get("geopolitical.summary", ""))
@@ -280,10 +531,10 @@ def _section_kpi_strip(outputs: dict[str, str]) -> str:
             f"{html.escape(str(events))} events",
         ))
 
-    # News sentiment
+    # News sentiment — with article counts
     news = _parse_output(outputs.get("news.summary", ""))
     if isinstance(news, dict):
-        sentiment = str(news.get("overall_sentiment", "N/A"))
+        sentiment = str(news.get("sentiment", "N/A"))
         articles = news.get("total_articles", 0)
         cards.append(_kpi_card(
             "News",
@@ -301,108 +552,303 @@ def _section_kpi_strip(outputs: dict[str, str]) -> str:
     )
 
 
-# --- Section builders ---
+# --- Executive summary ---
 
 
-def _section_etf_signals(outputs: dict[str, str]) -> str:
-    """Render the ETF entry signals table with full details."""
-    if "etf.scan" not in outputs:
+def _section_executive_summary(
+    outputs: dict[str, str],
+    signals: list[dict[str, object]],
+) -> str:
+    """Generate a narrative executive summary."""
+    # Count signals by state
+    signal_count = sum(
+        1 for s in signals
+        if isinstance(s.get("state"), str) and s["state"] == "SIGNAL"
+    )
+    alert_count = sum(
+        1 for s in signals
+        if isinstance(s.get("state"), str) and s["state"] == "ALERT"
+    )
+    active_count = sum(
+        1 for s in signals
+        if isinstance(s.get("state"), str) and s["state"] == "ACTIVE"
+    )
+
+    # Compute a representative confidence for the best signal
+    best_confidence: ConfidenceScore | None = None
+    signal_etfs = [
+        s for s in signals
+        if isinstance(s.get("state"), str) and s["state"] == "SIGNAL"
+    ]
+    if signal_etfs:
+        best_confidence = _compute_signal_confidence(outputs, signal_etfs[0])
+
+    # Gather factors for narrative
+    favorable_factors: list[str] = []
+    unfavorable_factors: list[str] = []
+    if best_confidence:
+        for f in best_confidence.factors:
+            if f.assessment == FactorAssessment.FAVORABLE:
+                favorable_factors.append(f.reason)
+            elif f.assessment == FactorAssessment.UNFAVORABLE:
+                unfavorable_factors.append(f.reason)
+
+    # Build narrative
+    lines: list[str] = []
+
+    # Headline
+    if signal_count > 0 and best_confidence:
+        if best_confidence.level == ConfidenceLevel.HIGH:
+            stance = "favor"
+        elif best_confidence.level == ConfidenceLevel.MEDIUM:
+            stance = "are mixed for"
+        else:
+            stance = "oppose"
+        conf_str = (
+            f"{best_confidence.favorable_count}/{best_confidence.total_factors}"
+        )
+        headline = (
+            f"Market conditions {stance} mean-reversion entries. "
+            f"{signal_count} ETF(s) at actionable SIGNAL level "
+            f"with {best_confidence.level} confidence ({conf_str})."
+        )
+    elif alert_count > 0:
+        headline = (
+            f"No ETFs at SIGNAL level. {alert_count} ETF(s) approaching "
+            f"entry thresholds at ALERT level. Monitoring for deeper drawdowns."
+        )
+    elif active_count > 0:
+        headline = (
+            f"{active_count} active position(s) being tracked. "
+            "No new entry signals today."
+        )
+    else:
+        headline = (
+            "No actionable signals today. "
+            f"{len(signals)} ETF(s) being monitored across the universe."
+        )
+
+    lines.append(f'<p class="headline">{html.escape(headline)}</p>')
+
+    # Key support / risk factors
+    if favorable_factors:
+        support = html.escape(favorable_factors[0])
+        lines.append(f'<p class="detail">Key support: {support}</p>')
+    if unfavorable_factors:
+        risk = html.escape(unfavorable_factors[0])
+        lines.append(f'<p class="detail">Key risk: {risk}</p>')
+
+    if not lines:
         return ""
-    data = _parse_output(outputs["etf.scan"])
-    if not isinstance(data, list) or not data:
+    return (
+        '<div class="exec-summary">\n'
+        + "\n".join(lines)
+        + "\n</div>\n"
+    )
+
+
+# --- ETF signal cards ---
+
+
+def _section_etf_signals(
+    outputs: dict[str, str],
+    signals: list[dict[str, object]],
+) -> str:
+    """Render ETF signals as individual cards with confidence drill-down."""
+    if not signals:
         return ""
-    rows: list[str] = []
-    for sig in data[:8]:
+    cards: list[str] = []
+    for sig in signals[:10]:
         if not isinstance(sig, dict):
             continue
         ticker = html.escape(str(sig.get("leveraged_ticker", "?")))
         underlying = html.escape(str(sig.get("underlying_ticker", "")))
         state = str(sig.get("state", "?"))
+        state_lower = state.lower()
         dd = sig.get("underlying_drawdown_pct", 0)
         dd_str = _fmt_pct(dd)
-        dd_cls = _pct_class(dd if isinstance(dd, (int, float)) else 0)
         ath = sig.get("underlying_ath", None)
         current = sig.get("underlying_current", None)
         pl = sig.get("current_pl_pct", None)
-        pl_cell = ""
+        entry_price = sig.get("leveraged_entry_price", None)
+        target_pct = sig.get("profit_target_pct", 0.10)
+
+        # Compute confidence
+        confidence = _compute_signal_confidence(outputs, sig)
+
+        # Card wrapper
+        card_cls = f"signal-card signal-card-{state_lower}"
+        parts: list[str] = [f'<div class="{card_cls}">']
+
+        # Header row: ticker, state, confidence
+        parts.append('<div class="signal-header">')
+        parts.append(
+            f'<span><span class="signal-ticker">{ticker}</span> '
+            f"({underlying}) &mdash; {_badge(state)}</span>",
+        )
+        conf_badge = _badge(str(confidence.level))
+        parts.append(
+            f"<span>Confidence: {conf_badge} "
+            f"({confidence.favorable_count}/{confidence.total_factors})"
+            "</span>",
+        )
+        parts.append("</div>")
+
+        # Details row
+        detail_parts = [f"Drawdown: {html.escape(dd_str)}"]
+        if isinstance(ath, (int, float)):
+            detail_parts.append(f"ATH: {_fmt_price(ath)}")
+        if isinstance(current, (int, float)):
+            detail_parts.append(f"Current: {_fmt_price(current)}")
+        if isinstance(entry_price, (int, float)):
+            detail_parts.append(f"Entry: {_fmt_price(entry_price)}")
+        if isinstance(target_pct, (int, float)):
+            detail_parts.append(f"Target: {_fmt_pct(target_pct)}")
         if isinstance(pl, (int, float)):
-            pl_cell = (
-                f'<span class="{_pct_class(pl)}">{_fmt_pct(pl, signed=True)}'
-                f"</span>"
+            pl_cls = _pct_class(pl)
+            detail_parts.append(
+                f'P&L: <span class="{pl_cls}">'
+                f"{_fmt_pct(pl, signed=True)}</span>",
             )
 
-        rows.append(
-            f"<tr><td><strong>{ticker}</strong></td>"
-            f"<td>{underlying}</td>"
-            f"<td>{_badge(state)}</td>"
-            f'<td class="num {dd_cls}">{html.escape(dd_str)}</td>'
-            f'<td class="num">{_fmt_price(ath)}</td>'
-            f'<td class="num">{_fmt_price(current)}</td>'
-            f'<td class="num">{pl_cell}</td></tr>',
+        parts.append(
+            '<div class="signal-details">'
+            + " &bull; ".join(detail_parts)
+            + "</div>",
         )
-    if not rows:
+
+        # Confidence dots
+        parts.append(_render_confidence_dots(confidence))
+
+        # Drill-down: factor breakdown
+        parts.append("<details>")
+        parts.append("<summary>View 9-factor analysis</summary>")
+        parts.append(_render_factor_table(confidence))
+        parts.append("</details>")
+
+        parts.append("</div>")
+        cards.append("\n".join(parts))
+
+    if not cards:
         return ""
     return (
-        "<h2>Entry Signals</h2>\n"
-        '<div class="card">\n<table>\n'
-        "<thead><tr>"
-        "<th>ETF</th><th>Underlying</th><th>State</th>"
-        "<th>Drawdown</th><th>ATH</th><th>Current</th><th>P&amp;L</th>"
-        "</tr></thead>\n<tbody>\n"
-        + "\n".join(rows)
-        + "\n</tbody></table>\n</div>\n"
+        "<h2>Entry Signals &amp; Active Positions</h2>\n"
+        + "\n".join(cards)
+        + "\n"
     )
 
 
-def _section_strategy(outputs: dict[str, str]) -> str:
-    """Render strategy proposals with backtest metrics."""
-    if "strategy.proposals" not in outputs:
-        return ""
-    data = _parse_output(outputs["strategy.proposals"])
-    if not isinstance(data, list) or not data:
-        return ""
-    rows: list[str] = []
-    for p in data[:8]:
-        if not isinstance(p, dict):
-            continue
-        ticker = html.escape(str(p.get("leveraged_ticker", "?")))
-        reason = html.escape(str(p.get("improvement_reason", "")))
-        sharpe = p.get("backtest_sharpe", None)
-        sharpe_str = (
-            f"{sharpe:.2f}" if isinstance(sharpe, (int, float)) else "N/A"
-        )
-        wr = p.get("backtest_win_rate", None)
-        wr_str = _fmt_pct(wr) if isinstance(wr, (int, float)) else "N/A"
-        ret = p.get("backtest_total_return", None)
-        ret_str = _fmt_pct(ret, signed=True) if isinstance(ret, (int, float)) else "N/A"
-        ret_cls = _pct_class(ret)
-
-        rows.append(
-            f"<tr><td><strong>{ticker}</strong></td>"
-            f"<td>{reason}</td>"
-            f'<td class="num">{html.escape(sharpe_str)}</td>'
-            f'<td class="num">{html.escape(wr_str)}</td>'
-            f'<td class="num {ret_cls}">{html.escape(ret_str)}</td></tr>',
-        )
-    if not rows:
-        return ""
-    return (
-        "<h2>Strategy Proposals</h2>\n"
-        '<div class="card">\n<table>\n'
-        "<thead><tr>"
-        "<th>ETF</th><th>Proposal</th>"
-        "<th>Sharpe</th><th>Win Rate</th><th>Return</th>"
-        "</tr></thead>\n<tbody>\n"
-        + "\n".join(rows)
-        + "\n</tbody></table>\n</div>\n"
-    )
+# --- Sentiment section ---
 
 
-def _section_market_indicators(outputs: dict[str, str]) -> str:
-    """Render market indicators: risk, commodities, correlations, officials."""
+def _section_sentiment(outputs: dict[str, str]) -> str:
+    """Render sentiment analysis with visual bars and drill-down."""
     parts: list[str] = []
 
-    # Statistics risk
+    news = _parse_output(outputs.get("news.summary", ""))
+    if isinstance(news, dict):
+        sentiment = str(news.get("sentiment", "N/A"))
+        bullish = news.get("bullish_count", 0)
+        bearish = news.get("bearish_count", 0)
+        neutral = news.get("neutral_count", 0)
+
+        bullish = int(bullish) if isinstance(bullish, (int, float)) else 0
+        bearish = int(bearish) if isinstance(bearish, (int, float)) else 0
+        neutral = int(neutral) if isinstance(neutral, (int, float)) else 0
+
+        total = bullish + bearish + neutral
+        if total > 0:
+            b_pct = (bullish / total) * 100
+            r_pct = (bearish / total) * 100
+            n_pct = (neutral / total) * 100
+        else:
+            b_pct = r_pct = 0.0
+            n_pct = 100.0
+
+        parts.append(f"<p>News Sentiment: {_badge(sentiment)}</p>")
+        parts.append(
+            '<div class="sentiment-bar">'
+            f'<div class="sentiment-fill-bullish" style="width:{b_pct:.1f}%"></div>'
+            f'<div class="sentiment-fill-bearish" style="width:{r_pct:.1f}%"></div>'
+            f'<div class="sentiment-fill-neutral" style="width:{n_pct:.1f}%"></div>'
+            "</div>",
+        )
+        parts.append(
+            '<div class="sentiment-counts">'
+            f'<span class="sentiment-count-bullish">{bullish} bullish</span>'
+            f'<span class="sentiment-count-bearish">{bearish} bearish</span>'
+            f"<span>{neutral} neutral</span>"
+            "</div>",
+        )
+
+        # Headlines drill-down
+        headlines = news.get("top_headlines", [])
+        if isinstance(headlines, list) and headlines:
+            parts.append("<details>")
+            parts.append("<summary>Top headlines</summary>")
+            parts.append("<ul>")
+            for h in headlines[:8]:
+                if isinstance(h, dict):
+                    title = html.escape(str(h.get("title", "")))
+                    h_sent = str(h.get("sentiment", ""))
+                    h_badge = _badge(h_sent) if h_sent else ""
+                    parts.append(f"<li>{title} {h_badge}</li>")
+            parts.append("</ul>")
+            parts.append("</details>")
+
+        # Sector mentions
+        sectors = news.get("sector_mentions", {})
+        if isinstance(sectors, dict) and sectors:
+            sorted_sectors = sorted(
+                sectors.items(),
+                key=lambda x: x[1] if isinstance(x[1], (int, float)) else 0,
+                reverse=True,
+            )
+            parts.append('<div class="sector-badges">')
+            for name, count in sorted_sectors[:8]:
+                parts.append(
+                    f'<span class="sector-badge">'
+                    f"{html.escape(str(name))} ({count})"
+                    "</span>",
+                )
+            parts.append("</div>")
+
+    # Officials tone from social
+    social = _parse_output(outputs.get("social.summary", ""))
+    if isinstance(social, dict):
+        officials = social.get("officials", {})
+        if isinstance(officials, dict):
+            tone = str(officials.get("fed_tone", "N/A"))
+            policy = str(officials.get("policy_direction", ""))
+            stmts = officials.get("total_statements", 0)
+            parts.append(
+                f'<p style="margin-top:12px">Officials Tone: {_badge(tone)}',
+            )
+            if policy and policy != "N/A":
+                parts.append(f" &nbsp; Policy: {_badge(policy)}")
+            if isinstance(stmts, (int, float)) and stmts > 0:
+                parts.append(
+                    f' <span style="color:#8b949e">({int(stmts)} statements)</span>',
+                )
+            parts.append("</p>")
+
+    if not parts:
+        return ""
+    return (
+        "<h2>Sentiment Analysis</h2>\n"
+        '<div class="card">\n'
+        + "\n".join(parts)
+        + "\n</div>\n"
+    )
+
+
+# --- Market conditions section ---
+
+
+def _section_market_conditions(outputs: dict[str, str]) -> str:
+    """Render market conditions: risk indicators, commodities, correlations."""
+    parts: list[str] = []
+
     stats = _parse_output(outputs.get("statistics.dashboard", ""))
     if isinstance(stats, dict):
         risk = stats.get("risk_indicators", {})
@@ -454,27 +900,68 @@ def _section_market_indicators(outputs: dict[str, str]) -> str:
                     f"{pairs}</p>",
                 )
 
-    # Social / officials tone
-    social = _parse_output(outputs.get("social.summary", ""))
-    if isinstance(social, dict):
-        officials = social.get("officials", {})
-        if isinstance(officials, dict):
-            tone = str(officials.get("overall_tone", "N/A"))
-            policy = str(officials.get("policy_direction", ""))
-            tone_line = f"<p>Officials Tone: {_badge(tone)}"
-            if policy and policy != "N/A":
-                tone_line += f" &nbsp; Policy: {_badge(policy)}"
-            tone_line += "</p>"
-            parts.append(tone_line)
-
     if not parts:
         return ""
     return (
-        "<h2>Market Indicators</h2>\n"
+        "<h2>Market Conditions</h2>\n"
         '<div class="card">\n'
         + "\n".join(parts)
         + "\n</div>\n"
     )
+
+
+# --- Strategy section ---
+
+
+def _section_strategy(outputs: dict[str, str]) -> str:
+    """Render strategy backtest results with drill-down."""
+    if "strategy.proposals" not in outputs:
+        return ""
+    data = _parse_output(outputs["strategy.proposals"])
+    if not isinstance(data, list) or not data:
+        return ""
+    rows: list[str] = []
+    for p in data[:8]:
+        if not isinstance(p, dict):
+            continue
+        ticker = html.escape(str(p.get("leveraged_ticker", "?")))
+        reason = html.escape(str(p.get("improvement_reason", "")))
+        sharpe = p.get("backtest_sharpe", None)
+        sharpe_str = (
+            f"{sharpe:.2f}" if isinstance(sharpe, (int, float)) else "N/A"
+        )
+        wr = p.get("backtest_win_rate", None)
+        wr_str = _fmt_pct(wr) if isinstance(wr, (int, float)) else "N/A"
+        ret = p.get("backtest_total_return", None)
+        ret_str = (
+            _fmt_pct(ret, signed=True)
+            if isinstance(ret, (int, float))
+            else "N/A"
+        )
+        ret_cls = _pct_class(ret)
+
+        rows.append(
+            f"<tr><td><strong>{ticker}</strong></td>"
+            f"<td>{reason}</td>"
+            f'<td class="num">{html.escape(sharpe_str)}</td>'
+            f'<td class="num">{html.escape(wr_str)}</td>'
+            f'<td class="num {ret_cls}">{html.escape(ret_str)}</td></tr>',
+        )
+    if not rows:
+        return ""
+    return (
+        "<h2>Strategy Backtest Results</h2>\n"
+        '<div class="card">\n<table>\n'
+        "<thead><tr>"
+        "<th>ETF</th><th>Proposal</th>"
+        "<th>Sharpe</th><th>Win Rate</th><th>Return</th>"
+        "</tr></thead>\n<tbody>\n"
+        + "\n".join(rows)
+        + "\n</tbody></table>\n</div>\n"
+    )
+
+
+# --- Module status ---
 
 
 def _section_module_status(run: SchedulerRun) -> str:
@@ -507,7 +994,7 @@ def build_html_report(
     *,
     date: str = "",
 ) -> str:
-    """Build a complete HTML dashboard page from a scheduler run."""
+    """Build a complete narrative HTML dashboard from a scheduler run."""
     report_date = date or datetime.now(tz=UTC).strftime("%Y-%m-%d")
 
     outputs: dict[str, str] = {}
@@ -515,10 +1002,19 @@ def build_html_report(
         if result.success and result.output.strip():
             outputs[result.name] = result.output.strip()
 
+    # Parse signals for signal cards + exec summary
+    signals_data = _parse_output(outputs.get("etf.signals", ""))
+    signals: list[dict[str, object]] = []
+    if isinstance(signals_data, list):
+        signals = [s for s in signals_data if isinstance(s, dict)]
+
+    # Build sections
+    exec_summary = _section_executive_summary(outputs, signals)
     kpi = _section_kpi_strip(outputs)
-    signals = _section_etf_signals(outputs)
+    signal_cards = _section_etf_signals(outputs, signals)
+    sentiment = _section_sentiment(outputs)
+    conditions = _section_market_conditions(outputs)
     strategy = _section_strategy(outputs)
-    indicators = _section_market_indicators(outputs)
     modules = _section_module_status(run)
 
     # Header
@@ -532,18 +1028,18 @@ def build_html_report(
         "</div>\n</div>\n"
     )
 
-    # Mid-section: two-column grid if both sides have content
+    # Mid-section: two-column grid for sentiment + market conditions
     mid = ""
-    if strategy or indicators:
-        if strategy and indicators:
+    if sentiment or conditions:
+        if sentiment and conditions:
             mid = (
                 '<div class="grid-2col">\n'
-                f"<div>{strategy}</div>\n"
-                f"<div>{indicators}</div>\n"
+                f"<div>{sentiment}</div>\n"
+                f"<div>{conditions}</div>\n"
                 "</div>\n"
             )
         else:
-            mid = strategy + indicators
+            mid = sentiment + conditions
 
     footer = (
         '<div class="footer">\n'
@@ -553,7 +1049,10 @@ def build_html_report(
         "</div>\n"
     )
 
-    body_parts = [header, kpi, signals, mid, modules, footer]
+    body_parts = [
+        header, exec_summary, kpi, signal_cards,
+        mid, strategy, modules, footer,
+    ]
     return _html_page(
         title=f"Dashboard {report_date}",
         body="\n".join(p for p in body_parts if p),

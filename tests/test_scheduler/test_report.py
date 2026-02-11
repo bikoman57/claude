@@ -54,11 +54,14 @@ def test_build_report_empty_run():
 def test_build_report_with_modules():
     macro_data = json.dumps({
         "vix_regime": "ELEVATED",
-        "fed_trajectory": "CUTTING",
+    })
+    rates_data = json.dumps({
+        "trajectory": "CUTTING",
     })
     run = _make_run([
         _ok("macro.dashboard", macro_data),
-        _ok("etf.scan", "[]"),
+        _ok("macro.rates", rates_data),
+        _ok("etf.signals", "[]"),
     ])
     text = build_report_text(run)
     assert "MARKET OVERVIEW" in text
@@ -85,7 +88,7 @@ def test_build_report_geopolitical():
 
 def test_build_report_news():
     news_data = json.dumps({
-        "overall_sentiment": "BEARISH",
+        "sentiment": "BEARISH",
         "total_articles": 42,
     })
     run = _make_run([_ok("news.summary", news_data)])
@@ -102,7 +105,7 @@ def test_build_report_etf_signals():
             "underlying_drawdown_pct": 0.072,
         },
     ])
-    run = _make_run([_ok("etf.scan", signals)])
+    run = _make_run([_ok("etf.signals", signals)])
     text = build_report_text(run)
     assert "ENTRY SIGNALS" in text
     assert "TQQQ" in text
@@ -135,7 +138,7 @@ async def test_send_daily_report_no_config():
 
 @pytest.mark.asyncio
 async def test_send_daily_report_success():
-    run = _make_run([_ok("etf.scan", "[]")])
+    run = _make_run([_ok("etf.signals", "[]")])
     mock_client = AsyncMock()
     mock_client.__aenter__ = AsyncMock(return_value=mock_client)
     mock_client.__aexit__ = AsyncMock(return_value=False)

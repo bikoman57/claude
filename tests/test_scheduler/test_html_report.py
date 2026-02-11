@@ -72,7 +72,7 @@ def test_build_html_report_has_dashboard_css():
 
 
 def test_build_html_report_header():
-    run = _make_run([_ok("etf.scan", "[]"), _fail("macro.dashboard")])
+    run = _make_run([_ok("etf.signals", "[]"), _fail("macro.dashboard")])
     html = build_html_report(run, date="2026-01-15")
     assert "Dashboard" in html
     assert ">1</span>/2 OK" in html
@@ -83,25 +83,26 @@ def test_build_html_report_kpi_vix():
     data = json.dumps({
         "vix": 22.5,
         "vix_regime": "ELEVATED",
-        "fed_trajectory": "CUTTING",
     })
     run = _make_run([_ok("macro.dashboard", data)])
     html = build_html_report(run, date="2026-01-15")
     assert "22.5" in html
     assert "ELEVATED" in html
-    assert "CUTTING" in html
     assert "kpi-card" in html
-    assert "kpi-bar-red" in html  # ELEVATED → red
+    assert "kpi-bar-red" in html  # ELEVATED -> red
 
 
-def test_build_html_report_kpi_fed_rate():
-    data = json.dumps({
-        "vix": 15.0,
-        "vix_regime": "NORMAL",
-        "fed_trajectory": "HIKING",
-        "fed_funds_rate": 5.25,
+def test_build_html_report_kpi_fed_from_rates():
+    """Fed trajectory comes from macro.rates, not macro.dashboard."""
+    macro = json.dumps({"vix": 15.0, "vix_regime": "NORMAL"})
+    rates = json.dumps({
+        "trajectory": "HIKING",
+        "current_rate": 5.25,
     })
-    run = _make_run([_ok("macro.dashboard", data)])
+    run = _make_run([
+        _ok("macro.dashboard", macro),
+        _ok("macro.rates", rates),
+    ])
     html = build_html_report(run, date="2026-01-15")
     assert "5.25%" in html
     assert "HIKING" in html
@@ -129,7 +130,7 @@ def test_build_html_report_kpi_geopolitical():
 
 def test_build_html_report_kpi_news():
     data = json.dumps({
-        "overall_sentiment": "BEARISH",
+        "sentiment": "BEARISH",
         "total_articles": 42,
     })
     run = _make_run([_ok("news.summary", data)])
@@ -142,7 +143,9 @@ def test_build_html_report_kpi_strip_all_sources():
     run = _make_run([
         _ok("macro.dashboard", json.dumps({
             "vix": 18.5, "vix_regime": "NORMAL",
-            "fed_trajectory": "CUTTING",
+        })),
+        _ok("macro.rates", json.dumps({
+            "trajectory": "CUTTING", "current_rate": 4.50,
         })),
         _ok("macro.yields", json.dumps({
             "curve_status": "NORMAL", "spread_3m_10y": 0.35,
@@ -151,7 +154,7 @@ def test_build_html_report_kpi_strip_all_sources():
             "risk_level": "LOW", "total_events": 1,
         })),
         _ok("news.summary", json.dumps({
-            "overall_sentiment": "BULLISH", "total_articles": 99,
+            "sentiment": "BULLISH", "total_articles": 99,
         })),
     ])
     html = build_html_report(run, date="2026-01-15")
@@ -160,36 +163,171 @@ def test_build_html_report_kpi_strip_all_sources():
     assert "kpi-strip" in html
 
 
-def test_build_html_report_etf_signals():
+def test_build_html_report_gauge_bars():
+    """KPI cards include gauge bars for VIX and yields."""
+    run = _make_run([
+        _ok("macro.dashboard", json.dumps({
+            "vix": 25.0, "vix_regime": "ELEVATED",
+        })),
+        _ok("macro.yields", json.dumps({
+            "curve_status": "NORMAL", "spread_3m_10y": 0.5,
+        })),
+    ])
+    html = build_html_report(run, date="2026-01-15")
+    assert "gauge-track" in html
+    assert "gauge-fill" in html
+
+
+def test_build_html_report_exec_summary_no_signals():
+    """Exec summary shown even with no signals."""
+    run = _make_run([
+        _ok("macro.dashboard", json.dumps({
+            "vix": 15.0, "vix_regime": "NORMAL",
+        })),
+    ])
+    html = build_html_report(run, date="2026-01-15")
+    assert "exec-summary" in html
+    assert "No actionable signals" in html
+
+
+def test_build_html_report_exec_summary_with_signals():
+    """Exec summary shows confidence and stance when signals exist."""
+    run = _make_run([
+        _ok("etf.signals", json.dumps([{
+            "leveraged_ticker": "TQQQ",
+            "underlying_ticker": "QQQ",
+            "state": "SIGNAL",
+            "underlying_drawdown_pct": -0.12,
+            "underlying_ath": 520.0,
+            "underlying_current": 457.6,
+        }])),
+        _ok("macro.dashboard", json.dumps({
+            "vix": 25.0, "vix_regime": "ELEVATED",
+        })),
+    ])
+    html = build_html_report(run, date="2026-01-15")
+    assert "exec-summary" in html
+    assert "SIGNAL" in html
+    assert "confidence" in html.lower()
+
+
+def test_build_html_report_signal_cards():
+    """ETF signals rendered as individual cards with confidence."""
     data = json.dumps([{
         "leveraged_ticker": "TQQQ",
         "underlying_ticker": "QQQ",
         "state": "SIGNAL",
-        "underlying_drawdown_pct": 0.072,
+        "underlying_drawdown_pct": -0.072,
         "underlying_ath": 520.0,
         "underlying_current": 482.56,
     }])
-    run = _make_run([_ok("etf.scan", data)])
+    run = _make_run([_ok("etf.signals", data)])
     html = build_html_report(run, date="2026-01-15")
     assert "TQQQ" in html
     assert "QQQ" in html
     assert "SIGNAL" in html
     assert "$520.00" in html
     assert "$482.56" in html
+    assert "signal-card" in html
+    assert "confidence-bar" in html
 
 
-def test_build_html_report_etf_signals_with_pl():
+def test_build_html_report_signal_confidence_drilldown():
+    """Signal cards have details/summary for 9-factor analysis."""
+    data = json.dumps([{
+        "leveraged_ticker": "TQQQ",
+        "underlying_ticker": "QQQ",
+        "state": "SIGNAL",
+        "underlying_drawdown_pct": -0.072,
+    }])
+    run = _make_run([_ok("etf.signals", data)])
+    html = build_html_report(run, date="2026-01-15")
+    assert "<details>" in html
+    assert "9-factor analysis" in html
+    assert "factor-table" in html
+
+
+def test_build_html_report_signal_with_pl():
     data = json.dumps([{
         "leveraged_ticker": "TQQQ",
         "underlying_ticker": "QQQ",
         "state": "ACTIVE",
-        "underlying_drawdown_pct": 0.05,
+        "underlying_drawdown_pct": -0.05,
         "current_pl_pct": 0.08,
     }])
-    run = _make_run([_ok("etf.scan", data)])
+    run = _make_run([_ok("etf.signals", data)])
     html = build_html_report(run, date="2026-01-15")
     assert "pct-up" in html
     assert "+8.0%" in html
+
+
+def test_build_html_report_sentiment_section():
+    """Sentiment section shows bars and counts."""
+    data = json.dumps({
+        "sentiment": "BEARISH",
+        "total_articles": 100,
+        "bullish_count": 20,
+        "bearish_count": 50,
+        "neutral_count": 30,
+    })
+    run = _make_run([_ok("news.summary", data)])
+    html = build_html_report(run, date="2026-01-15")
+    assert "Sentiment Analysis" in html
+    assert "sentiment-bar" in html
+    assert "sentiment-fill-bullish" in html
+    assert "sentiment-fill-bearish" in html
+    assert "20 bullish" in html
+    assert "50 bearish" in html
+    assert "30 neutral" in html
+
+
+def test_build_html_report_sentiment_headlines():
+    """Sentiment section has expandable headlines."""
+    data = json.dumps({
+        "sentiment": "BULLISH",
+        "total_articles": 10,
+        "bullish_count": 7,
+        "bearish_count": 2,
+        "neutral_count": 1,
+        "top_headlines": [
+            {"title": "Markets rally", "sentiment": "BULLISH"},
+        ],
+    })
+    run = _make_run([_ok("news.summary", data)])
+    html = build_html_report(run, date="2026-01-15")
+    assert "Top headlines" in html
+    assert "Markets rally" in html
+
+
+def test_build_html_report_sentiment_sectors():
+    """Sentiment section shows sector badges."""
+    data = json.dumps({
+        "sentiment": "NEUTRAL",
+        "total_articles": 50,
+        "bullish_count": 15,
+        "bearish_count": 15,
+        "neutral_count": 20,
+        "sector_mentions": {"technology": 25, "energy": 10},
+    })
+    run = _make_run([_ok("news.summary", data)])
+    html = build_html_report(run, date="2026-01-15")
+    assert "sector-badge" in html
+    assert "technology" in html
+
+
+def test_build_html_report_officials_tone():
+    """Social officials shown in sentiment section with correct field."""
+    run = _make_run([
+        _ok("social.summary", json.dumps({
+            "officials": {
+                "fed_tone": "HAWKISH",
+                "policy_direction": "CONTRACTIONARY",
+            },
+        })),
+    ])
+    html = build_html_report(run, date="2026-01-15")
+    assert "HAWKISH" in html
+    assert "CONTRACTIONARY" in html
 
 
 def test_build_html_report_strategy():
@@ -209,7 +347,7 @@ def test_build_html_report_strategy():
     assert "+42.0%" in html
 
 
-def test_build_html_report_market_indicators():
+def test_build_html_report_market_conditions():
     data = json.dumps({
         "risk_indicators": {
             "risk_assessment": "RISK_OFF",
@@ -235,27 +373,13 @@ def test_build_html_report_market_indicators():
     assert "SPY-IWM" in html
 
 
-def test_build_html_report_market_indicators_officials():
-    run = _make_run([
-        _ok("social.summary", json.dumps({
-            "officials": {
-                "overall_tone": "HAWKISH",
-                "policy_direction": "CONTRACTIONARY",
-            },
-        })),
-    ])
-    html = build_html_report(run, date="2026-01-15")
-    assert "HAWKISH" in html
-    assert "CONTRACTIONARY" in html
-
-
 def test_build_html_report_module_status_pills():
-    run = _make_run([_ok("etf.scan", "[]"), _fail("macro.dashboard")])
+    run = _make_run([_ok("etf.signals", "[]"), _fail("macro.dashboard")])
     html = build_html_report(run, date="2026-01-15")
     assert "module-grid" in html
     assert "module-pill-ok" in html
     assert "module-pill-fail" in html
-    assert "etf.scan" in html
+    assert "etf.signals" in html
     assert "macro.dashboard" in html
 
 
@@ -263,7 +387,6 @@ def test_build_html_report_xss_safety():
     data = json.dumps({
         "vix": 20.0,
         "vix_regime": "<script>alert('xss')</script>",
-        "fed_trajectory": "CUTTING",
     })
     run = _make_run([_ok("macro.dashboard", data)])
     html = build_html_report(run, date="2026-01-15")
@@ -272,11 +395,15 @@ def test_build_html_report_xss_safety():
 
 
 def test_build_html_report_two_col_grid():
+    """Grid used when both sentiment and conditions present."""
     run = _make_run([
-        _ok("strategy.proposals", json.dumps([{
-            "leveraged_ticker": "TQQQ",
-            "improvement_reason": "test",
-        }])),
+        _ok("news.summary", json.dumps({
+            "sentiment": "BEARISH",
+            "total_articles": 10,
+            "bullish_count": 2,
+            "bearish_count": 6,
+            "neutral_count": 2,
+        })),
         _ok("statistics.dashboard", json.dumps({
             "risk_indicators": {"risk_assessment": "NEUTRAL"},
         })),
@@ -296,7 +423,9 @@ def test_build_html_report_all_sections():
     run = _make_run([
         _ok("macro.dashboard", json.dumps({
             "vix": 12.0, "vix_regime": "CALM",
-            "fed_trajectory": "HOLDING",
+        })),
+        _ok("macro.rates", json.dumps({
+            "trajectory": "HOLDING", "current_rate": 4.50,
         })),
         _ok("macro.yields", json.dumps({
             "curve_status": "NORMAL", "spread_3m_10y": 0.5,
@@ -305,19 +434,20 @@ def test_build_html_report_all_sections():
             "risk_level": "LOW", "total_events": 2,
         })),
         _ok("social.summary", json.dumps({
-            "officials": {"overall_tone": "NEUTRAL"},
+            "officials": {"fed_tone": "NEUTRAL"},
         })),
         _ok("news.summary", json.dumps({
-            "overall_sentiment": "BULLISH", "total_articles": 30,
+            "sentiment": "BULLISH", "total_articles": 30,
+            "bullish_count": 20, "bearish_count": 5, "neutral_count": 5,
         })),
         _ok("statistics.dashboard", json.dumps({
             "risk_indicators": {"risk_assessment": "LOW"},
         })),
-        _ok("etf.scan", json.dumps([{
+        _ok("etf.signals", json.dumps([{
             "leveraged_ticker": "TQQQ",
             "underlying_ticker": "QQQ",
             "state": "WATCH",
-            "underlying_drawdown_pct": 0.03,
+            "underlying_drawdown_pct": -0.03,
         }])),
         _ok("strategy.proposals", json.dumps([{
             "leveraged_ticker": "SOXL",
@@ -329,9 +459,11 @@ def test_build_html_report_all_sections():
     assert "TQQQ" in html
     assert "SOXL" in html
     assert "All Reports" in html
+    assert "exec-summary" in html
     assert "kpi-strip" in html
     assert "grid-2col" in html
     assert "module-grid" in html
+    assert "signal-card" in html
 
 
 # --- Index tests ---
@@ -382,7 +514,7 @@ def test_write_report_creates_files(tmp_path, monkeypatch):
         "app.scheduler.publisher._REPORTS_DIR",
         tmp_path / "docs" / "reports",
     )
-    run = _make_run([_ok("etf.scan", "[]")])
+    run = _make_run([_ok("etf.signals", "[]")])
     path = write_report(run, date="2026-01-15")
 
     assert path.exists()
@@ -415,10 +547,9 @@ def test_write_report_overwrites_same_date(tmp_path, monkeypatch):
         "app.scheduler.publisher._REPORTS_DIR",
         tmp_path / "docs" / "reports",
     )
-    run1 = _make_run([_ok("etf.scan", "[]")])
+    run1 = _make_run([_ok("etf.signals", "[]")])
     run2 = _make_run([_ok("macro.dashboard", json.dumps({
         "vix": 30.0, "vix_regime": "HIGH",
-        "fed_trajectory": "HIKING",
     }))])
     write_report(run1, date="2026-01-15")
     write_report(run2, date="2026-01-15")

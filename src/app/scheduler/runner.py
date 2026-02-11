@@ -13,7 +13,7 @@ _STATUS_PATH = Path("data/scheduler_status.json")
 
 # Each module CLI command to run, in order
 MODULE_COMMANDS: list[tuple[str, list[str]]] = [
-    ("etf.scan", [sys.executable, "-m", "app.etf", "scan"]),
+    ("etf.signals", [sys.executable, "-m", "app.etf", "signals"]),
     ("etf.active", [sys.executable, "-m", "app.etf", "active"]),
     ("macro.dashboard", [sys.executable, "-m", "app.macro", "dashboard"]),
     ("macro.yields", [sys.executable, "-m", "app.macro", "yields"]),
