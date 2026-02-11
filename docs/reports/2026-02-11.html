@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Report 2026-02-11</title>
+<style>* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  max-width: 900px; margin: 0 auto; padding: 20px;
+  background: #0d1117; color: #c9d1d9; line-height: 1.5;
+}
+h1 { color: #58a6ff; border-bottom: 1px solid #30363d; padding-bottom: 12px;
+     margin-bottom: 16px; font-size: 1.6em; }
+h2 { color: #79c0ff; margin-top: 24px; margin-bottom: 8px; font-size: 1.2em; }
+.card { background: #161b22; border: 1px solid #30363d; border-radius: 6px;
+        padding: 16px; margin: 12px 0; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 12px;
+         font-size: 0.85em; font-weight: 600; }
+.badge-green { background: #238636; color: #fff; }
+.badge-yellow { background: #9e6a03; color: #fff; }
+.badge-red { background: #da3633; color: #fff; }
+.badge-gray { background: #30363d; color: #8b949e; }
+table { border-collapse: collapse; width: 100%; margin: 8px 0; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid #30363d; }
+th { color: #8b949e; font-weight: 600; }
+.footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid #30363d;
+          font-size: 0.85em; color: #8b949e; }
+a { color: #58a6ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+.ok { color: #3fb950; }
+.fail { color: #f85149; }
+.summary { font-size: 1.05em; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<h1>Daily Swing Trading Report &mdash; 2026-02-11</h1>
+<p class="summary">Modules: <span class="ok">12</span>/15 OK | Failed: <span class="fail">3</span></p>
+<h2>Market Overview</h2>
+<div class="card">
+<p>VIX Regime: <span class="badge badge-yellow">NORMAL</span> &nbsp; Fed Trajectory: <span class="badge badge-gray">N/A</span></p>
+</div>
+
+<h2>Geopolitical Risk</h2>
+<div class="card">
+<p>Risk Level: <span class="badge badge-green">LOW</span> &nbsp; Events: 0</p>
+</div>
+
+<h2>Social &amp; Officials</h2>
+<div class="card">
+<p>Officials Tone: <span class="badge badge-gray">N/A</span></p>
+</div>
+
+<h2>News Sentiment</h2>
+<div class="card">
+<p>Sentiment: <span class="badge badge-gray">N/A</span> &nbsp; Articles: 141</p>
+</div>
+
+<h2>Market Statistics</h2>
+<div class="card">
+<p>Risk Assessment: <span class="badge badge-gray">NEUTRAL</span></p>
+</div>
+
+<h2>Strategy Insights</h2>
+<div class="card">
+<table>
+<tr><th>ETF</th><th>Proposal</th></tr>
+<tr><td>TQQQ</td><td>Backtest (Sharpe=3.30): entry 10% vs current 5%</td></tr>
+<tr><td>UPRO</td><td>Backtest (Sharpe=2.81): entry 10% vs current 5%</td></tr>
+<tr><td>SOXL</td><td>Backtest (Sharpe=1.36): entry 15% vs current 8%</td></tr>
+<tr><td>TNA</td><td>Backtest (Sharpe=2.13): entry 5% vs current 7%, target 15% vs current 10%</td></tr>
+<tr><td>TECL</td><td>Backtest (Sharpe=2.53): entry 12% vs current 7%</td></tr>
+</table>
+</div>
+
+<h2>Module Status</h2>
+<div class="card">
+<table>
+<tr><th></th><th>Module</th><th>Duration</th></tr>
+<tr><td><span class="ok">&#10003;</span></td><td>etf.scan</td><td>6.3s</td></tr>
+<tr><td><span class="ok">&#10003;</span></td><td>etf.active</td><td>0.8s</td></tr>
+<tr><td><span class="ok">&#10003;</span></td><td>macro.dashboard</td><td>1.7s</td></tr>
+<tr><td><span class="ok">&#10003;</span></td><td>macro.yields</td><td>2.3s</td></tr>
+<tr><td><span class="fail">&#10007;</span></td><td>macro.rates</td><td>0.9s</td></tr>
+<tr><td><span class="ok">&#10003;</span></td><td>macro.calendar</td><td>0.8s</td></tr>
+<tr><td><span class="fail">&#10007;</span></td><td>sec.recent</td><td>0.2s</td></tr>
+<tr><td><span class="fail">&#10007;</span></td><td>sec.institutional</td><td>0.2s</td></tr>
+<tr><td><span class="ok">&#10003;</span></td><td>geopolitical.summary</td><td>15.9s</td></tr>
+<tr><td><span class="ok">&#10003;</span></td><td>social.summary</td><td>0.9s</td></tr>
+<tr><td><span class="ok">&#10003;</span></td><td>news.summary</td><td>2.3s</td></tr>
+<tr><td><span class="ok">&#10003;</span></td><td>statistics.dashboard</td><td>2.5s</td></tr>
+<tr><td><span class="ok">&#10003;</span></td><td>strategy.proposals</td><td>14.4s</td></tr>
+<tr><td><span class="ok">&#10003;</span></td><td>history.weights</td><td>0.1s</td></tr>
+<tr><td><span class="ok">&#10003;</span></td><td>history.summary</td><td>0.1s</td></tr>
+</table>
+</div>
+
+<p class="footer">Generated 2026-02-11 | <a href="../index.html">All Reports</a> | This is not financial advice.</p>
+</body>
+</html>
