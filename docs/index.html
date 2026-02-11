@@ -18,6 +18,14 @@ h2 { color: #e6edf3; margin-bottom: 12px; font-size: 1.1em; font-weight: 600;
           margin-bottom: 24px; flex-wrap: wrap; gap: 8px; }
 .header-status { font-size: 0.9em; }
 
+/* Executive summary */
+.exec-summary { background: #161b22; border: 1px solid #30363d;
+  border-left: 4px solid #58a6ff; border-radius: 8px; padding: 20px;
+  margin-bottom: 24px; }
+.exec-summary p { margin-bottom: 8px; }
+.exec-summary .headline { font-size: 1.15em; color: #e6edf3; font-weight: 600; }
+.exec-summary .detail { font-size: 0.95em; color: #8b949e; }
+
 /* KPI strip */
 .kpi-strip { display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
@@ -37,6 +45,15 @@ h2 { color: #e6edf3; margin-bottom: 12px; font-size: 1.1em; font-weight: 600;
 .kpi-bar-red { border-top-color: #da3633; }
 .kpi-bar-gray { border-top-color: #484f58; }
 
+/* Gauge bar */
+.gauge-track { height: 6px; background: #21262d; border-radius: 3px;
+  margin-top: 8px; overflow: hidden; }
+.gauge-fill { height: 100%; border-radius: 3px; transition: width 0.3s ease; }
+.gauge-fill-green { background: #238636; }
+.gauge-fill-yellow { background: #9e6a03; }
+.gauge-fill-red { background: #da3633; }
+.gauge-fill-gray { background: #484f58; }
+
 /* Cards */
 .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px;
   padding: 20px; margin-bottom: 24px;
@@ -54,6 +71,7 @@ h2 { color: #e6edf3; margin-bottom: 12px; font-size: 1.1em; font-weight: 600;
 .badge-yellow { background: #9e6a03; color: #fff; }
 .badge-red { background: #da3633; color: #fff; }
 .badge-gray { background: #30363d; color: #8b949e; }
+.badge-blue { background: #1f6feb; color: #fff; }
 
 /* Tables */
 table { border-collapse: collapse; width: 100%; }
@@ -65,6 +83,57 @@ tbody tr:hover { background: #1c2128; }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
 .pct-up { color: #3fb950; }
 .pct-down { color: #f85149; }
+
+/* Signal cards */
+.signal-card { background: #161b22; border: 1px solid #30363d;
+  border-radius: 8px; padding: 16px; margin-bottom: 12px;
+  border-left: 4px solid #30363d; }
+.signal-card-signal { border-left-color: #3fb950; }
+.signal-card-alert { border-left-color: #9e6a03; }
+.signal-card-active { border-left-color: #1f6feb; }
+.signal-card-watch { border-left-color: #484f58; }
+.signal-card-target { border-left-color: #a371f7; }
+.signal-header { display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
+.signal-ticker { font-size: 1.2em; font-weight: 700; color: #e6edf3; }
+.signal-details { font-size: 0.9em; color: #8b949e; }
+
+/* Confidence */
+.confidence-bar { display: flex; gap: 3px; margin-top: 6px; }
+.conf-dot { width: 12px; height: 12px; border-radius: 50%;
+  background: #21262d; }
+.conf-dot-favorable { background: #238636; }
+.conf-dot-unfavorable { background: #da3633; }
+.conf-dot-neutral { background: #484f58; }
+
+/* Factor table in details */
+.factor-table { width: 100%; margin-top: 8px; }
+.factor-table td { padding: 4px 8px; font-size: 0.85em;
+  border-bottom: 1px solid #21262d; }
+.factor-table .factor-name { color: #8b949e; }
+
+/* Sentiment bar */
+.sentiment-bar { display: flex; height: 20px; border-radius: 4px;
+  overflow: hidden; margin: 8px 0; }
+.sentiment-fill-bullish { background: #238636; }
+.sentiment-fill-bearish { background: #da3633; }
+.sentiment-fill-neutral { background: #484f58; }
+.sentiment-counts { display: flex; gap: 16px; font-size: 0.85em;
+  color: #8b949e; margin-top: 4px; }
+.sentiment-count-bullish { color: #3fb950; }
+.sentiment-count-bearish { color: #f85149; }
+
+/* Details/summary */
+details { margin-top: 8px; }
+summary { cursor: pointer; font-size: 0.85em; color: #58a6ff;
+  padding: 4px 0; }
+summary:hover { text-decoration: underline; }
+details[open] summary { margin-bottom: 8px; }
+
+/* Sector badges */
+.sector-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.sector-badge { display: inline-block; padding: 2px 8px; border-radius: 10px;
+  font-size: 0.75em; background: #21262d; color: #8b949e; }
 
 /* Indicators row */
 .ind-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
