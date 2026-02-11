@@ -150,12 +150,96 @@ def assess_sec_sentiment(
     )
 
 
+def assess_geopolitical_risk(risk_level: str) -> FactorResult:
+    """Assess geopolitical risk level for mean-reversion."""
+    if risk_level == "LOW":
+        return FactorResult(
+            "geopolitical_risk",
+            FactorAssessment.FAVORABLE,
+            "Low geopolitical risk",
+        )
+    if risk_level == "HIGH":
+        return FactorResult(
+            "geopolitical_risk",
+            FactorAssessment.UNFAVORABLE,
+            "High geopolitical risk",
+        )
+    return FactorResult(
+        "geopolitical_risk",
+        FactorAssessment.NEUTRAL,
+        f"Geopolitical risk {risk_level.lower()}",
+    )
+
+
+def assess_social_sentiment(sentiment: str) -> FactorResult:
+    """Assess social media sentiment (contrarian: bearish = favorable)."""
+    if sentiment == "BEARISH":
+        return FactorResult(
+            "social_sentiment",
+            FactorAssessment.FAVORABLE,
+            "Social sentiment bearish (contrarian)",
+        )
+    if sentiment == "BULLISH":
+        return FactorResult(
+            "social_sentiment",
+            FactorAssessment.NEUTRAL,
+            "Social sentiment bullish",
+        )
+    return FactorResult(
+        "social_sentiment",
+        FactorAssessment.NEUTRAL,
+        "Social sentiment neutral",
+    )
+
+
+def assess_news_sentiment(sentiment: str) -> FactorResult:
+    """Assess news sentiment (contrarian: bearish = favorable)."""
+    if sentiment == "BEARISH":
+        return FactorResult(
+            "news_sentiment",
+            FactorAssessment.FAVORABLE,
+            "News sentiment bearish (contrarian)",
+        )
+    if sentiment == "BULLISH":
+        return FactorResult(
+            "news_sentiment",
+            FactorAssessment.NEUTRAL,
+            "News sentiment bullish",
+        )
+    return FactorResult(
+        "news_sentiment",
+        FactorAssessment.NEUTRAL,
+        "News sentiment neutral",
+    )
+
+
+def assess_market_statistics(assessment: str) -> FactorResult:
+    """Assess market statistics (contrarian: risk-off = favorable)."""
+    if assessment == "RISK_OFF":
+        return FactorResult(
+            "market_statistics",
+            FactorAssessment.FAVORABLE,
+            "Market risk-off (contrarian opportunity)",
+        )
+    if assessment == "RISK_ON":
+        return FactorResult(
+            "market_statistics",
+            FactorAssessment.NEUTRAL,
+            "Market risk-on",
+        )
+    return FactorResult(
+        "market_statistics",
+        FactorAssessment.NEUTRAL,
+        "Market statistics neutral",
+    )
+
+
 def compute_confidence(
     factors: list[FactorResult],
 ) -> ConfidenceScore:
     """Compute overall confidence from factor assessments.
 
-    HIGH: 4-5 favorable, MEDIUM: 2-3, LOW: 0-1.
+    HIGH: 7+/9 favorable, MEDIUM: 4-6, LOW: 0-3.
     """
     favorable = sum(
         1
@@ -164,9 +248,9 @@ def compute_confidence(
     )
     total = len(factors)
 
-    if favorable >= 4:
+    if favorable >= 7:
         level = ConfidenceLevel.HIGH
-    elif favorable >= 2:
+    elif favorable >= 4:
         level = ConfidenceLevel.MEDIUM
     else:
         level = ConfidenceLevel.LOW

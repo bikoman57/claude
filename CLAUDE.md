@@ -40,22 +40,34 @@
 - `src/app/sec/` — SEC EDGAR filings, institutional 13F tracking, index holdings
 - `src/app/history/` — Analysis snapshots, trade outcomes, factor weight learning
 - `src/app/telegram/` — Telegram notifications and bidirectional messaging
+- `src/app/news/` — Financial RSS feeds, article categorization, journalist accuracy tracking
+- `src/app/geopolitical/` — GDELT events, geopolitical RSS, impact classification by sector
+- `src/app/social/` — Reddit sentiment, Fed/SEC official statements, hawkish/dovish classification
+- `src/app/statistics/` — Sector rotation, market breadth, cross-asset correlations, risk indicators
+- `src/app/strategy/` — Backtesting engine, threshold optimization, strategy proposals
+- `src/app/scheduler/` — Daily runner (all modules), report generation, Telegram delivery
 
 ### CLI Commands
 - `uv run python -m app.etf scan|drawdown|signals|active|stats|universe|enter|close`
 - `uv run python -m app.macro dashboard|rates|yields|calendar`
 - `uv run python -m app.sec filings|institutional|recent`
 - `uv run python -m app.history outcomes|weights|summary|snapshots`
+- `uv run python -m app.news headlines|summary|journalists`
+- `uv run python -m app.geopolitical events|headlines|summary`
+- `uv run python -m app.social reddit|officials|summary`
+- `uv run python -m app.statistics sectors|breadth|risk|correlations|dashboard`
+- `uv run python -m app.strategy backtest|optimize|proposals|compare|history`
+- `uv run python -m app.scheduler daily|test-run|status`
 
 ### Agents & Skills
-- `.claude/agents/` — chief-analyst, drawdown-monitor, market-analyst, macro-analyst, sec-analyst, swing-screener
+- `.claude/agents/` — chief-analyst, drawdown-monitor, market-analyst, macro-analyst, sec-analyst, swing-screener, news-analyst, geopolitical-analyst, social-analyst, statistics-analyst, strategy-analyst
 - `.claude/skills/` — unified-report, analyze-etf, scan-opportunities, market-report
 
 ### Data & State
 - Signal lifecycle: WATCH → ALERT → SIGNAL → ACTIVE → TARGET
-- Confidence scoring: 5 factors → HIGH/MEDIUM/LOW (drawdown, VIX, Fed, yields, SEC)
+- Confidence scoring: 9 factors → HIGH/MEDIUM/LOW (drawdown, VIX, Fed, yields, SEC, geopolitical, social, news, statistics)
 - Factor weight learning: track trade outcomes, compute predictive weights over time
-- Runtime state persisted in `data/` (gitignored): signals.json, outcomes.json, history/
+- Runtime state persisted in `data/` (gitignored): signals.json, outcomes.json, history/, backtests/, scheduler_status.json
 - Configuration via environment variables (see `.env`)
 - Keep modules small and focused; prefer composition over inheritance
 
@@ -75,6 +87,14 @@
 - Only processes messages from the configured `TELEGRAM_CHAT_ID` (security)
 - Processes one command at a time; rejects concurrent with "still working" message
 - Auto-start via Windows Scheduled Task (see plan file for setup script)
+
+## Environment Variables
+- `TELEGRAM_BOT_TOKEN` — Telegram bot token (required for notifications)
+- `TELEGRAM_CHAT_ID` — Telegram chat ID (required for notifications)
+- `FRED_API_KEY` — FRED API key (optional, for macro data)
+- `SEC_EDGAR_EMAIL` — Email for SEC EDGAR User-Agent (optional)
+- `REDDIT_CLIENT_ID` — Reddit OAuth client ID (optional, for social module)
+- `REDDIT_CLIENT_SECRET` — Reddit OAuth client secret (optional, for social module)
 
 ## Token Discipline
 - IMPORTANT: Use subagents for any exploration that reads more than 3 files — keep main context clean

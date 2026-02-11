@@ -8,7 +8,7 @@ When an underlying index (e.g., Nasdaq-100) drops X% from its all-time high, tha
 
 **Signal lifecycle**: WATCH → ALERT → SIGNAL → ACTIVE → TARGET
 
-**Confidence scoring**: Each signal is scored across 5 factors (drawdown depth, VIX regime, Fed policy, yield curve, SEC sentiment) → HIGH (4-5 favorable), MEDIUM (2-3), LOW (0-1).
+**Confidence scoring**: Each signal is scored across 9 factors (drawdown depth, VIX regime, Fed policy, yield curve, SEC sentiment, geopolitical risk, social sentiment, news sentiment, market statistics) → HIGH (7+/9 favorable), MEDIUM (4-6), LOW (0-3).
 
 ## ETF Universe
 
@@ -39,7 +39,7 @@ Set up Telegram (one-time): run `/telegram-setup` in Claude Code.
 
 | Skill | What it does |
 |---|---|
-| `/unified-report` | Full orchestrated report: drawdowns + macro + SEC + confidence |
+| `/unified-report` | Full orchestrated report: all 11 modules + 9-factor confidence |
 | `/analyze-etf TQQQ` | Deep analysis: drawdown + macro + SEC + momentum + confidence |
 | `/scan-opportunities` | Scan all ETFs for entry/exit signals with macro context |
 | `/market-report` | Quick drawdown dashboard + positions |
@@ -70,6 +70,41 @@ uv run python -m app.sec recent          # Recent filings for all index holdings
 uv run python -m app.sec filings AAPL    # Filings for a specific ticker
 uv run python -m app.sec institutional   # 13F filings from tracked institutions
 
+# News analysis
+uv run python -m app.news headlines      # Latest financial news headlines
+uv run python -m app.news summary        # Categorized news with sentiment
+uv run python -m app.news journalists    # Journalist accuracy ratings
+
+# Geopolitical risk
+uv run python -m app.geopolitical events     # GDELT events by theme
+uv run python -m app.geopolitical headlines  # Geopolitical RSS headlines
+uv run python -m app.geopolitical summary    # Classified events with risk level
+
+# Social & officials
+uv run python -m app.social reddit       # Reddit sentiment (needs credentials)
+uv run python -m app.social officials    # Fed/SEC official statements
+uv run python -m app.social summary      # Combined social summary
+
+# Market statistics
+uv run python -m app.statistics sectors       # Sector rotation analysis
+uv run python -m app.statistics breadth       # Market breadth (put/call, VIX term)
+uv run python -m app.statistics risk          # Cross-asset risk indicators
+uv run python -m app.statistics correlations  # Index correlations
+uv run python -m app.statistics dashboard     # Full statistics dashboard
+
+# Strategy & backtesting
+uv run python -m app.strategy backtest QQQ             # Backtest with defaults
+uv run python -m app.strategy backtest QQQ --threshold 0.07 --target 0.15
+uv run python -m app.strategy optimize QQQ             # Find best parameters
+uv run python -m app.strategy proposals                # Proposals across all ETFs
+uv run python -m app.strategy compare QQQ              # Compare all combos
+uv run python -m app.strategy history                  # Saved backtest results
+
+# Daily scheduler
+uv run python -m app.scheduler daily      # Run all modules + send Telegram
+uv run python -m app.scheduler test-run   # Run all modules (no Telegram)
+uv run python -m app.scheduler status     # Show last run status
+
 # History & learning
 uv run python -m app.history outcomes    # View trade outcomes
 uv run python -m app.history weights     # Factor weight analysis
@@ -81,12 +116,17 @@ uv run python -m app.history snapshots   # List all snapshots
 
 | Agent | Purpose | Model |
 |---|---|---|
-| `chief-analyst` | Orchestrates all modules into unified report | sonnet |
+| `chief-analyst` | Orchestrates all 11 modules into unified report | sonnet |
 | `drawdown-monitor` | ATH drawdown tracking with macro context | sonnet |
 | `market-analyst` | Momentum, volatility, Fed rates, yield curve | sonnet |
 | `macro-analyst` | Macro data interpretation for mean-reversion | sonnet |
 | `sec-analyst` | SEC filings and institutional sentiment | sonnet |
 | `swing-screener` | Entry/exit signals with confidence scoring | sonnet |
+| `news-analyst` | Financial news categorization and sentiment | sonnet |
+| `geopolitical-analyst` | Geopolitical events, trade wars, sanctions | sonnet |
+| `social-analyst` | Reddit sentiment, official statements | sonnet |
+| `statistics-analyst` | Sector rotation, breadth, correlations | sonnet |
+| `strategy-analyst` | Backtesting and parameter optimization | sonnet |
 | `code-reviewer` | Code quality review | sonnet |
 | `security-reviewer` | Security vulnerability audit | sonnet |
 | `token-optimizer` | Token usage audit | haiku |
@@ -97,34 +137,15 @@ uv run python -m app.history snapshots   # List all snapshots
 .
 ├── CLAUDE.md                          # Agent conventions
 ├── .claude/
-│   ├── agents/                        # Analysis agents
-│   │   ├── chief-analyst.md           # Orchestrator — unified reports
-│   │   ├── drawdown-monitor.md        # ATH drawdown tracking
-│   │   ├── market-analyst.md          # Momentum & volatility
-│   │   ├── macro-analyst.md           # Macro data interpretation
-│   │   ├── sec-analyst.md             # SEC filings & institutional
-│   │   ├── swing-screener.md          # Entry/exit signals
-│   │   ├── code-reviewer.md           # Code review
-│   │   ├── security-reviewer.md       # Security audit
-│   │   └── token-optimizer.md         # Token waste audit
+│   ├── agents/                        # 14 analysis agents
 │   ├── skills/                        # User-facing workflows
-│   │   ├── unified-report/            # /unified-report (full orchestrated)
-│   │   ├── analyze-etf/               # /analyze-etf <ticker>
-│   │   ├── scan-opportunities/        # /scan-opportunities
-│   │   ├── market-report/             # /market-report (lite)
-│   │   ├── telegram-notify/           # /telegram-notify <msg>
-│   │   ├── telegram-ask/              # /telegram-ask <question>
-│   │   ├── telegram-setup/            # /telegram-setup
-│   │   ├── fix-issue/                 # /fix-issue <number>
-│   │   ├── new-module/                # /new-module <name>
-│   │   └── self-improve/              # /self-improve
 │   └── settings.json                  # Permission allowlists
 ├── src/app/
 │   ├── etf/                           # ETF analysis engine
 │   │   ├── universe.py                # ETF mappings & config
 │   │   ├── drawdown.py                # ATH drawdown calculation
 │   │   ├── signals.py                 # Signal state machine
-│   │   ├── confidence.py              # 5-factor confidence scoring
+│   │   ├── confidence.py              # 9-factor confidence scoring
 │   │   ├── store.py                   # JSON persistence
 │   │   ├── stats.py                   # Recovery statistics
 │   │   └── __main__.py                # CLI entry point
@@ -138,14 +159,43 @@ uv run python -m app.history snapshots   # List all snapshots
 │   │   ├── filings.py                 # Company filings (10-K, 10-Q, 8-K)
 │   │   ├── institutional.py           # 13F institutional tracking
 │   │   └── __main__.py                # CLI entry point
+│   ├── news/                          # Financial news analysis
+│   │   ├── feeds.py                   # RSS feed fetching & parsing
+│   │   ├── categorizer.py             # Article categorization & sentiment
+│   │   ├── journalists.py             # Journalist accuracy tracking
+│   │   └── __main__.py                # CLI entry point
+│   ├── geopolitical/                  # Geopolitical risk monitoring
+│   │   ├── gdelt.py                   # GDELT API event fetching
+│   │   ├── rss.py                     # Geopolitical RSS feeds
+│   │   ├── classifier.py              # Impact classification & sector mapping
+│   │   └── __main__.py                # CLI entry point
+│   ├── social/                        # Social & official sentiment
+│   │   ├── reddit.py                  # Reddit OAuth + sentiment
+│   │   ├── officials.py               # Fed/SEC official statements
+│   │   ├── sentiment.py               # Shared keyword classification
+│   │   └── __main__.py                # CLI entry point
+│   ├── statistics/                    # Market statistics
+│   │   ├── sectors.py                 # Sector rotation analysis
+│   │   ├── breadth.py                 # Market breadth (put/call, VIX term)
+│   │   ├── correlations.py            # Cross-asset risk & correlations
+│   │   └── __main__.py                # CLI entry point
+│   ├── strategy/                      # Strategy & backtesting
+│   │   ├── backtest.py                # Backtesting engine
+│   │   ├── proposals.py               # Threshold optimization & proposals
+│   │   ├── store.py                   # Backtest result persistence
+│   │   └── __main__.py                # CLI entry point
+│   ├── scheduler/                     # Daily automation
+│   │   ├── runner.py                  # Module execution & status tracking
+│   │   ├── report.py                  # Report generation & Telegram delivery
+│   │   └── __main__.py                # CLI entry point
 │   ├── history/                       # Learning & tracking
 │   │   ├── recorder.py                # Analysis snapshots
 │   │   ├── outcomes.py                # Trade outcome recording
-│   │   ├── weights.py                 # Factor weight calculation
+│   │   ├── weights.py                 # Factor weight calculation (9 factors)
 │   │   └── __main__.py                # CLI entry point
-│   ├── telegram/                      # Telegram bot (notify + ask)
+│   ├── telegram/                      # Telegram bot (notify + ask + listen)
 │   └── __main__.py                    # App entry point
-├── tests/                             # 140 tests
+├── tests/                             # 265 tests
 ├── data/                              # Runtime state (gitignored)
 └── pyproject.toml                     # Dependencies & tooling
 ```
@@ -154,14 +204,17 @@ uv run python -m app.history snapshots   # List all snapshots
 
 | Source | Data | Auth |
 |---|---|---|
-| yfinance | Stock prices, VIX, Treasury yields | None (free) |
+| yfinance | Stock prices, VIX, Treasury yields, sector ETFs | None (free) |
 | FRED API | CPI, GDP, unemployment, Fed funds rate | Free API key (optional) |
 | SEC EDGAR | Company filings, 13F institutional | None (User-Agent header) |
+| GDELT Project | Geopolitical events (trade wars, military, sanctions) | None (free) |
+| RSS Feeds | Reuters, AP, BBC, CNBC, Fed speeches, SEC press | None (free) |
+| Reddit API | Subreddit sentiment (r/wallstreetbets, r/stocks) | OAuth credentials (optional) |
 
 ## Development
 
 ```bash
-uv run pytest              # Run tests (140 tests)
+uv run pytest              # Run tests (265 tests)
 uv run ruff check .        # Lint
 uv run mypy src/           # Type check
 ```

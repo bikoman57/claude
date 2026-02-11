@@ -4,7 +4,7 @@ description: Generate the complete unified daily swing trading report with all d
 disable-model-invocation: true
 metadata:
   author: bikoman57
-  version: 1.0.0
+  version: 2.0.0
   category: financial-analysis
 ---
 
@@ -27,6 +27,11 @@ uv run python -m app.macro rates
 uv run python -m app.macro calendar
 uv run python -m app.sec recent
 uv run python -m app.sec institutional
+uv run python -m app.geopolitical summary
+uv run python -m app.social summary
+uv run python -m app.news summary
+uv run python -m app.statistics dashboard
+uv run python -m app.strategy proposals
 uv run python -m app.history weights
 uv run python -m app.history summary
 ```
@@ -48,9 +53,9 @@ for sym, name in [('SPY','S&P 500'),('QQQ','Nasdaq-100'),('IWM','Russell 2000'),
 ### Step 3: Synthesize with Chief Analyst
 
 Use the `chief-analyst` agent to:
-- Cross-reference all data sources
-- Compute confidence scores for each entry signal
-- Identify tensions between domains (e.g., bad macro but deep drawdown)
+- Cross-reference all data sources (ETF + macro + SEC + geopolitical + social + news + statistics + strategy)
+- Compute confidence scores (9 factors) for each entry signal
+- Identify tensions between domains (e.g., bad macro but deep drawdown, high geopolitical risk but bearish sentiment)
 - Produce the unified report in the format below
 
 ### Step 4: Send via Telegram
@@ -68,31 +73,38 @@ uv run python -m app.telegram notify --title "Daily Swing Report" "<report summa
 
 MARKET OVERVIEW
 Indices: SPY {%} | QQQ {%} | IWM {%}
-VIX: {val} [{regime}]
-Fed Rate: {rate} | Next FOMC: {date} | Trajectory: {hiking/pausing/cutting}
-10Y Yield: {val} | 3M-10Y Spread: {val} [{normal/inverted/flat}]
+VIX: {val} [{regime}] | Fed: {trajectory} | Yields: {curve}
 
-MACRO EVENTS THIS WEEK
-- [upcoming events from FOMC calendar, CPI, jobs]
+GEOPOLITICAL RISK
+Risk Level: [HIGH/MEDIUM/LOW]
+- [event summary with sector impact]
+
+SOCIAL & OFFICIAL SENTIMENT
+Reddit: [sentiment] (trending: $TICKER, $TICKER)
+Officials: Fed tone [HAWKISH/DOVISH/NEUTRAL]
+
+NEWS SENTIMENT
+Overall: [sentiment] ([N] articles)
+- [top headline with sector relevance]
+
+MARKET STATISTICS
+Rotation: [RISK_ON/RISK_OFF] | Put/Call: [val] | VIX Term: [structure]
+Gold: $[price] ({%}) | DXY: [val] ({%})
 
 SEC FILINGS (last 7 days)
 - [ticker] [form_type] filed [date]: [materiality]
-- [institution] 13F: filed [date]
 
 ENTRY SIGNALS
 [1] BUY TQQQ — QQQ down 5.2% from ATH
-    Price: $44.20 | Target: +10% ($48.62)
-    Recovery: Avg 23 days, 87% success
-    CONFIDENCE: HIGH (4/5 factors)
-      Drawdown: FAVORABLE | VIX: FAVORABLE
-      Macro: FAVORABLE | Yields: FAVORABLE | SEC: NEUTRAL
-
-EXIT SIGNALS
-[1] TAKE PROFIT UPRO — Up 10.5% from entry
+    CONFIDENCE: HIGH (7/9 factors)
+    Drawdown: FAV | VIX: FAV | Fed: FAV | Yields: FAV | SEC: NEU
+    Geopolitical: FAV | Social: FAV | News: FAV | Stats: NEU
 
 ACTIVE POSITIONS
 | ETF  | Entry  | Current | P/L   | Target | Days |
-| SOXL | $32.50 | $34.80  | +7.1% | +10%   | 12   |
+
+STRATEGY INSIGHTS
+- [backtest-based proposals for parameter changes]
 
 LEARNING INSIGHTS
 Based on N past trades:
@@ -109,5 +121,7 @@ This is not financial advice.
 **Missing FRED_API_KEY**: Macro dashboard will only show VIX. Note partial data.
 
 **Missing SEC_EDGAR_EMAIL**: SEC filings will be skipped. Note in report.
+
+**Missing Reddit credentials**: Social module will skip Reddit data. Note partial data.
 
 **No completed trades**: Learning insights will say "No completed trades yet."

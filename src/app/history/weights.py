@@ -10,6 +10,10 @@ FACTOR_NAMES = [
     "fed_regime",
     "yield_curve",
     "sec_sentiment",
+    "geopolitical_risk",
+    "social_sentiment",
+    "news_sentiment",
+    "market_statistics",
 ]
 
 

@@ -19,7 +19,13 @@
       "Bash(uv run python -m app.etf*)",
       "Bash(uv run python -m app.history*)",
       "Bash(uv run python -m app.macro*)",
-      "Bash(uv run python -m app.sec*)"
+      "Bash(uv run python -m app.sec*)",
+      "Bash(uv run python -m app.geopolitical*)",
+      "Bash(uv run python -m app.social*)",
+      "Bash(uv run python -m app.news*)",
+      "Bash(uv run python -m app.statistics*)",
+      "Bash(uv run python -m app.strategy*)",
+      "Bash(uv run python -m app.scheduler*)"
     ],
     "deny": []
   }

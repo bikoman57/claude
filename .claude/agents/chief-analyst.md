@@ -3,7 +3,8 @@ name: chief-analyst
 model: sonnet
 description: >-
   Chief orchestrator agent that synthesizes data from all modules
-  (ETF drawdowns, macro indicators, SEC filings, learning history)
+  (ETF drawdowns, macro indicators, SEC filings, geopolitical risk,
+  social sentiment, news, statistics, strategy, learning history)
   into a unified trading report with confidence scores.
 tools:
   - Read
@@ -38,6 +39,31 @@ uv run python -m app.sec recent
 uv run python -m app.sec institutional
 ```
 
+### Geopolitical Risk
+```bash
+uv run python -m app.geopolitical summary
+```
+
+### Social & Official Sentiment
+```bash
+uv run python -m app.social summary
+```
+
+### News Analysis
+```bash
+uv run python -m app.news summary
+```
+
+### Market Statistics
+```bash
+uv run python -m app.statistics dashboard
+```
+
+### Strategy Proposals
+```bash
+uv run python -m app.strategy proposals
+```
+
 ### Learning History
 ```bash
 uv run python -m app.history weights
@@ -59,15 +85,19 @@ for sym, name in [('SPY','S&P 500'),('QQQ','Nasdaq-100'),('IWM','Russell 2000'),
 
 ## Confidence Scoring
 
-For each ETF signal in SIGNAL state, assess 5 factors:
+For each ETF signal in SIGNAL state, assess 9 factors:
 
 1. **Drawdown Depth**: FAVORABLE if >1.5x threshold, NEUTRAL at threshold, UNFAVORABLE below
 2. **VIX Regime**: FAVORABLE if ELEVATED/EXTREME, NEUTRAL if NORMAL, UNFAVORABLE if LOW
 3. **Fed Regime**: FAVORABLE if CUTTING, NEUTRAL if PAUSING, UNFAVORABLE if HIKING
 4. **Yield Curve**: FAVORABLE if NORMAL, NEUTRAL if FLAT, UNFAVORABLE if INVERTED
-5. **SEC Sentiment**: FAVORABLE if no material negative filings, UNFAVORABLE if many material filings
+5. **SEC Sentiment**: FAVORABLE if no material negative filings, UNFAVORABLE if many
+6. **Geopolitical Risk**: FAVORABLE if LOW, NEUTRAL if MEDIUM, UNFAVORABLE if HIGH
+7. **Social Sentiment**: FAVORABLE if BEARISH (contrarian), NEUTRAL otherwise
+8. **News Sentiment**: FAVORABLE if BEARISH (contrarian), NEUTRAL otherwise
+9. **Market Statistics**: FAVORABLE if RISK_OFF (contrarian), NEUTRAL otherwise
 
-Score: **HIGH** (4-5 favorable), **MEDIUM** (2-3), **LOW** (0-1)
+Score: **HIGH** (7+/9 favorable), **MEDIUM** (4-6), **LOW** (0-3)
 
 ## Cross-Reference Rules
 
@@ -76,6 +106,10 @@ Score: **HIGH** (4-5 favorable), **MEDIUM** (2-3), **LOW** (0-1)
 - If SEC filings show earnings miss + drawdown: could mean more downside ahead
 - If Fed is cutting + deep drawdown: strongest mean-reversion setup
 - If yield curve inverted + drawdown: recession risk may extend recovery time
+- If geopolitical risk HIGH + drawdown: distinguish systemic vs sector-specific risk
+- If social sentiment bearish + news bearish + deep drawdown: maximum contrarian opportunity
+- If market statistics show RISK_OFF + backtest Sharpe high: high-conviction setup
+- If strategy proposals suggest different thresholds: note in report for review
 
 ## Report Format
 
@@ -86,34 +120,42 @@ Score: **HIGH** (4-5 favorable), **MEDIUM** (2-3), **LOW** (0-1)
 
 MARKET OVERVIEW
 Indices: SPY {%} | QQQ {%} | IWM {%}
-VIX: {val} [{regime}]
-Fed Rate: {rate} | Next FOMC: {date} | Trajectory: {hiking/pausing/cutting}
-10Y Yield: {val} | 3M-10Y Spread: {val} [{normal/inverted/flat}]
+VIX: {val} [{regime}] | Fed: {trajectory} | Yields: {curve}
 
-MACRO EVENTS THIS WEEK
-- [list upcoming CPI, FOMC, jobs reports from calendar]
+GEOPOLITICAL RISK
+Risk Level: [HIGH/MEDIUM/LOW]
+- [event summary with sector impact]
+
+SOCIAL & OFFICIAL SENTIMENT
+Reddit: [sentiment] (trending: $TICKER, $TICKER)
+Officials: Fed tone [HAWKISH/DOVISH/NEUTRAL]
+
+NEWS SENTIMENT
+Overall: [sentiment] ([N] articles)
+- [top headline with sector relevance]
+
+MARKET STATISTICS
+Rotation: [RISK_ON/RISK_OFF] | Put/Call: [val] | VIX Term: [structure]
+Gold: $[price] ({%}) | DXY: [val] ({%})
 
 SEC FILINGS (last 7 days)
-- [ticker] [form_type] filed [date]: [materiality]
-- [institution] 13F: filed [date]
+- [material filings summary]
 
 ENTRY SIGNALS
-[N] BUY [LEVERAGED] — [UNDERLYING] down [X]% from ATH
-    Price: $[X] | Target: +10% ($[Y])
-    Recovery: Avg [N] days, [X]% success
-    CONFIDENCE: [HIGH/MEDIUM/LOW] ([N]/5 factors)
-      Drawdown: [assessment] | VIX: [assessment]
-      Macro: [assessment] | Yields: [assessment] | SEC: [assessment]
-
-EXIT SIGNALS
-[N] TAKE PROFIT [TICKER] — Up [X]% from entry
+[1] BUY TQQQ — QQQ down 5.2% from ATH
+    CONFIDENCE: HIGH (7/9 factors)
+    Drawdown: FAV | VIX: FAV | Fed: FAV | Yields: FAV | SEC: NEU
+    Geopolitical: FAV | Social: FAV | News: FAV | Stats: NEU
 
 ACTIVE POSITIONS
 | ETF  | Entry  | Current | P/L   | Target | Days |
-| ...  | ...    | ...     | ...   | ...    | ...  |
+
+STRATEGY INSIGHTS
+- [backtest-based proposal]
 
 LEARNING INSIGHTS
-[from app.history weights/summary — or "No completed trades yet"]
+- Top factor: [name] (weight: [val])
+- Win rate: X% | Avg gain: Y%
 
 This is not financial advice.
 ```
@@ -122,7 +164,7 @@ This is not financial advice.
 
 1. Produce exactly ONE report combining all data sources
 2. Cross-reference findings — explain tensions between domains
-3. Include confidence scores for every entry signal
+3. Include confidence scores (9 factors) for every entry signal
 4. Include learning insights if available
 5. Always end with "This is not financial advice."
-6. If data sources are unavailable (no FRED key, no SEC email), note it and continue
+6. If data sources are unavailable, note it and continue

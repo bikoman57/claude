@@ -6,6 +6,10 @@ from app.etf.confidence import (
     FactorResult,
     assess_drawdown_depth,
     assess_fed_regime,
+    assess_geopolitical_risk,
+    assess_market_statistics,
+    assess_news_sentiment,
+    assess_social_sentiment,
     assess_vix_regime,
     assess_yield_curve,
     compute_confidence,
@@ -49,22 +53,65 @@ def _neutral(name: str) -> FactorResult:
     return FactorResult(name, FactorAssessment.NEUTRAL, "test")
 
 
+def test_new_factor_geopolitical():
+    r = assess_geopolitical_risk("LOW")
+    assert r.assessment == FactorAssessment.FAVORABLE
+    r = assess_geopolitical_risk("MEDIUM")
+    assert r.assessment == FactorAssessment.NEUTRAL
+    r = assess_geopolitical_risk("HIGH")
+    assert r.assessment == FactorAssessment.UNFAVORABLE
+
+
+def test_new_factor_social_sentiment():
+    r = assess_social_sentiment("BEARISH")
+    assert r.assessment == FactorAssessment.FAVORABLE
+    r = assess_social_sentiment("BULLISH")
+    assert r.assessment == FactorAssessment.NEUTRAL
+    r = assess_social_sentiment("NEUTRAL")
+    assert r.assessment == FactorAssessment.NEUTRAL
+
+
+def test_new_factor_news_sentiment():
+    r = assess_news_sentiment("BEARISH")
+    assert r.assessment == FactorAssessment.FAVORABLE
+    r = assess_news_sentiment("BULLISH")
+    assert r.assessment == FactorAssessment.NEUTRAL
+    r = assess_news_sentiment("NEUTRAL")
+    assert r.assessment == FactorAssessment.NEUTRAL
+
+
+def test_new_factor_market_statistics():
+    r = assess_market_statistics("RISK_OFF")
+    assert r.assessment == FactorAssessment.FAVORABLE
+    r = assess_market_statistics("RISK_ON")
+    assert r.assessment == FactorAssessment.NEUTRAL
+    r = assess_market_statistics("NEUTRAL")
+    assert r.assessment == FactorAssessment.NEUTRAL
+
+
 def test_compute_confidence_high():
-    factors = [_fav("a"), _fav("b"), _fav("c"), _fav("d"), _neutral("e")]
+    factors = [_fav(f"f{i}") for i in range(7)] + [
+        _neutral("n1"),
+        _neutral("n2"),
+    ]
     score = compute_confidence(factors)
     assert score.level == ConfidenceLevel.HIGH
-    assert score.favorable_count == 4
+    assert score.favorable_count == 7
 
 
 def test_compute_confidence_medium():
-    factors = [_fav("a"), _fav("b"), _neutral("c"), _unfav("d"), _unfav("e")]
+    factors = [_fav(f"f{i}") for i in range(5)] + [
+        _neutral(f"n{i}") for i in range(4)
+    ]
     score = compute_confidence(factors)
     assert score.level == ConfidenceLevel.MEDIUM
-    assert score.favorable_count == 2
+    assert score.favorable_count == 5
 
 
 def test_compute_confidence_low():
-    factors = [_unfav("a"), _unfav("b"), _neutral("c"), _neutral("d"), _fav("e")]
+    factors = [_fav("f1")] + [
+        _unfav(f"u{i}") for i in range(4)
+    ] + [_neutral(f"n{i}") for i in range(4)]
     score = compute_confidence(factors)
     assert score.level == ConfidenceLevel.LOW
     assert score.favorable_count == 1
