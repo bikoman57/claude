@@ -3,98 +3,201 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Report 2026-02-11</title>
+<title>Dashboard 2026-02-11</title>
 <style>* { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  max-width: 900px; margin: 0 auto; padding: 20px;
-  background: #0d1117; color: #c9d1d9; line-height: 1.5;
+  max-width: 1200px; margin: 0 auto; padding: 24px;
+  background: #0d1117; color: #c9d1d9; line-height: 1.6;
 }
-h1 { color: #58a6ff; border-bottom: 1px solid #30363d; padding-bottom: 12px;
-     margin-bottom: 16px; font-size: 1.6em; }
-h2 { color: #79c0ff; margin-top: 24px; margin-bottom: 8px; font-size: 1.2em; }
-.card { background: #161b22; border: 1px solid #30363d; border-radius: 6px;
-        padding: 16px; margin: 12px 0; }
-.badge { display: inline-block; padding: 2px 8px; border-radius: 12px;
-         font-size: 0.85em; font-weight: 600; }
+h1 { color: #e6edf3; font-size: 1.5em; font-weight: 600; }
+h2 { color: #e6edf3; margin-bottom: 12px; font-size: 1.1em; font-weight: 600;
+     text-transform: uppercase; letter-spacing: 0.05em; }
+.header { display: flex; align-items: center; justify-content: space-between;
+          border-bottom: 1px solid #30363d; padding-bottom: 16px;
+          margin-bottom: 24px; flex-wrap: wrap; gap: 8px; }
+.header-status { font-size: 0.9em; }
+
+/* KPI strip */
+.kpi-strip { display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px; margin-bottom: 24px; }
+.kpi-card { background: #161b22; border: 1px solid #30363d;
+  border-radius: 8px; padding: 16px; border-top: 3px solid #30363d;
+  transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.kpi-card:hover { transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.kpi-label { font-size: 0.75em; color: #8b949e; text-transform: uppercase;
+  letter-spacing: 0.08em; margin-bottom: 4px; }
+.kpi-value { font-size: 1.8em; font-weight: 700; color: #e6edf3;
+  line-height: 1.2; }
+.kpi-sub { font-size: 0.85em; color: #8b949e; margin-top: 4px; }
+.kpi-bar-green { border-top-color: #238636; }
+.kpi-bar-yellow { border-top-color: #9e6a03; }
+.kpi-bar-red { border-top-color: #da3633; }
+.kpi-bar-gray { border-top-color: #484f58; }
+
+/* Cards */
+.card { background: #161b22; border: 1px solid #30363d; border-radius: 8px;
+  padding: 20px; margin-bottom: 24px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.card:hover { transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+
+/* Grid layouts */
+.grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+/* Badges */
+.badge { display: inline-block; padding: 2px 10px; border-radius: 12px;
+  font-size: 0.8em; font-weight: 600; letter-spacing: 0.03em; }
 .badge-green { background: #238636; color: #fff; }
 .badge-yellow { background: #9e6a03; color: #fff; }
 .badge-red { background: #da3633; color: #fff; }
 .badge-gray { background: #30363d; color: #8b949e; }
-table { border-collapse: collapse; width: 100%; margin: 8px 0; }
-th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid #30363d; }
-th { color: #8b949e; font-weight: 600; }
-.footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid #30363d;
-          font-size: 0.85em; color: #8b949e; }
+
+/* Tables */
+table { border-collapse: collapse; width: 100%; }
+th { text-align: left; padding: 10px 12px; color: #8b949e; font-weight: 600;
+  font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 2px solid #30363d; }
+td { padding: 10px 12px; border-bottom: 1px solid #21262d; }
+tbody tr:hover { background: #1c2128; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.pct-up { color: #3fb950; }
+.pct-down { color: #f85149; }
+
+/* Indicators row */
+.ind-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
+.ind-item { display: flex; align-items: center; gap: 6px;
+  font-size: 0.9em; }
+.ind-label { color: #8b949e; }
+
+/* Module pills */
+.module-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.module-pill { display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 12px; border-radius: 16px; font-size: 0.8em;
+  font-weight: 500; }
+.module-pill-ok { background: #0d2818; color: #3fb950;
+  border: 1px solid #238636; }
+.module-pill-fail { background: #2d1214; color: #f85149;
+  border: 1px solid #da3633; }
+.pill-dur { color: #8b949e; font-size: 0.85em; }
+
+/* Footer */
+.footer { margin-top: 32px; padding-top: 16px;
+  border-top: 1px solid #30363d; font-size: 0.85em; color: #8b949e;
+  display: flex; justify-content: space-between; flex-wrap: wrap;
+  gap: 8px; }
 a { color: #58a6ff; text-decoration: none; }
 a:hover { text-decoration: underline; }
 .ok { color: #3fb950; }
 .fail { color: #f85149; }
-.summary { font-size: 1.05em; margin-bottom: 16px; }
+
+/* Index page */
+.report-list { display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px; margin-top: 16px; }
+.report-card { background: #161b22; border: 1px solid #30363d;
+  border-radius: 8px; padding: 16px; text-align: center;
+  transition: transform 0.15s ease, border-color 0.15s ease; }
+.report-card:hover { transform: translateY(-2px);
+  border-color: #58a6ff; }
+.report-card a { font-size: 1.1em; font-weight: 600; }
+.badge-latest { background: #1f6feb; color: #fff; font-size: 0.7em;
+  padding: 2px 8px; border-radius: 8px; margin-left: 6px; }
+
+@media (max-width: 768px) {
+  .grid-2col { grid-template-columns: 1fr; }
+  .header { flex-direction: column; align-items: flex-start; }
+  .kpi-strip { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+  .kpi-value { font-size: 1.4em; }
+}
 </style>
 </head>
 <body>
-<h1>Daily Swing Trading Report &mdash; 2026-02-11</h1>
-<p class="summary">Modules: <span class="ok">12</span>/15 OK | Failed: <span class="fail">3</span></p>
-<h2>Market Overview</h2>
-<div class="card">
-<p>VIX Regime: <span class="badge badge-yellow">NORMAL</span> &nbsp; Fed Trajectory: <span class="badge badge-gray">N/A</span></p>
+<div class="header">
+<h1>Daily Swing Trading Dashboard &mdash; 2026-02-11</h1>
+<div class="header-status"><span class="ok">12</span>/15 OK &nbsp; <span class="fail">3</span> failed</div>
 </div>
 
-<h2>Geopolitical Risk</h2>
-<div class="card">
-<p>Risk Level: <span class="badge badge-green">LOW</span> &nbsp; Events: 0</p>
+<div class="kpi-strip">
+<div class="kpi-card kpi-bar-yellow">
+<div class="kpi-label">VIX</div>
+<div class="kpi-value">17.6</div>
+<div class="kpi-sub"><span class="badge badge-yellow">NORMAL</span></div>
+</div>
+<div class="kpi-card kpi-bar-gray">
+<div class="kpi-label">Fed</div>
+<div class="kpi-value"><span class="badge badge-gray">N/A</span></div>
+</div>
+<div class="kpi-card kpi-bar-yellow">
+<div class="kpi-label">Yield Curve</div>
+<div class="kpi-value"><span class="badge badge-yellow">NORMAL</span></div>
+<div class="kpi-sub">Spread: +0.57%</div>
+</div>
+<div class="kpi-card kpi-bar-green">
+<div class="kpi-label">Geopolitical</div>
+<div class="kpi-value"><span class="badge badge-green">LOW</span></div>
+<div class="kpi-sub">0 events</div>
+</div>
+<div class="kpi-card kpi-bar-gray">
+<div class="kpi-label">News</div>
+<div class="kpi-value"><span class="badge badge-gray">N/A</span></div>
+<div class="kpi-sub">142 articles</div>
+</div>
 </div>
 
-<h2>Social &amp; Officials</h2>
-<div class="card">
-<p>Officials Tone: <span class="badge badge-gray">N/A</span></p>
-</div>
-
-<h2>News Sentiment</h2>
-<div class="card">
-<p>Sentiment: <span class="badge badge-gray">N/A</span> &nbsp; Articles: 141</p>
-</div>
-
-<h2>Market Statistics</h2>
-<div class="card">
-<p>Risk Assessment: <span class="badge badge-gray">NEUTRAL</span></p>
-</div>
-
-<h2>Strategy Insights</h2>
+<div class="grid-2col">
+<div><h2>Strategy Proposals</h2>
 <div class="card">
 <table>
-<tr><th>ETF</th><th>Proposal</th></tr>
-<tr><td>TQQQ</td><td>Backtest (Sharpe=3.30): entry 10% vs current 5%</td></tr>
-<tr><td>UPRO</td><td>Backtest (Sharpe=2.81): entry 10% vs current 5%</td></tr>
-<tr><td>SOXL</td><td>Backtest (Sharpe=1.36): entry 15% vs current 8%</td></tr>
-<tr><td>TNA</td><td>Backtest (Sharpe=2.13): entry 5% vs current 7%, target 15% vs current 10%</td></tr>
-<tr><td>TECL</td><td>Backtest (Sharpe=2.53): entry 12% vs current 7%</td></tr>
-</table>
+<thead><tr><th>ETF</th><th>Proposal</th><th>Sharpe</th><th>Win Rate</th><th>Return</th></tr></thead>
+<tbody>
+<tr><td><strong>TQQQ</strong></td><td>Backtest (Sharpe=3.30): entry 10% vs current 5%</td><td class="num">3.30</td><td class="num">100.0%</td><td class="num pct-up">+71.3%</td></tr>
+<tr><td><strong>UPRO</strong></td><td>Backtest (Sharpe=2.81): entry 10% vs current 5%</td><td class="num">2.81</td><td class="num">100.0%</td><td class="num pct-up">+42.4%</td></tr>
+<tr><td><strong>SOXL</strong></td><td>Backtest (Sharpe=1.36): entry 15% vs current 8%</td><td class="num">1.36</td><td class="num">80.0%</td><td class="num pct-up">+87.9%</td></tr>
+<tr><td><strong>TNA</strong></td><td>Backtest (Sharpe=2.06): entry 5% vs current 7%, target 15% vs current 10%</td><td class="num">2.06</td><td class="num">80.0%</td><td class="num pct-up">+124.7%</td></tr>
+<tr><td><strong>TECL</strong></td><td>Backtest (Sharpe=2.53): entry 12% vs current 7%</td><td class="num">2.53</td><td class="num">100.0%</td><td class="num pct-up">+72.4%</td></tr>
+<tr><td><strong>FAS</strong></td><td>Backtest (Sharpe=9.51): target 15% vs current 10%</td><td class="num">9.51</td><td class="num">100.0%</td><td class="num pct-up">+61.2%</td></tr>
+<tr><td><strong>LABU</strong></td><td>Backtest (Sharpe=8.46): entry 15% vs current 10%, target 8% vs current 10%</td><td class="num">8.46</td><td class="num">100.0%</td><td class="num pct-up">+39.5%</td></tr>
+<tr><td><strong>UCO</strong></td><td>Backtest (Sharpe=54.39): entry 15% vs current 10%</td><td class="num">54.39</td><td class="num">100.0%</td><td class="num pct-up">+51.3%</td></tr>
+</tbody></table>
+</div>
+</div>
+<div><h2>Market Indicators</h2>
+<div class="card">
+<p>Risk Assessment: <span class="badge badge-gray">NEUTRAL</span></p>
+<div class="ind-row"><span class="ind-item"><span class="ind-label">Gold:</span> $466.12 <span class="pct-up">+5.5%</span></span><span class="ind-item"><span class="ind-label">Oil:</span> $79.10 <span class="pct-up">+3.1%</span></span><span class="ind-item"><span class="ind-label">DXY:</span> $96.99 <span class="pct-down">-0.8%</span></span></div>
+<p>Officials Tone: <span class="badge badge-gray">N/A</span> &nbsp; Policy: <span class="badge badge-gray">CONTRACTIONARY</span></p>
+</div>
+</div>
 </div>
 
 <h2>Module Status</h2>
 <div class="card">
-<table>
-<tr><th></th><th>Module</th><th>Duration</th></tr>
-<tr><td><span class="ok">&#10003;</span></td><td>etf.scan</td><td>6.3s</td></tr>
-<tr><td><span class="ok">&#10003;</span></td><td>etf.active</td><td>0.8s</td></tr>
-<tr><td><span class="ok">&#10003;</span></td><td>macro.dashboard</td><td>1.7s</td></tr>
-<tr><td><span class="ok">&#10003;</span></td><td>macro.yields</td><td>2.3s</td></tr>
-<tr><td><span class="fail">&#10007;</span></td><td>macro.rates</td><td>0.9s</td></tr>
-<tr><td><span class="ok">&#10003;</span></td><td>macro.calendar</td><td>0.8s</td></tr>
-<tr><td><span class="fail">&#10007;</span></td><td>sec.recent</td><td>0.2s</td></tr>
-<tr><td><span class="fail">&#10007;</span></td><td>sec.institutional</td><td>0.2s</td></tr>
-<tr><td><span class="ok">&#10003;</span></td><td>geopolitical.summary</td><td>15.9s</td></tr>
-<tr><td><span class="ok">&#10003;</span></td><td>social.summary</td><td>0.9s</td></tr>
-<tr><td><span class="ok">&#10003;</span></td><td>news.summary</td><td>2.3s</td></tr>
-<tr><td><span class="ok">&#10003;</span></td><td>statistics.dashboard</td><td>2.5s</td></tr>
-<tr><td><span class="ok">&#10003;</span></td><td>strategy.proposals</td><td>14.4s</td></tr>
-<tr><td><span class="ok">&#10003;</span></td><td>history.weights</td><td>0.1s</td></tr>
-<tr><td><span class="ok">&#10003;</span></td><td>history.summary</td><td>0.1s</td></tr>
-</table>
+<div class="module-grid">
+<span class="module-pill module-pill-ok">&#10003; etf.scan <span class="pill-dur">3.4s</span></span>
+<span class="module-pill module-pill-ok">&#10003; etf.active <span class="pill-dur">0.8s</span></span>
+<span class="module-pill module-pill-ok">&#10003; macro.dashboard <span class="pill-dur">1.7s</span></span>
+<span class="module-pill module-pill-ok">&#10003; macro.yields <span class="pill-dur">2.0s</span></span>
+<span class="module-pill module-pill-fail">&#10007; macro.rates <span class="pill-dur">0.9s</span></span>
+<span class="module-pill module-pill-ok">&#10003; macro.calendar <span class="pill-dur">0.8s</span></span>
+<span class="module-pill module-pill-fail">&#10007; sec.recent <span class="pill-dur">0.2s</span></span>
+<span class="module-pill module-pill-fail">&#10007; sec.institutional <span class="pill-dur">0.2s</span></span>
+<span class="module-pill module-pill-ok">&#10003; geopolitical.summary <span class="pill-dur">13.6s</span></span>
+<span class="module-pill module-pill-ok">&#10003; social.summary <span class="pill-dur">1.1s</span></span>
+<span class="module-pill module-pill-ok">&#10003; news.summary <span class="pill-dur">2.1s</span></span>
+<span class="module-pill module-pill-ok">&#10003; statistics.dashboard <span class="pill-dur">2.5s</span></span>
+<span class="module-pill module-pill-ok">&#10003; strategy.proposals <span class="pill-dur">14.8s</span></span>
+<span class="module-pill module-pill-ok">&#10003; history.weights <span class="pill-dur">0.1s</span></span>
+<span class="module-pill module-pill-ok">&#10003; history.summary <span class="pill-dur">0.1s</span></span>
+</div>
 </div>
 
-<p class="footer">Generated 2026-02-11 | <a href="../index.html">All Reports</a> | This is not financial advice.</p>
+<div class="footer">
+<span>Generated 2026-02-11 &mdash; not financial advice.</span>
+<span><a href="../index.html">All Reports</a></span>
+</div>
+
 </body>
 </html>
