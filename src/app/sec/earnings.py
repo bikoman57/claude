@@ -126,12 +126,8 @@ def classify_track_record(events: tuple[EarningsEvent, ...]) -> str:
     if len(events) < 2:
         return "INSUFFICIENT_DATA"
 
-    beats = sum(
-        1 for e in events if e.surprise_pct is not None and e.surprise_pct > 0
-    )
-    misses = sum(
-        1 for e in events if e.surprise_pct is not None and e.surprise_pct < 0
-    )
+    beats = sum(1 for e in events if e.surprise_pct is not None and e.surprise_pct > 0)
+    misses = sum(1 for e in events if e.surprise_pct is not None and e.surprise_pct < 0)
 
     if beats >= 3:
         return "CONSISTENT_BEATS"

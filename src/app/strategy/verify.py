@@ -212,9 +212,7 @@ def verify_forecasts(
         correct_count=correct_count,
         hit_rate=round(hit_rate, 4),
         recent_hit_rate=(
-            round(recent_hit_rate, 4)
-            if recent_hit_rate is not None
-            else None
+            round(recent_hit_rate, 4) if recent_hit_rate is not None else None
         ),
         trend=trend,
         verifications=tuple(new_verifications),
@@ -230,10 +228,7 @@ def _load_verifications() -> list[ForecastVerification]:
         return []
     try:
         data = json.loads(_ACCURACY_PATH.read_text(encoding="utf-8"))
-        return [
-            ForecastVerification(**v)
-            for v in data.get("verifications", [])
-        ]
+        return [ForecastVerification(**v) for v in data.get("verifications", [])]
     except (json.JSONDecodeError, KeyError, TypeError):
         return []
 
@@ -255,8 +250,7 @@ def load_accuracy_report() -> AccuracyReport | None:
     try:
         data = json.loads(_ACCURACY_PATH.read_text(encoding="utf-8"))
         verifications = tuple(
-            ForecastVerification(**v)
-            for v in data.get("verifications", [])
+            ForecastVerification(**v) for v in data.get("verifications", [])
         )
         return AccuracyReport(
             total_verifications=data.get("total_verifications", 0),

@@ -169,10 +169,7 @@ def generate_forecast(
                 bt_lookup[underlying] = bt
             elif isinstance(sharpe, (int, float)):
                 ex_sharpe = existing.get("sharpe_ratio")
-                if (
-                    not isinstance(ex_sharpe, (int, float))
-                    or sharpe > ex_sharpe
-                ):
+                if not isinstance(ex_sharpe, (int, float)) or sharpe > ex_sharpe:
                     bt_lookup[underlying] = bt
 
     forecasts: list[ETFForecast] = []
@@ -232,9 +229,7 @@ def generate_forecast(
             signal_state=state,
             factor_assessments=factor_scores,
             backtest_win_rate=(
-                float(win_rate)
-                if isinstance(win_rate, (int, float))
-                else None
+                float(win_rate) if isinstance(win_rate, (int, float)) else None
             ),
             factor_weights=factor_weights,
         )
@@ -289,9 +284,7 @@ def save_forecast(report: ForecastReport, path: Path | None = None) -> Path:
 def load_forecast(path: Path) -> ForecastReport:
     """Load forecast report from JSON."""
     data = json.loads(path.read_text(encoding="utf-8"))
-    forecasts = tuple(
-        ETFForecast(**f) for f in data.get("forecasts", [])
-    )
+    forecasts = tuple(ETFForecast(**f) for f in data.get("forecasts", []))
     return ForecastReport(
         date=data["date"],
         forecasts=forecasts,

@@ -110,18 +110,18 @@ def match_round_trips(
         for trade in sorted_trades:
             if trade.transaction_type == TransactionType.PURCHASE:
                 buys.append(trade)
-            elif trade.transaction_type in (
-                TransactionType.SALE_FULL,
-                TransactionType.SALE_PARTIAL,
-            ) and buys:
+            elif (
+                trade.transaction_type
+                in (
+                    TransactionType.SALE_FULL,
+                    TransactionType.SALE_PARTIAL,
+                )
+                and buys
+            ):
                 buy = buys.pop(0)  # FIFO
                 buy_mid = _amount_midpoint(buy)
                 sell_mid = _amount_midpoint(trade)
-                ret_pct = (
-                    ((sell_mid - buy_mid) / buy_mid * 100)
-                    if buy_mid > 0
-                    else 0.0
-                )
+                ret_pct = ((sell_mid - buy_mid) / buy_mid * 100) if buy_mid > 0 else 0.0
                 days = _days_between(buy.trade_date, trade.trade_date)
                 round_trips.append(
                     RoundTrip(

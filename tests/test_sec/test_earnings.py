@@ -126,7 +126,10 @@ def test_classify_proximity_unknown() -> None:
 
 def _event(surprise: float | None) -> EarningsEvent:
     return EarningsEvent(
-        ticker="TEST", date="2025-01-01", eps_estimate=1.0, eps_actual=1.0,
+        ticker="TEST",
+        date="2025-01-01",
+        eps_estimate=1.0,
+        eps_actual=1.0,
         surprise_pct=surprise,
     )
 

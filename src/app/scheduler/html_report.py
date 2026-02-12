@@ -198,6 +198,7 @@ td { padding: 12px 14px; border-bottom: 1px solid var(--border-light); }
 tbody tr:nth-child(even) { background: #fafbfc; }
 tbody tr:hover { background: #f0f4f8; }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
+th.num { text-align: right; }
 .pct-up { color: var(--success); }
 .pct-down { color: var(--danger); }
 
@@ -1597,9 +1598,12 @@ def _section_strategy(outputs: dict[str, str]) -> str:
         "<thead><tr>"
         '<th scope="col">ETF</th><th scope="col">Strategy</th>'
         '<th scope="col">Proposal</th>'
-        '<th scope="col">Sharpe</th><th scope="col">Win Rate</th>'
-        '<th scope="col">Return</th><th scope="col">Trades</th>'
-        '<th scope="col">Max DD</th><th scope="col">Avg Hold</th>'
+        '<th scope="col" class="num">Sharpe</th>'
+        '<th scope="col" class="num">Win Rate</th>'
+        '<th scope="col" class="num">Return</th>'
+        '<th scope="col" class="num">Trades</th>'
+        '<th scope="col" class="num">Max DD</th>'
+        '<th scope="col" class="num">Avg Hold</th>'
         "</tr></thead>\n<tbody>\n" + "\n".join(rows) + "\n</tbody></table>\n"
         "</div>\n</section>\n"
     )
@@ -2323,13 +2327,13 @@ def build_trade_logs_html(
         '<th scope="col">ETF</th>'
         '<th scope="col">Underlying</th>'
         '<th scope="col">Strategy</th>'
-        '<th scope="col">Entry</th>'
-        '<th scope="col">Target</th>'
-        '<th scope="col">Trades</th>'
-        '<th scope="col">Sharpe</th>'
-        '<th scope="col">Win Rate</th>'
-        '<th scope="col">Return</th>'
-        '<th scope="col">Max DD</th>'
+        '<th scope="col" class="num">Entry</th>'
+        '<th scope="col" class="num">Target</th>'
+        '<th scope="col" class="num">Trades</th>'
+        '<th scope="col" class="num">Sharpe</th>'
+        '<th scope="col" class="num">Win Rate</th>'
+        '<th scope="col" class="num">Return</th>'
+        '<th scope="col" class="num">Max DD</th>'
         "</tr></thead>\n<tbody>\n"
         + "\n".join(summary_rows)
         + "\n</tbody></table>\n</div>\n</section>\n"
@@ -2351,13 +2355,13 @@ def build_trade_logs_html(
         '<table class="mt-12">\n<thead><tr>'
         '<th scope="col">ETF</th>'
         '<th scope="col">Strategy</th>'
-        '<th scope="col">#</th>'
+        '<th scope="col" class="num">#</th>'
         '<th scope="col">Entry Date</th>'
         '<th scope="col">Exit Date</th>'
-        '<th scope="col">Entry $</th>'
-        '<th scope="col">Exit $</th>'
-        '<th scope="col">DD at Entry</th>'
-        '<th scope="col">Return</th>'
+        '<th scope="col" class="num">Entry $</th>'
+        '<th scope="col" class="num">Exit $</th>'
+        '<th scope="col" class="num">DD at Entry</th>'
+        '<th scope="col" class="num">Return</th>'
         '<th scope="col">Exit Reason</th>'
         '<th scope="col">W/L</th>'
         "</tr></thead>\n<tbody>\n"
@@ -2471,9 +2475,7 @@ def build_forecasts_html(
         accuracy_section = (
             "<section>\n"
             "<h2>Forecast Accuracy</h2>\n"
-            '<div class="kpi-strip">\n'
-            + "\n".join(kpis)
-            + "\n</div>\n</section>\n"
+            '<div class="kpi-strip">\n' + "\n".join(kpis) + "\n</div>\n</section>\n"
         )
 
     # Build forecast table rows
@@ -2500,12 +2502,18 @@ def build_forecasts_html(
         stype_label = strat_short.get(strategy, strategy)
 
         state_badge = _badge(
-            "TARGET" if state in ("SIGNAL", "ACTIVE", "TARGET") else
-            "ALERT" if state == "ALERT" else "WATCH",
+            "TARGET"
+            if state in ("SIGNAL", "ACTIVE", "TARGET")
+            else "ALERT"
+            if state == "ALERT"
+            else "WATCH",
         )
         conf_badge = _badge(
-            "TARGET" if confidence == "HIGH" else
-            "ALERT" if confidence == "MEDIUM" else "WATCH",
+            "TARGET"
+            if confidence == "HIGH"
+            else "ALERT"
+            if confidence == "MEDIUM"
+            else "WATCH",
         )
         prob_cls = _pct_class(entry_prob - 0.5)  # green if >50%, red if <50%
 
@@ -2546,11 +2554,11 @@ def build_forecasts_html(
         '<table class="mt-12">\n<thead><tr>'
         '<th scope="col">ETF</th>'
         '<th scope="col">Signal</th>'
-        '<th scope="col">Drawdown</th>'
+        '<th scope="col" class="num">Drawdown</th>'
         '<th scope="col">Confidence</th>'
-        '<th scope="col">Entry Prob</th>'
-        '<th scope="col">Exp Return</th>'
-        '<th scope="col">Hold Time</th>'
+        '<th scope="col" class="num">Entry Prob</th>'
+        '<th scope="col" class="num">Exp Return</th>'
+        '<th scope="col" class="num">Hold Time</th>'
         '<th scope="col">Strategy</th>'
         "</tr></thead>\n<tbody>\n"
         + "\n".join(forecast_rows)
