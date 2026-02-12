@@ -89,6 +89,10 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
   transition: color 0.15s, border-color 0.15s; }
 .nav-menu a:hover, .nav-menu a:focus { color: var(--accent);
   border-bottom-color: var(--accent); text-decoration: none; }
+.nav-menu a.nav-active { color: var(--accent);
+  border-bottom-color: var(--accent); }
+.nav-menu .nav-divider { width: 1px; background: var(--border-light);
+  margin: 8px 0; flex-shrink: 0; }
 
 /* Masthead */
 .masthead { background: var(--bg-dark); color: #fff;
