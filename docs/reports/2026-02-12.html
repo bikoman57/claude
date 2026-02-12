@@ -457,7 +457,7 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 <nav class="nav-menu" aria-label="Report sections"><a href="#signals">Signals</a><a href="#sentiment">Sentiment</a><a href="#market">Market</a><a href="#risks">Risks</a><a href="#geopolitical">Geopolitical</a><a href="#strategy">Strategy</a><a href="#research">Research</a><a href="#modules">Modules</a></nav>
 
 <header class="header">
-<span>2026-02-12 &bull; 10:20 IST</span>
+<span>2026-02-12 &bull; 10:22 IST</span>
 <div class="header-status"><span class="ok">15</span>/16 OK &bull; <span class="fail">1</span> failed</div>
 </header>
 
@@ -493,8 +493,8 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 </div>
 <div class="kpi-card kpi-bar-red">
 <div class="kpi-icon"><span class="material-symbols-outlined">newspaper</span></div><div class="kpi-label">News</div>
-<div class="kpi-value">134</div>
-<div class="kpi-sub"><span class="badge badge-red">BEARISH</span> 134 articles</div>
+<div class="kpi-value">135</div>
+<div class="kpi-sub"><span class="badge badge-red">BEARISH</span> 135 articles</div>
 </div>
 </div>
 
@@ -677,8 +677,8 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 <h2><span class="section-icon"><span class="material-symbols-outlined">newspaper</span></span> Sentiment Analysis</h2>
 <div class="card">
 <p>News Sentiment: <span class="badge badge-red">BEARISH</span></p>
-<div class="sentiment-bar" role="img" aria-label="Sentiment: 16 bullish, 27 bearish, 91 neutral"><div class="sentiment-fill-bullish" style="width:11.9%"></div><div class="sentiment-fill-bearish" style="width:20.1%"></div><div class="sentiment-fill-neutral" style="width:67.9%"></div></div>
-<div class="sentiment-counts"><span class="sentiment-count-bullish">16 bullish</span><span class="sentiment-count-bearish">27 bearish</span><span>91 neutral</span></div>
+<div class="sentiment-bar" role="img" aria-label="Sentiment: 16 bullish, 28 bearish, 91 neutral"><div class="sentiment-fill-bullish" style="width:11.9%"></div><div class="sentiment-fill-bearish" style="width:20.7%"></div><div class="sentiment-fill-neutral" style="width:67.4%"></div></div>
+<div class="sentiment-counts"><span class="sentiment-count-bullish">16 bullish</span><span class="sentiment-count-bearish">28 bearish</span><span>91 neutral</span></div>
 <p class="mt-12"><strong>Top headlines</strong></p>
 <ul class="headline-list">
 <li><span class="hl-marker hl-bull">Bull</span><a href="https://www.cnbc.com/2026/02/12/chinese-ai-stocks-new-model-and-agent-releases-zhipu-minimax.html" target="_blank" rel="noopener">Zhipu leads rally in Chinese AI stocks, surging 30%, as a wave of new releases hits market</a><span class="hl-source">CNBC Top News</span></li>
@@ -706,7 +706,7 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 <div class="card">
 <p>Risk Assessment: <span class="badge badge-gray">NEUTRAL</span></p>
 <div class="index-tiles"><div class="index-tile"><div class="index-name">S&amp;P 500</div><div class="index-price">$691.96</div><div class="index-chg pct-up">0.0%</div></div><div class="index-tile"><div class="index-name">NASDAQ</div><div class="index-price">$613.11</div><div class="index-chg pct-up">0.0%</div></div><div class="index-tile"><div class="index-name">DOW</div><div class="index-price">$501.33</div><div class="index-chg pct-up">0.0%</div></div></div>
-<div class="commodity-tiles"><div class="commodity-tile"><div class="commodity-name">Gold</div><div class="commodity-price">$467.63</div><div class="commodity-chg pct-up">+5.8%</div></div><div class="commodity-tile"><div class="commodity-name">Oil</div><div class="commodity-price">$78.89</div><div class="commodity-chg pct-up">+2.9%</div></div><div class="commodity-tile"><div class="commodity-name">DXY</div><div class="commodity-price">$96.84</div><div class="commodity-chg pct-down">-0.8%</div></div></div>
+<div class="commodity-tiles"><div class="commodity-tile"><div class="commodity-name">Gold</div><div class="commodity-price">$467.63</div><div class="commodity-chg pct-up">+5.8%</div></div><div class="commodity-tile"><div class="commodity-name">Oil</div><div class="commodity-price">$78.89</div><div class="commodity-chg pct-up">+2.9%</div></div><div class="commodity-tile"><div class="commodity-name">DXY</div><div class="commodity-price">$96.86</div><div class="commodity-chg pct-down">-0.8%</div></div></div>
 </div>
 </section>
 </div>
@@ -758,6 +758,44 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 </div>
 </section>
 
+<section id="strategy">
+<h2><span class="section-icon"><span class="material-symbols-outlined">analytics</span></span> Strategy Backtest Results</h2>
+<div class="card">
+<p>Backtests run over <strong>2y</strong> of historical data. Strategy optimizer tests <strong>4 strategy types</strong> (ATH Mean-Reversion, RSI Oversold, Bollinger Lower, MA Dip) with multiple parameter combinations per ETF, ranked by Sharpe ratio.</p>
+<p class="text-muted" style="font-size:13px">Reference: avg gain +19.9% per trade.</p>
+<table class="mt-12">
+<thead><tr><th scope="col">ETF</th><th scope="col">Strategy</th><th scope="col">Proposal</th><th scope="col">Sharpe</th><th scope="col">Win Rate</th><th scope="col">Return</th><th scope="col">Trades</th><th scope="col">Max DD</th><th scope="col">Avg Hold</th></tr></thead>
+<tbody>
+<tr><td><strong>TQQQ</strong></td><td><span class="badge badge-gray">ATH</span></td><td>Backtest (Sharpe=3.30): drawdown %: 0.1 vs current 5%</td><td class="num">3.30</td><td class="num">100.0%</td><td class="num pct-up">+71.3%</td><td class="num"><span class="trade-count trade-count-warn">3</span></td><td class="num">0.0%</td><td class="num">~167d</td></tr>
+<tr><td colspan="9"><div class="strategy-entry-exit"><span><span class="label">Strategy:</span> Buy when underlying draws down from ATH</span><span><span class="label">Entry:</span> drawdown %: 0.1 (current: 0.05)</span><span><span class="label">Exit:</span> +10% profit target (current: +10%)</span><span><span class="label">Avg Hold:</span> ~167d</span></div></td></tr>
+<tr><td><strong>UPRO</strong></td><td><span class="badge badge-gray">ATH</span></td><td>Backtest (Sharpe=2.81): drawdown %: 0.1 vs current 5%</td><td class="num">2.81</td><td class="num">100.0%</td><td class="num pct-up">+42.4%</td><td class="num"><span class="trade-count trade-count-warn">2</span></td><td class="num">0.0%</td><td class="num">~251d</td></tr>
+<tr><td colspan="9"><div class="strategy-entry-exit"><span><span class="label">Strategy:</span> Buy when underlying draws down from ATH</span><span><span class="label">Entry:</span> drawdown %: 0.1 (current: 0.05)</span><span><span class="label">Exit:</span> +10% profit target (current: +10%)</span><span><span class="label">Avg Hold:</span> ~251d</span></div></td></tr>
+<tr><td><strong>SOXL</strong></td><td><span class="badge badge-gray">RSI</span></td><td>Backtest (Sharpe=1.66): strategy: Buy when RSI(14) drops below threshold, RSI level: 35.0 vs current 8%, target 8% vs current 10%</td><td class="num">1.66</td><td class="num">87.5%</td><td class="num pct-up">+104.8%</td><td class="num"><span class="trade-count">8</span></td><td class="num">22.4%</td><td class="num">~62d</td></tr>
+<tr><td colspan="9"><div class="strategy-entry-exit"><span><span class="label">Strategy:</span> Buy when RSI(14) drops below threshold</span><span><span class="label">Entry:</span> RSI level: 35.0 (current: 0.08)</span><span><span class="label">Exit:</span> +8% profit target (current: +10%)</span><span><span class="label">Avg Hold:</span> ~62d</span></div></td></tr>
+<tr><td><strong>TNA</strong></td><td><span class="badge badge-gray">RSI</span></td><td>Backtest (Sharpe=18.01): strategy: Buy when RSI(14) drops below threshold, RSI level: 25.0 vs current 7%</td><td class="num">18.01</td><td class="num">100.0%</td><td class="num pct-up">+28.6%</td><td class="num"><span class="trade-count trade-count-warn">2</span></td><td class="num">0.0%</td><td class="num">~251d</td></tr>
+<tr><td colspan="9"><div class="strategy-entry-exit"><span><span class="label">Strategy:</span> Buy when RSI(14) drops below threshold</span><span><span class="label">Entry:</span> RSI level: 25.0 (current: 0.07)</span><span><span class="label">Exit:</span> +10% profit target (current: +10%)</span><span><span class="label">Avg Hold:</span> ~251d</span></div></td></tr>
+<tr><td><strong>TECL</strong></td><td><span class="badge badge-gray">ATH</span></td><td>Backtest (Sharpe=2.53): drawdown %: 0.12 vs current 7%</td><td class="num">2.53</td><td class="num">100.0%</td><td class="num pct-up">+72.4%</td><td class="num"><span class="trade-count trade-count-warn">3</span></td><td class="num">0.0%</td><td class="num">~167d</td></tr>
+<tr><td colspan="9"><div class="strategy-entry-exit"><span><span class="label">Strategy:</span> Buy when underlying draws down from ATH</span><span><span class="label">Entry:</span> drawdown %: 0.12 (current: 0.07)</span><span><span class="label">Exit:</span> +10% profit target (current: +10%)</span><span><span class="label">Avg Hold:</span> ~167d</span></div></td></tr>
+<tr><td><strong>FAS</strong></td><td><span class="badge badge-gray">RSI</span></td><td>Backtest (Sharpe=15.86): strategy: Buy when RSI(14) drops below threshold, RSI level: 35.0 vs current 7%, target 15% vs current 10%</td><td class="num">15.86</td><td class="num">100.0%</td><td class="num pct-up">+115.7%</td><td class="num"><span class="trade-count">5</span></td><td class="num">0.0%</td><td class="num">~100d</td></tr>
+<tr><td colspan="9"><div class="strategy-entry-exit"><span><span class="label">Strategy:</span> Buy when RSI(14) drops below threshold</span><span><span class="label">Entry:</span> RSI level: 35.0 (current: 0.07)</span><span><span class="label">Exit:</span> +15% profit target (current: +10%)</span><span><span class="label">Avg Hold:</span> ~100d</span></div></td></tr>
+<tr><td><strong>LABU</strong></td><td><span class="badge badge-gray">ATH</span></td><td>Backtest (Sharpe=8.46): drawdown %: 0.15 vs current 10%, target 8% vs current 10%</td><td class="num">8.46</td><td class="num">100.0%</td><td class="num pct-up">+39.5%</td><td class="num"><span class="trade-count trade-count-warn">3</span></td><td class="num">0.0%</td><td class="num">~167d</td></tr>
+<tr><td colspan="9"><div class="strategy-entry-exit"><span><span class="label">Strategy:</span> Buy when underlying draws down from ATH</span><span><span class="label">Entry:</span> drawdown %: 0.15 (current: 0.1)</span><span><span class="label">Exit:</span> +8% profit target (current: +10%)</span><span><span class="label">Avg Hold:</span> ~167d</span></div></td></tr>
+<tr><td><strong>UCO</strong></td><td><span class="badge badge-gray">Bollinger</span></td><td>Backtest (Sharpe=180.77): strategy: Buy when price touches lower Bollinger Band, std deviations: 2.5 vs current 10%</td><td class="num">180.77</td><td class="num">100.0%</td><td class="num pct-up">+49.7%</td><td class="num"><span class="trade-count trade-count-warn">4</span></td><td class="num">0.0%</td><td class="num">~125d</td></tr>
+<tr><td colspan="9"><div class="strategy-entry-exit"><span><span class="label">Strategy:</span> Buy when price touches lower Bollinger Band</span><span><span class="label">Entry:</span> std deviations: 2.5 (current: 0.1)</span><span><span class="label">Exit:</span> +10% profit target (current: +10%)</span><span><span class="label">Avg Hold:</span> ~125d</span></div></td></tr>
+</tbody></table>
+</div>
+</section>
+
+<section id="research">
+<h2><span class="section-icon"><span class="material-symbols-outlined">analytics</span></span> Strategy Research</h2>
+<div class="card">
+<p class="kicker">Strategy Research</p>
+<p>The multi-strategy optimizer explored <strong>8 ETF(s)</strong> across <strong>3 strategy types</strong> (ATH drawdown, RSI oversold, Bollinger band, MA dip) with multiple parameter combinations each. Results are ranked by risk-adjusted returns (Sharpe ratio).</p>
+<p class="mt-8">Strategies tested: <span class="badge badge-gray">ATH Mean-Reversion</span> <span class="badge badge-gray">Bollinger Lower</span> <span class="badge badge-gray">RSI Oversold</span></p>
+<div class="sector-badges mt-8"><span class="sector-badge">TQQQ</span> <span class="sector-badge">UPRO</span> <span class="sector-badge">SOXL</span> <span class="sector-badge">TNA</span> <span class="sector-badge">TECL</span> <span class="sector-badge">FAS</span> <span class="sector-badge">LABU</span> <span class="sector-badge">UCO</span></div>
+</div>
+</section>
+
 <section id="modules">
 <details>
 <summary><h2 style="display:inline">Module Status</h2> <span class="badge badge-red">15/16</span></summary>
@@ -765,18 +803,18 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 <div class="module-grid">
 <span class="module-pill module-pill-ok">&#10003; etf.signals <span class="pill-dur">0.8s</span></span>
 <span class="module-pill module-pill-ok">&#10003; etf.active <span class="pill-dur">0.8s</span></span>
-<span class="module-pill module-pill-ok">&#10003; macro.dashboard <span class="pill-dur">2.9s</span></span>
-<span class="module-pill module-pill-ok">&#10003; macro.yields <span class="pill-dur">1.8s</span></span>
-<span class="module-pill module-pill-fail">&#10007; macro.rates <span class="pill-dur">5.0s</span></span>
+<span class="module-pill module-pill-ok">&#10003; macro.dashboard <span class="pill-dur">3.1s</span></span>
+<span class="module-pill module-pill-ok">&#10003; macro.yields <span class="pill-dur">2.0s</span></span>
+<span class="module-pill module-pill-fail">&#10007; macro.rates <span class="pill-dur">3.5s</span></span>
 <span class="module-pill module-pill-ok">&#10003; macro.calendar <span class="pill-dur">0.8s</span></span>
 <span class="module-pill module-pill-ok">&#10003; sec.recent <span class="pill-dur">10.1s</span></span>
-<span class="module-pill module-pill-ok">&#10003; sec.institutional <span class="pill-dur">2.3s</span></span>
-<span class="module-pill module-pill-ok">&#10003; geopolitical.summary <span class="pill-dur">22.8s</span></span>
-<span class="module-pill module-pill-ok">&#10003; social.summary <span class="pill-dur">0.8s</span></span>
+<span class="module-pill module-pill-ok">&#10003; sec.institutional <span class="pill-dur">2.2s</span></span>
+<span class="module-pill module-pill-ok">&#10003; geopolitical.summary <span class="pill-dur">10.6s</span></span>
+<span class="module-pill module-pill-ok">&#10003; social.summary <span class="pill-dur">1.0s</span></span>
 <span class="module-pill module-pill-ok">&#10003; news.summary <span class="pill-dur">2.0s</span></span>
 <span class="module-pill module-pill-ok">&#10003; statistics.dashboard <span class="pill-dur">2.6s</span></span>
-<span class="module-pill module-pill-ok">&#10003; strategy.proposals <span class="pill-dur">34.1s</span></span>
-<span class="module-pill module-pill-ok">&#10003; strategy.backtest-all <span class="pill-dur">4.9s</span></span>
+<span class="module-pill module-pill-ok">&#10003; strategy.proposals <span class="pill-dur">36.2s</span></span>
+<span class="module-pill module-pill-ok">&#10003; strategy.backtest-all <span class="pill-dur">5.0s</span></span>
 <span class="module-pill module-pill-ok">&#10003; history.weights <span class="pill-dur">0.1s</span></span>
 <span class="module-pill module-pill-ok">&#10003; history.summary <span class="pill-dur">0.1s</span></span>
 </div>
@@ -787,7 +825,7 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 </main>
 
 <footer class="footer">
-<span>Generated 2026-02-12 10:20 IST &mdash; not financial advice.</span>
+<span>Generated 2026-02-12 10:22 IST &mdash; not financial advice.</span>
 <span><a href="trade-logs-2026-02-12.html">Trade Logs</a> &bull; <a href="../index.html">All Reports</a></span>
 </footer>
 
