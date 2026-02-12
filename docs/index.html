@@ -86,7 +86,7 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
 
 /* Navigation menu */
 .nav-menu { display: flex; gap: 0; overflow-x: auto;
-  -webkit-overflow-scrolling: touch; margin-left: auto; }
+  -webkit-overflow-scrolling: touch; }
 .nav-menu a { font-family: var(--font-mono); font-size: 11px;
   font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
   color: rgba(255,255,255,0.65); white-space: nowrap;
@@ -98,6 +98,18 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
   border-bottom-color: #fff; }
 .nav-menu .nav-divider { width: 1px; background: rgba(255,255,255,0.2);
   margin: 12px 0; flex-shrink: 0; }
+
+/* Report date picker */
+.nav-date-picker { font-family: var(--font-mono); font-size: 11px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.65); background: transparent;
+  border: 1px solid rgba(255,255,255,0.25); border-radius: 4px;
+  padding: 6px 10px; margin: 0 8px; cursor: pointer;
+  appearance: auto; }
+.nav-date-picker:hover, .nav-date-picker:focus {
+  color: #fff; border-color: rgba(255,255,255,0.5);
+  outline: none; }
+.nav-date-picker option { background: var(--bg-dark); color: #fff; }
 
 /* Header / datebar */
 .header { display: flex; align-items: center; justify-content: space-between;
@@ -180,6 +192,7 @@ td { padding: 12px 14px; border-bottom: 1px solid var(--border-light); }
 tbody tr:nth-child(even) { background: #fafbfc; }
 tbody tr:hover { background: #f0f4f8; }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
+th.num { text-align: right; }
 .pct-up { color: var(--success); }
 .pct-down { color: var(--danger); }
 

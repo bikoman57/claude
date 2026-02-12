@@ -86,7 +86,7 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
 
 /* Navigation menu */
 .nav-menu { display: flex; gap: 0; overflow-x: auto;
-  -webkit-overflow-scrolling: touch; margin-left: auto; }
+  -webkit-overflow-scrolling: touch; }
 .nav-menu a { font-family: var(--font-mono); font-size: 11px;
   font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
   color: rgba(255,255,255,0.65); white-space: nowrap;
@@ -98,6 +98,18 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
   border-bottom-color: #fff; }
 .nav-menu .nav-divider { width: 1px; background: rgba(255,255,255,0.2);
   margin: 12px 0; flex-shrink: 0; }
+
+/* Report date picker */
+.nav-date-picker { font-family: var(--font-mono); font-size: 11px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.65); background: transparent;
+  border: 1px solid rgba(255,255,255,0.25); border-radius: 4px;
+  padding: 6px 10px; margin: 0 8px; cursor: pointer;
+  appearance: auto; }
+.nav-date-picker:hover, .nav-date-picker:focus {
+  color: #fff; border-color: rgba(255,255,255,0.5);
+  outline: none; }
+.nav-date-picker option { background: var(--bg-dark); color: #fff; }
 
 /* Header / datebar */
 .header { display: flex; align-items: center; justify-content: space-between;
@@ -180,6 +192,7 @@ td { padding: 12px 14px; border-bottom: 1px solid var(--border-light); }
 tbody tr:nth-child(even) { background: #fafbfc; }
 tbody tr:hover { background: #f0f4f8; }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
+th.num { text-align: right; }
 .pct-up { color: var(--success); }
 .pct-down { color: var(--danger); }
 
@@ -452,11 +465,12 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 <a href="#main-content" class="skip-nav">Skip to main content</a>
 <div class="top-bar">
 <h1>Swing Trading Report</h1>
-<nav class="nav-menu" aria-label="Report navigation"><a href="2026-02-12.html" class="nav-active">Dashboard</a><a href="trade-logs-2026-02-12.html">Trade Logs</a><a href="forecasts-2026-02-12.html">Forecasts</a><a href="../index.html">All Reports</a><span class="nav-divider"></span><a href="#signals">Signals</a><a href="#sentiment">Sentiment</a><a href="#market">Market</a><a href="#risks">Risks</a><a href="#geopolitical">Geopolitical</a><a href="#strategy">Strategy</a><a href="#research">Research</a><a href="#modules">Modules</a></nav>
+<select class="nav-date-picker" aria-label="Select report date" onchange="window.location.href=this.value+'.html'"><option value="2026-02-12" selected>2026-02-12</option><option value="2026-02-11">2026-02-11</option></select>
+<nav class="nav-menu" aria-label="Report navigation"><a href="2026-02-12.html" class="nav-active">Dashboard</a><a href="trade-logs-2026-02-12.html">Trade Logs</a><a href="forecasts-2026-02-12.html">Forecasts</a><span class="nav-divider"></span><a href="#signals">Signals</a><a href="#sentiment">Sentiment</a><a href="#market">Market</a><a href="#risks">Risks</a><a href="#geopolitical">Geopolitical</a><a href="#strategy">Strategy</a><a href="#research">Research</a><a href="#modules">Modules</a></nav>
 </div>
 
 <header class="header">
-<span>2026-02-12 &bull; 15:50 IST</span>
+<span>2026-02-12 &bull; 16:19 IST</span>
 <div class="header-status"><span class="ok">19</span>/19 OK &bull; <span class="fail">0</span> failed</div>
 </header>
 
@@ -471,7 +485,7 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 <div class="kpi-strip">
 <div class="kpi-card kpi-bar-yellow">
 <div class="kpi-icon"><span class="material-symbols-outlined">trending_up</span></div><div class="kpi-label">VIX</div>
-<div class="kpi-value">17.4</div>
+<div class="kpi-value">17.3</div>
 <div class="kpi-sub"><span class="badge badge-yellow">NORMAL</span></div>
 <div class="gauge-track" role="progressbar" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100" aria-label="VIX gauge"><div class="gauge-fill gauge-fill-yellow" style="width:35%"></div></div>
 </div>
@@ -482,19 +496,19 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 </div>
 <div class="kpi-card kpi-bar-yellow">
 <div class="kpi-icon"><span class="material-symbols-outlined">show_chart</span></div><div class="kpi-label">Yield Curve</div>
-<div class="kpi-value">+0.56%</div>
+<div class="kpi-value">+0.57%</div>
 <div class="kpi-sub"><span class="badge badge-yellow">NORMAL</span></div>
 <div class="gauge-track" role="progressbar" aria-valuenow="64" aria-valuemin="0" aria-valuemax="100" aria-label="Yield Curve gauge"><div class="gauge-fill gauge-fill-yellow" style="width:64%"></div></div>
 </div>
 <div class="kpi-card kpi-bar-green">
 <div class="kpi-icon"><span class="material-symbols-outlined">public</span></div><div class="kpi-label">Geopolitical</div>
-<div class="kpi-value">80</div>
-<div class="kpi-sub"><span class="badge badge-green">LOW</span> 80 events</div>
+<div class="kpi-value">130</div>
+<div class="kpi-sub"><span class="badge badge-green">LOW</span> 130 events</div>
 </div>
 <div class="kpi-card kpi-bar-red">
 <div class="kpi-icon"><span class="material-symbols-outlined">newspaper</span></div><div class="kpi-label">News</div>
-<div class="kpi-value">376</div>
-<div class="kpi-sub"><span class="badge badge-red">BEARISH</span> 376 articles</div>
+<div class="kpi-value">374</div>
+<div class="kpi-sub"><span class="badge badge-red">BEARISH</span> 374 articles</div>
 </div>
 </div>
 
@@ -677,8 +691,8 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 <h2><span class="section-icon"><span class="material-symbols-outlined">newspaper</span></span> Sentiment Analysis</h2>
 <div class="card">
 <p>News Sentiment: <span class="badge badge-red">BEARISH</span></p>
-<div class="sentiment-bar" role="img" aria-label="Sentiment: 48 bullish, 58 bearish, 270 neutral"><div class="sentiment-fill-bullish" style="width:12.8%"></div><div class="sentiment-fill-bearish" style="width:15.4%"></div><div class="sentiment-fill-neutral" style="width:71.8%"></div></div>
-<div class="sentiment-counts"><span class="sentiment-count-bullish">48 bullish</span><span class="sentiment-count-bearish">58 bearish</span><span>270 neutral</span></div>
+<div class="sentiment-bar" role="img" aria-label="Sentiment: 47 bullish, 60 bearish, 267 neutral"><div class="sentiment-fill-bullish" style="width:12.6%"></div><div class="sentiment-fill-bearish" style="width:16.0%"></div><div class="sentiment-fill-neutral" style="width:71.4%"></div></div>
+<div class="sentiment-counts"><span class="sentiment-count-bullish">47 bullish</span><span class="sentiment-count-bearish">60 bearish</span><span>267 neutral</span></div>
 <p class="mt-12"><strong>Top headlines</strong></p>
 <ul class="headline-list">
 <li><span class="hl-marker hl-bull">Bull</span><a href="https://www.bloomberg.com/news/articles/2026-02-12/emerging-market-stocks-rally-for-fourth-day-led-by-korean-tech" target="_blank" rel="noopener">Emerging Market Stocks Rally for Fourth Day, Led by Korean Tech</a><span class="hl-source">Bloomberg Markets</span></li>
@@ -688,10 +702,10 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 <li><span class="hl-marker hl-bear">Bear</span><a href="https://www.wsj.com/opinion/ai-stock-market-software-companies-selloff-02bef5d0?mod=rss_markets_main" target="_blank" rel="noopener">Opinion | The AI Stock Market Rout</a><span class="hl-source">WSJ Markets</span></li>
 </ul>
 <div class="sector-badges">
-<span class="sector-badge">tech (77)</span>
-<span class="sector-badge">finance (47)</span>
-<span class="sector-badge">energy (24)</span>
-<span class="sector-badge">semiconductors (13)</span>
+<span class="sector-badge">tech (75)</span>
+<span class="sector-badge">finance (50)</span>
+<span class="sector-badge">energy (27)</span>
+<span class="sector-badge">semiconductors (14)</span>
 <span class="sector-badge">healthcare (10)</span>
 </div>
 <p class="mt-12">Officials Tone: <span class="badge badge-yellow">HAWKISH</span>
@@ -706,7 +720,7 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 <div class="card">
 <p>Risk Assessment: <span class="badge badge-gray">NEUTRAL</span></p>
 <div class="index-tiles"><div class="index-tile"><div class="index-name">S&amp;P 500</div><div class="index-price">$691.96</div><div class="index-chg pct-up">0.0%</div></div><div class="index-tile"><div class="index-name">NASDAQ</div><div class="index-price">$613.11</div><div class="index-chg pct-up">0.0%</div></div><div class="index-tile"><div class="index-name">DOW</div><div class="index-price">$501.33</div><div class="index-chg pct-up">0.0%</div></div></div>
-<div class="commodity-tiles"><div class="commodity-tile"><div class="commodity-name">Gold</div><div class="commodity-price">$467.63</div><div class="commodity-chg pct-up">+5.8%</div></div><div class="commodity-tile"><div class="commodity-name">Oil</div><div class="commodity-price">$78.89</div><div class="commodity-chg pct-up">+2.9%</div></div><div class="commodity-tile"><div class="commodity-name">DXY</div><div class="commodity-price">$96.84</div><div class="commodity-chg pct-down">-0.8%</div></div></div>
+<div class="commodity-tiles"><div class="commodity-tile"><div class="commodity-name">Gold</div><div class="commodity-price">$467.63</div><div class="commodity-chg pct-up">+5.8%</div></div><div class="commodity-tile"><div class="commodity-name">Oil</div><div class="commodity-price">$78.89</div><div class="commodity-chg pct-up">+2.9%</div></div><div class="commodity-tile"><div class="commodity-name">DXY</div><div class="commodity-price">$96.82</div><div class="commodity-chg pct-down">-0.8%</div></div></div>
 <p class="mt-16"><strong><span class="section-icon"><span class="material-symbols-outlined">currency_exchange</span></span> Global Central Bank Rates</strong></p>
 <div class="rates-grid"><div class="rate-tile"><div class="rate-bank">ECB</div><div class="rate-value">2.00%</div></div><div class="rate-tile"><div class="rate-bank">BOE</div><div class="rate-value">3.73%</div></div><div class="rate-tile"><div class="rate-bank">BOJ</div><div class="rate-value">0.30%</div></div><div class="rate-tile"><div class="rate-bank">BOC</div><div class="rate-value">5.25%</div></div><div class="rate-tile"><div class="rate-bank">RBA</div><div class="rate-value">3.60%</div></div></div>
 </div>
@@ -720,38 +734,40 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 <p class="kicker">Events Watchlist</p>
 <p>Ongoing world events being monitored for potential market impact. Each theme is tracked via GDELT global event data and classified by affected sectors.</p>
 <div style="padding:12px 0;border-bottom:1px solid var(--border-light)"><p><strong>Military Conflicts &amp; Defense</strong> <span class="badge badge-red">HIGH</span> <span class="text-muted">(50 events)</span></p><p style="font-size:13px;color:var(--text-secondary);margin-top:4px">Military escalation drives oil prices higher and creates broad risk-off sentiment. Defense sector benefits.</p><p style="font-size:12px;color:var(--text-muted);margin-top:4px"><span class="label">Impact:</span> Oil spikes, flight to safety (bonds, gold), tech selloff on risk aversion.</p><div style="margin-top:6px"><span class="badge badge-blue">UCO</span> <span class="badge badge-blue">TQQQ</span> <span class="badge badge-blue">UPRO</span></div></div>
+<div style="padding:12px 0;border-bottom:1px solid var(--border-light)"><p><strong>Economic Sanctions</strong> <span class="badge badge-red">HIGH</span> <span class="text-muted">(50 events)</span></p><p style="font-size:13px;color:var(--text-secondary);margin-top:4px">Sanctions disrupt energy supply, banking channels, and cross-border trade flows.</p><p style="font-size:12px;color:var(--text-muted);margin-top:4px"><span class="label">Impact:</span> Energy volatility, banking sector stress, commodity price dislocations.</p><div style="margin-top:6px"><span class="badge badge-blue">UCO</span> <span class="badge badge-blue">FAS</span></div></div>
 </div>
 </section>
 
 <section id="geopolitical">
 <h2><span class="section-icon"><span class="material-symbols-outlined">public</span></span> Geopolitical Risk</h2>
 <div class="card">
-<p>Risk Level: <span class="badge badge-green">LOW</span> &mdash; 80 events tracked (0 high-impact)</p>
+<p>Risk Level: <span class="badge badge-green">LOW</span> &mdash; 130 events tracked (0 high-impact)</p>
 <div class="sector-badges">
-<span class="sector-badge">energy (50)</span>
+<span class="sector-badge">energy (100)</span>
 <span class="sector-badge">defense (50)</span>
+<span class="sector-badge">finance (50)</span>
 <span class="sector-badge">general (30)</span>
 </div>
-<p class="mt-8"><span class="badge badge-gray">MILITARY (50)</span> <span class="badge badge-gray">ELECTIONS (30)</span></p>
+<p class="mt-8"><span class="badge badge-gray">MILITARY (50)</span> <span class="badge badge-gray">SANCTIONS (50)</span> <span class="badge badge-gray">ELECTIONS (30)</span></p>
 <div class="geo-events">
 <div class="geo-event">
-<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="http://www.calcuttanews.net/news/278863871/haan-ya-naa-time-mat-pass-karo-varun-dhawan-recalls-bhushan-kumar-straight-talk-before-signing-border-2" target="_blank" rel="noopener">  Haan ya naa ? Time mat pass karo ...: Varun Dhawan recalls Bhushan Kumar straight talk before signing  Border 2  </a></div>
+<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://auto.economictimes.indiatimes.com/news/industry/rolls-royce-expands-operations-in-india-focus-on-defence-engine-co-development-and-local-manufacturing/128258082" target="_blank" rel="noopener">Rolls - Royce Expands Operations in India : Focus on Defence Engine Co - Development and Local Manufacturing , ETAuto</a></div>
 <div class="geo-meta">MILITARY &bull; Sectors: energy, defense</div>
 </div>
 <div class="geo-event">
-<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://cyprus-mail.com/2026/02/12/bangladesh-votes-in-first-election-since-gen-z-protests-ousted-pm" target="_blank" rel="noopener">Bangladesh votes in first election since Gen Z protests ousted PM</a></div>
+<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://www.cleveland.com/open/2026/02/ohio-lawmaker-wants-state-to-pony-up-cash-to-reduce-property-tax-bills-capitol-letter.html" target="_blank" rel="noopener">Ohio lawmaker wants state to pony up cash to reduce property tax bills : Capitol Letter</a></div>
 <div class="geo-meta">MILITARY &bull; Sectors: energy, defense</div>
 </div>
 <div class="geo-event">
-<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://www.middleeastmonitor.com/20260212-egypt-and-turkey-boost-military-presence-in-somalia-amid-regional-tensions/" target="_blank" rel="noopener">Egypt and Turkey boost military presence in Somalia amid regional tensions</a></div>
+<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://rus.delfi.lv/57862/v-mire/120106490/massirovannaya-ataka-na-kiev-dnepr-i-odessu-raneny-deti-tysyachi-domov-snova-bez-otopleniya" target="_blank" rel="noopener">Массированная атака на Киев , Днепр и Одессу : ранены дети , тысячи домов снова без отопления</a></div>
 <div class="geo-meta">MILITARY &bull; Sectors: energy, defense</div>
 </div>
 <div class="geo-event">
-<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://www.adalet.az/az/posts/detail/eli-kerimli-aztv-ni-ele-kecirmekle-bagli-tapsiriq-veribmis-1770889035" target="_blank" rel="noopener">Əli Kərimli AzTV - ni ələ keçirməklə bağlı tapşırıq veribmiş</a></div>
+<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://www.bctv.org/2026/02/12/alvernia-theatre-professor-recognized-for-innovative-teaching-excellence-award/" target="_blank" rel="noopener">Alvernia Theatre Professor Recognized for Innovative Teaching Excellence Award</a></div>
 <div class="geo-meta">MILITARY &bull; Sectors: energy, defense</div>
 </div>
 <div class="geo-event">
-<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://dennikn.sk/5136071/norsky-general-varuje-rizikom-nie-je-ruske-ovladnutie-gronska-ale-ich-ponorky-v-arktide/" target="_blank" rel="noopener">Nórsky generál varuje : rizikom nie je ruské ovládnutie Grónska , ale ich ponorky v Arktíde</a></div>
+<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://www.mersinhaber.com/haber-canakkale-geliboluda-durgun-sulardan-gecis-egitimi-gerceklestirildi/544153" target="_blank" rel="noopener">Çanakkale Geliboluda Durgun Sulardan Geçiş Eğitimi Gerçekleştirildi</a></div>
 <div class="geo-meta">MILITARY &bull; Sectors: energy, defense</div>
 </div>
 </div>
@@ -764,23 +780,23 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 <p>Backtests run over <strong>2y</strong> of historical data. Strategy optimizer tests <strong>4 strategy types</strong> (ATH Mean-Reversion, RSI Oversold, Bollinger Lower, MA Dip) with multiple parameter combinations per ETF, ranked by Sharpe ratio.</p>
 <p class="text-muted" style="font-size:13px">Reference: avg gain +19.9% per trade.</p>
 <table class="mt-12">
-<thead><tr><th scope="col">ETF</th><th scope="col">Strategy</th><th scope="col">Proposal</th><th scope="col">Sharpe</th><th scope="col">Win Rate</th><th scope="col">Return</th><th scope="col">Trades</th><th scope="col">Max DD</th><th scope="col">Avg Hold</th></tr></thead>
+<thead><tr><th scope="col">ETF</th><th scope="col">Strategy</th><th scope="col">Proposal</th><th scope="col" class="num">Sharpe</th><th scope="col" class="num">Win Rate</th><th scope="col" class="num">Return</th><th scope="col" class="num">Trades</th><th scope="col" class="num">Max DD</th><th scope="col" class="num">Avg Hold</th></tr></thead>
 <tbody>
-<tr><td><strong>TQQQ</strong></td><td><span class="badge badge-gray">ATH</span></td><td>Backtest (Sharpe=3.30): drawdown %: 0.1 vs current 5%</td><td class="num">3.30</td><td class="num">100.0%</td><td class="num pct-up">+71.3%</td><td class="num"><span class="trade-count trade-count-warn">3</span></td><td class="num">0.0%</td><td class="num">~167d</td></tr>
+<tr><td><strong>TQQQ</strong></td><td><span class="badge badge-gray" title="Buy leveraged ETF when its underlying index drops a threshold % from all-time high, exit at profit target. Captures mean-reversion after broad market drawdowns.">ATH</span></td><td>Backtest (Sharpe=3.30): drawdown %: 0.1 vs current 5%</td><td class="num">3.30</td><td class="num">100.0%</td><td class="num pct-up">+71.3%</td><td class="num"><span class="trade-count trade-count-warn">3</span></td><td class="num">0.0%</td><td class="num">~167d</td></tr>
 <tr><td colspan="9"><div class="strategy-entry-exit"><span><span class="label">Strategy:</span> Buy when underlying draws down from ATH</span><span><span class="label">Entry:</span> drawdown %: 0.1 (current: 0.05)</span><span><span class="label">Exit:</span> +10% profit target (current: +10%)</span><span><span class="label">Avg Hold:</span> ~167d</span></div></td></tr>
-<tr><td><strong>UPRO</strong></td><td><span class="badge badge-gray">ATH</span></td><td>Backtest (Sharpe=2.81): drawdown %: 0.1 vs current 5%</td><td class="num">2.81</td><td class="num">100.0%</td><td class="num pct-up">+42.4%</td><td class="num"><span class="trade-count trade-count-warn">2</span></td><td class="num">0.0%</td><td class="num">~251d</td></tr>
+<tr><td><strong>UPRO</strong></td><td><span class="badge badge-gray" title="Buy leveraged ETF when its underlying index drops a threshold % from all-time high, exit at profit target. Captures mean-reversion after broad market drawdowns.">ATH</span></td><td>Backtest (Sharpe=2.81): drawdown %: 0.1 vs current 5%</td><td class="num">2.81</td><td class="num">100.0%</td><td class="num pct-up">+42.4%</td><td class="num"><span class="trade-count trade-count-warn">2</span></td><td class="num">0.0%</td><td class="num">~251d</td></tr>
 <tr><td colspan="9"><div class="strategy-entry-exit"><span><span class="label">Strategy:</span> Buy when underlying draws down from ATH</span><span><span class="label">Entry:</span> drawdown %: 0.1 (current: 0.05)</span><span><span class="label">Exit:</span> +10% profit target (current: +10%)</span><span><span class="label">Avg Hold:</span> ~251d</span></div></td></tr>
-<tr><td><strong>SOXL</strong></td><td><span class="badge badge-gray">RSI</span></td><td>Backtest (Sharpe=1.66): strategy: Buy when RSI(14) drops below threshold, RSI level: 35.0 vs current 8%, target 8% vs current 10%</td><td class="num">1.66</td><td class="num">87.5%</td><td class="num pct-up">+104.8%</td><td class="num"><span class="trade-count">8</span></td><td class="num">22.4%</td><td class="num">~62d</td></tr>
+<tr><td><strong>SOXL</strong></td><td><span class="badge badge-gray" title="Buy when 14-day RSI falls below oversold threshold (typically 30), exit when RSI recovers above overbought level or profit target hit. Targets short-term momentum reversals.">RSI</span></td><td>Backtest (Sharpe=1.66): strategy: Buy when RSI(14) drops below threshold, RSI level: 35.0 vs current 8%, target 8% vs current 10%</td><td class="num">1.66</td><td class="num">87.5%</td><td class="num pct-up">+104.8%</td><td class="num"><span class="trade-count">8</span></td><td class="num">22.4%</td><td class="num">~62d</td></tr>
 <tr><td colspan="9"><div class="strategy-entry-exit"><span><span class="label">Strategy:</span> Buy when RSI(14) drops below threshold</span><span><span class="label">Entry:</span> RSI level: 35.0 (current: 0.08)</span><span><span class="label">Exit:</span> +8% profit target (current: +10%)</span><span><span class="label">Avg Hold:</span> ~62d</span></div></td></tr>
-<tr><td><strong>TNA</strong></td><td><span class="badge badge-gray">RSI</span></td><td>Backtest (Sharpe=18.01): strategy: Buy when RSI(14) drops below threshold, RSI level: 25.0 vs current 7%</td><td class="num">18.01</td><td class="num">100.0%</td><td class="num pct-up">+28.6%</td><td class="num"><span class="trade-count trade-count-warn">2</span></td><td class="num">0.0%</td><td class="num">~251d</td></tr>
+<tr><td><strong>TNA</strong></td><td><span class="badge badge-gray" title="Buy when 14-day RSI falls below oversold threshold (typically 30), exit when RSI recovers above overbought level or profit target hit. Targets short-term momentum reversals.">RSI</span></td><td>Backtest (Sharpe=18.01): strategy: Buy when RSI(14) drops below threshold, RSI level: 25.0 vs current 7%</td><td class="num">18.01</td><td class="num">100.0%</td><td class="num pct-up">+28.6%</td><td class="num"><span class="trade-count trade-count-warn">2</span></td><td class="num">0.0%</td><td class="num">~251d</td></tr>
 <tr><td colspan="9"><div class="strategy-entry-exit"><span><span class="label">Strategy:</span> Buy when RSI(14) drops below threshold</span><span><span class="label">Entry:</span> RSI level: 25.0 (current: 0.07)</span><span><span class="label">Exit:</span> +10% profit target (current: +10%)</span><span><span class="label">Avg Hold:</span> ~251d</span></div></td></tr>
-<tr><td><strong>TECL</strong></td><td><span class="badge badge-gray">ATH</span></td><td>Backtest (Sharpe=2.53): drawdown %: 0.12 vs current 7%</td><td class="num">2.53</td><td class="num">100.0%</td><td class="num pct-up">+72.4%</td><td class="num"><span class="trade-count trade-count-warn">3</span></td><td class="num">0.0%</td><td class="num">~167d</td></tr>
+<tr><td><strong>TECL</strong></td><td><span class="badge badge-gray" title="Buy leveraged ETF when its underlying index drops a threshold % from all-time high, exit at profit target. Captures mean-reversion after broad market drawdowns.">ATH</span></td><td>Backtest (Sharpe=2.53): drawdown %: 0.12 vs current 7%</td><td class="num">2.53</td><td class="num">100.0%</td><td class="num pct-up">+72.4%</td><td class="num"><span class="trade-count trade-count-warn">3</span></td><td class="num">0.0%</td><td class="num">~167d</td></tr>
 <tr><td colspan="9"><div class="strategy-entry-exit"><span><span class="label">Strategy:</span> Buy when underlying draws down from ATH</span><span><span class="label">Entry:</span> drawdown %: 0.12 (current: 0.07)</span><span><span class="label">Exit:</span> +10% profit target (current: +10%)</span><span><span class="label">Avg Hold:</span> ~167d</span></div></td></tr>
-<tr><td><strong>FAS</strong></td><td><span class="badge badge-gray">RSI</span></td><td>Backtest (Sharpe=15.86): strategy: Buy when RSI(14) drops below threshold, RSI level: 35.0 vs current 7%, target 15% vs current 10%</td><td class="num">15.86</td><td class="num">100.0%</td><td class="num pct-up">+115.7%</td><td class="num"><span class="trade-count">5</span></td><td class="num">0.0%</td><td class="num">~100d</td></tr>
+<tr><td><strong>FAS</strong></td><td><span class="badge badge-gray" title="Buy when 14-day RSI falls below oversold threshold (typically 30), exit when RSI recovers above overbought level or profit target hit. Targets short-term momentum reversals.">RSI</span></td><td>Backtest (Sharpe=15.86): strategy: Buy when RSI(14) drops below threshold, RSI level: 35.0 vs current 7%, target 15% vs current 10%</td><td class="num">15.86</td><td class="num">100.0%</td><td class="num pct-up">+115.7%</td><td class="num"><span class="trade-count">5</span></td><td class="num">0.0%</td><td class="num">~100d</td></tr>
 <tr><td colspan="9"><div class="strategy-entry-exit"><span><span class="label">Strategy:</span> Buy when RSI(14) drops below threshold</span><span><span class="label">Entry:</span> RSI level: 35.0 (current: 0.07)</span><span><span class="label">Exit:</span> +15% profit target (current: +10%)</span><span><span class="label">Avg Hold:</span> ~100d</span></div></td></tr>
-<tr><td><strong>LABU</strong></td><td><span class="badge badge-gray">ATH</span></td><td>Backtest (Sharpe=8.46): drawdown %: 0.15 vs current 10%, target 8% vs current 10%</td><td class="num">8.46</td><td class="num">100.0%</td><td class="num pct-up">+39.5%</td><td class="num"><span class="trade-count trade-count-warn">3</span></td><td class="num">0.0%</td><td class="num">~167d</td></tr>
+<tr><td><strong>LABU</strong></td><td><span class="badge badge-gray" title="Buy leveraged ETF when its underlying index drops a threshold % from all-time high, exit at profit target. Captures mean-reversion after broad market drawdowns.">ATH</span></td><td>Backtest (Sharpe=8.46): drawdown %: 0.15 vs current 10%, target 8% vs current 10%</td><td class="num">8.46</td><td class="num">100.0%</td><td class="num pct-up">+39.5%</td><td class="num"><span class="trade-count trade-count-warn">3</span></td><td class="num">0.0%</td><td class="num">~167d</td></tr>
 <tr><td colspan="9"><div class="strategy-entry-exit"><span><span class="label">Strategy:</span> Buy when underlying draws down from ATH</span><span><span class="label">Entry:</span> drawdown %: 0.15 (current: 0.1)</span><span><span class="label">Exit:</span> +8% profit target (current: +10%)</span><span><span class="label">Avg Hold:</span> ~167d</span></div></td></tr>
-<tr><td><strong>UCO</strong></td><td><span class="badge badge-gray">Bollinger</span></td><td>Backtest (Sharpe=180.77): strategy: Buy when price touches lower Bollinger Band, std deviations: 2.5 vs current 10%</td><td class="num">180.77</td><td class="num">100.0%</td><td class="num pct-up">+49.7%</td><td class="num"><span class="trade-count trade-count-warn">4</span></td><td class="num">0.0%</td><td class="num">~125d</td></tr>
+<tr><td><strong>UCO</strong></td><td><span class="badge badge-gray" title="Buy when price touches or breaks below the lower Bollinger Band (20-day SMA minus 2 standard deviations), exit at the middle band or profit target. Identifies statistical extremes in price action.">Bollinger</span></td><td>Backtest (Sharpe=180.77): strategy: Buy when price touches lower Bollinger Band, std deviations: 2.5 vs current 10%</td><td class="num">180.77</td><td class="num">100.0%</td><td class="num pct-up">+49.7%</td><td class="num"><span class="trade-count trade-count-warn">4</span></td><td class="num">0.0%</td><td class="num">~125d</td></tr>
 <tr><td colspan="9"><div class="strategy-entry-exit"><span><span class="label">Strategy:</span> Buy when price touches lower Bollinger Band</span><span><span class="label">Entry:</span> std deviations: 2.5 (current: 0.1)</span><span><span class="label">Exit:</span> +10% profit target (current: +10%)</span><span><span class="label">Avg Hold:</span> ~125d</span></div></td></tr>
 </tbody></table>
 </div>
@@ -790,8 +806,10 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 <h2><span class="section-icon"><span class="material-symbols-outlined">analytics</span></span> Strategy Research</h2>
 <div class="card">
 <p class="kicker">Strategy Research</p>
-<p>The multi-strategy optimizer explored <strong>8 ETF(s)</strong> across <strong>3 strategy types</strong> (ATH drawdown, RSI oversold, Bollinger band, MA dip) with multiple parameter combinations each. Results are ranked by risk-adjusted returns (Sharpe ratio).</p>
-<p class="mt-8">Strategies tested: <span class="badge badge-gray">ATH Mean-Reversion</span> <span class="badge badge-gray">Bollinger Lower</span> <span class="badge badge-gray">RSI Oversold</span></p>
+<p>The multi-strategy optimizer explored <strong>8 ETF(s)</strong> across <strong>3 strategy types</strong> with multiple parameter combinations each. Results are ranked by risk-adjusted returns (Sharpe ratio).</p>
+<div class="mt-12"><div style="padding:8px 0;border-bottom:1px solid var(--border-light)"><span class="badge badge-gray">ATH Mean-Reversion</span> <span style="font-size:13px;color:var(--text-secondary)">&mdash; Buy leveraged ETF when its underlying index drops a threshold % from all-time high, exit at profit target. Captures mean-reversion after broad market drawdowns.</span></div>
+<div style="padding:8px 0;border-bottom:1px solid var(--border-light)"><span class="badge badge-gray">Bollinger Lower Band</span> <span style="font-size:13px;color:var(--text-secondary)">&mdash; Buy when price touches or breaks below the lower Bollinger Band (20-day SMA minus 2 standard deviations), exit at the middle band or profit target. Identifies statistical extremes in price action.</span></div>
+<div style="padding:8px 0;border-bottom:1px solid var(--border-light)"><span class="badge badge-gray">RSI Oversold</span> <span style="font-size:13px;color:var(--text-secondary)">&mdash; Buy when 14-day RSI falls below oversold threshold (typically 30), exit when RSI recovers above overbought level or profit target hit. Targets short-term momentum reversals.</span></div></div>
 <div class="sector-badges mt-8"><span class="sector-badge">TQQQ</span> <span class="sector-badge">UPRO</span> <span class="sector-badge">SOXL</span> <span class="sector-badge">TNA</span> <span class="sector-badge">TECL</span> <span class="sector-badge">FAS</span> <span class="sector-badge">LABU</span> <span class="sector-badge">UCO</span></div>
 </div>
 </section>
@@ -803,19 +821,19 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 <div class="module-grid">
 <span class="module-pill module-pill-ok">&#10003; etf.signals <span class="pill-dur">0.9s</span></span>
 <span class="module-pill module-pill-ok">&#10003; etf.active <span class="pill-dur">0.8s</span></span>
-<span class="module-pill module-pill-ok">&#10003; macro.dashboard <span class="pill-dur">4.0s</span></span>
-<span class="module-pill module-pill-ok">&#10003; macro.yields <span class="pill-dur">1.9s</span></span>
-<span class="module-pill module-pill-ok">&#10003; macro.rates <span class="pill-dur">5.6s</span></span>
-<span class="module-pill module-pill-ok">&#10003; macro.calendar <span class="pill-dur">0.8s</span></span>
-<span class="module-pill module-pill-ok">&#10003; sec.recent <span class="pill-dur">17.6s</span></span>
+<span class="module-pill module-pill-ok">&#10003; macro.dashboard <span class="pill-dur">3.2s</span></span>
+<span class="module-pill module-pill-ok">&#10003; macro.yields <span class="pill-dur">2.1s</span></span>
+<span class="module-pill module-pill-ok">&#10003; macro.rates <span class="pill-dur">3.7s</span></span>
+<span class="module-pill module-pill-ok">&#10003; macro.calendar <span class="pill-dur">0.9s</span></span>
+<span class="module-pill module-pill-ok">&#10003; sec.recent <span class="pill-dur">11.7s</span></span>
 <span class="module-pill module-pill-ok">&#10003; sec.institutional <span class="pill-dur">3.1s</span></span>
-<span class="module-pill module-pill-ok">&#10003; geopolitical.summary <span class="pill-dur">16.6s</span></span>
-<span class="module-pill module-pill-ok">&#10003; social.summary <span class="pill-dur">0.9s</span></span>
-<span class="module-pill module-pill-ok">&#10003; news.summary <span class="pill-dur">7.9s</span></span>
-<span class="module-pill module-pill-ok">&#10003; statistics.dashboard <span class="pill-dur">24.4s</span></span>
-<span class="module-pill module-pill-ok">&#10003; strategy.proposals <span class="pill-dur">48.3s</span></span>
-<span class="module-pill module-pill-ok">&#10003; strategy.backtest-all <span class="pill-dur">5.5s</span></span>
-<span class="module-pill module-pill-ok">&#10003; strategy.forecast <span class="pill-dur">0.9s</span></span>
+<span class="module-pill module-pill-ok">&#10003; geopolitical.summary <span class="pill-dur">29.0s</span></span>
+<span class="module-pill module-pill-ok">&#10003; social.summary <span class="pill-dur">1.0s</span></span>
+<span class="module-pill module-pill-ok">&#10003; news.summary <span class="pill-dur">4.9s</span></span>
+<span class="module-pill module-pill-ok">&#10003; statistics.dashboard <span class="pill-dur">2.7s</span></span>
+<span class="module-pill module-pill-ok">&#10003; strategy.proposals <span class="pill-dur">36.1s</span></span>
+<span class="module-pill module-pill-ok">&#10003; strategy.backtest-all <span class="pill-dur">5.2s</span></span>
+<span class="module-pill module-pill-ok">&#10003; strategy.forecast <span class="pill-dur">0.8s</span></span>
 <span class="module-pill module-pill-ok">&#10003; strategy.verify <span class="pill-dur">0.8s</span></span>
 <span class="module-pill module-pill-ok">&#10003; congress.summary <span class="pill-dur">3.3s</span></span>
 <span class="module-pill module-pill-ok">&#10003; history.weights <span class="pill-dur">0.1s</span></span>
@@ -828,7 +846,7 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 </main>
 
 <footer class="footer">
-<span>Generated 2026-02-12 15:50 IST &mdash; not financial advice.</span>
+<span>Generated 2026-02-12 16:19 IST &mdash; not financial advice.</span>
 </footer>
 
 </body>
