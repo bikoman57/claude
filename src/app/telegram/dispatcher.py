@@ -15,6 +15,24 @@ logger = logging.getLogger(__name__)
 
 TELEGRAM_MAX_LENGTH = 4096
 
+# Tools to pre-approve for headless Claude CLI runs.
+_ALLOWED_TOOLS: list[str] = [
+    "Bash(uv run*)",
+    "Bash(uv sync*)",
+    "Bash(git *)",
+    "Bash(gh *)",
+    "Bash(powershell*)",
+    "Read",
+    "Write",
+    "Edit",
+    "Glob",
+    "Grep",
+    "WebFetch",
+    "WebSearch",
+    "TodoWrite",
+    "Task",
+]
+
 # Mapping of bot commands to Claude skill prompts
 _COMMAND_SKILLS: dict[str, str] = {
     "analyze": "Use /analyze-stock",
@@ -146,10 +164,13 @@ class CommandDispatcher:
         try:
             env = os.environ.copy()
             env.setdefault("CLAUDE_CODE_GIT_BASH_PATH", r"D:\Git\bin\bash.exe")
+
+            cmd: list[str] = [self.claude_executable, "-p", prompt]
+            for tool in _ALLOWED_TOOLS:
+                cmd.extend(["--allowedTools", tool])
+
             process = await asyncio.create_subprocess_exec(
-                self.claude_executable,
-                "-p",
-                prompt,
+                *cmd,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
                 cwd=self.project_dir,

@@ -72,9 +72,13 @@ class GeopoliticalSummary:
     as_of: str
 
 
-def classify_impact(tone: float, volume: int) -> GeopoliticalImpact:
-    """Classify event impact based on tone and volume."""
-    if (tone < -5 and volume > 100) or volume > 500:
+def classify_impact(tone: float, volume: int = 0) -> GeopoliticalImpact:
+    """Classify event impact based on tone and article volume.
+
+    Tone alone drives classification since GDELT DOC API does not
+    provide per-article volume metrics.
+    """
+    if tone < -5 or volume > 500:
         return GeopoliticalImpact.HIGH
     if tone < -2 or volume > 50:
         return GeopoliticalImpact.MEDIUM

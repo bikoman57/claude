@@ -66,7 +66,7 @@ def fetch_gdelt_events(query: GdeltQuery) -> list[GdeltEvent]:
                 url=article.get("url", ""),
                 source=article.get("domain", ""),
                 tone=float(article.get("tone", 0.0)),
-                volume=int(article.get("socialimage", 0) or 0),
+                volume=0,  # GDELT DOC API has no per-article volume field
                 theme=query.theme,
                 date=article.get("seendate", ""),
             ),

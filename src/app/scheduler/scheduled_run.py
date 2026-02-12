@@ -7,9 +7,10 @@ import logging
 import os
 import subprocess
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import datetime
 from enum import StrEnum
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from app.scheduler.config import SchedulerConfig
 from app.scheduler.publisher import git_publish, write_report
@@ -20,6 +21,28 @@ from app.telegram.dispatcher import split_message
 from app.telegram.formatting import bold, escape_markdown
 
 logger = logging.getLogger(__name__)
+
+_ISRAEL_TZ = ZoneInfo("Asia/Jerusalem")
+
+# Tools to pre-approve for headless Claude CLI runs.
+# These match the project .claude/settings.json allow-list so that
+# scheduled and Telegram-triggered runs execute without permission prompts.
+_ALLOWED_TOOLS: list[str] = [
+    "Bash(uv run*)",
+    "Bash(uv sync*)",
+    "Bash(git *)",
+    "Bash(gh *)",
+    "Bash(powershell*)",
+    "Read",
+    "Write",
+    "Edit",
+    "Glob",
+    "Grep",
+    "WebFetch",
+    "WebSearch",
+    "TodoWrite",
+    "Task",
+]
 
 
 class RunSession(StrEnum):
@@ -134,7 +157,7 @@ class ScheduledRunResult:
 def _setup_logging(config: SchedulerConfig, session: RunSession) -> Path:
     """Configure file logging for this run. Returns log file path."""
     config.logs_dir.mkdir(parents=True, exist_ok=True)
-    date_str = datetime.now(tz=UTC).strftime("%Y-%m-%d")
+    date_str = datetime.now(tz=_ISRAEL_TZ).strftime("%Y-%m-%d")
     log_file = config.logs_dir / f"{date_str}_{session.value}.log"
 
     file_handler = logging.FileHandler(log_file, encoding="utf-8")
@@ -190,12 +213,20 @@ def _publish_report(run: SchedulerRun) -> bool:
         return False
 
 
+def _build_allowed_tools_args() -> list[str]:
+    """Build --allowedTools CLI arguments for Claude headless mode."""
+    args: list[str] = []
+    for tool in _ALLOWED_TOOLS:
+        args.extend(["--allowedTools", tool])
+    return args
+
+
 def _run_claude_analysis(
     config: SchedulerConfig,
     session: RunSession,
 ) -> tuple[bool, str]:
     """Phase 3: Invoke Claude CLI for comprehensive agent analysis."""
-    date_str = datetime.now(tz=UTC).strftime("%Y-%m-%d")
+    date_str = datetime.now(tz=_ISRAEL_TZ).strftime("%Y-%m-%d")
 
     prompt = (
         _PRE_MARKET_PROMPT.format(date=date_str)
@@ -213,8 +244,11 @@ def _run_claude_analysis(
         env = os.environ.copy()
         env.setdefault("CLAUDE_CODE_GIT_BASH_PATH", r"D:\Git\bin\bash.exe")
 
+        cmd = [str(config.claude_executable), "-p", prompt, "--verbose"]
+        cmd.extend(_build_allowed_tools_args())
+
         result = subprocess.run(  # noqa: S603
-            [str(config.claude_executable), "-p", prompt, "--verbose"],
+            cmd,
             capture_output=True,
             text=True,
             timeout=config.claude_timeout,
@@ -263,7 +297,7 @@ async def _send_telegram_summary(
         logger.warning("Telegram not configured, skipping notification")
         return False
 
-    date_str = datetime.now(tz=UTC).strftime("%Y-%m-%d")
+    date_str = datetime.now(tz=_ISRAEL_TZ).strftime("%Y-%m-%d")
     session_label = session.value.upper().replace("-", " ")
 
     lines = [
@@ -302,7 +336,7 @@ def run_scheduled(session: RunSession) -> ScheduledRunResult:
     config = SchedulerConfig.from_env()
     log_file = _setup_logging(config, session)
 
-    started = datetime.now(tz=UTC).isoformat(timespec="seconds")
+    started = datetime.now(tz=_ISRAEL_TZ).isoformat(timespec="seconds")
     logger.info("=" * 60)
     logger.info("SCHEDULED RUN: %s at %s", session.value, started)
     logger.info("Log file: %s", log_file)
@@ -327,7 +361,7 @@ def run_scheduled(session: RunSession) -> ScheduledRunResult:
         ),
     )
 
-    finished = datetime.now(tz=UTC).isoformat(timespec="seconds")
+    finished = datetime.now(tz=_ISRAEL_TZ).isoformat(timespec="seconds")
     logger.info("=" * 60)
     logger.info("SCHEDULED RUN COMPLETE: %s", finished)
     logger.info(

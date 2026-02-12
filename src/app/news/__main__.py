@@ -47,6 +47,8 @@ def cmd_summary() -> int:
         "top_headlines": [
             {
                 "title": a.article.title,
+                "link": a.article.link,
+                "source": a.article.source,
                 "sentiment": a.sentiment,
                 "sectors": list(a.sectors),
                 "relevance": a.relevance,

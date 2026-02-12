@@ -118,6 +118,28 @@ When reviewing, evaluate each file against these categories:
 - Advanced accessibility (prefers-reduced-motion, skip-nav)
 - Design token systematization
 
+## Design Reference: Target Aesthetic
+
+The report should follow a **modern analytics dashboard** style:
+- Clean white cards with subtle box-shadows (0 1px 3px rgba(0,0,0,0.04))
+- Rounded corners (8px border-radius)
+- Generous whitespace between sections
+- KPI cards with icons, large numbers, and trend indicators
+- Sticky navigation menu for quick section access
+- Two-column grid layouts for sentiment + market conditions
+- Clean sans-serif typography with monospace for data
+- Semantic color system: green=success, red=danger, yellow=warning
+- Progressive disclosure: details/summary for secondary info
+- Mobile-first responsive design
+- Israel timezone (Asia/Jerusalem) for all timestamps
+
+## Primary Review Target
+
+The main file to review is `src/app/scheduler/html_report.py` which contains:
+- All CSS (inline in `_CSS` variable)
+- All HTML generation functions
+- The page builder (`build_html_report`)
+
 ## Output Format
 
 For each issue found, provide:

@@ -77,6 +77,7 @@ def test_build_html_report_header():
     assert "Dashboard" in html
     assert ">1</span>/2 OK" in html
     assert ">1</span> failed" in html
+    assert "masthead" in html
 
 
 def test_build_html_report_kpi_vix():
@@ -540,7 +541,7 @@ def test_build_html_report_responsive():
     run = _make_run()
     html = build_html_report(run, date="2026-01-15")
     assert "@media" in html
-    assert "768px" in html
+    assert "900px" in html
 
 
 def test_build_html_report_all_sections():
@@ -646,6 +647,360 @@ def test_build_html_report_all_sections():
     assert "grid-2col" in html
     assert "module-grid" in html
     assert "signal-card" in html
+
+
+# --- New feature tests ---
+
+
+def test_build_html_report_material_icons_font():
+    """Google Material Symbols font is loaded."""
+    run = _make_run()
+    html = build_html_report(run, date="2026-01-15")
+    assert "Material+Symbols+Outlined" in html
+    assert "material-symbols-outlined" in html
+
+
+def test_build_html_report_fluid_layout():
+    """Report uses fluid layout without fixed max-width."""
+    run = _make_run()
+    html = build_html_report(run, date="2026-01-15")
+    assert "width: 100%" in html
+    assert "clamp(16px" in html
+
+
+def test_build_html_report_signal_grid():
+    """Signal cards are rendered in a CSS grid."""
+    data = json.dumps(
+        [
+            {
+                "leveraged_ticker": "TQQQ",
+                "underlying_ticker": "QQQ",
+                "state": "SIGNAL",
+                "underlying_drawdown_pct": -0.072,
+            },
+            {
+                "leveraged_ticker": "SOXL",
+                "underlying_ticker": "SOXX",
+                "state": "ALERT",
+                "underlying_drawdown_pct": -0.05,
+            },
+        ]
+    )
+    run = _make_run([_ok("etf.signals", data)])
+    html = build_html_report(run, date="2026-01-15")
+    assert "signal-grid" in html
+    assert "TQQQ" in html
+    assert "SOXL" in html
+
+
+def test_build_html_report_index_tiles():
+    """Market conditions section shows major index tiles."""
+    data = json.dumps(
+        {
+            "risk_indicators": {
+                "risk_assessment": "NEUTRAL",
+                "spy_price": 545.20,
+                "spy_change_1d_pct": 0.012,
+                "qqq_price": 480.50,
+                "qqq_change_1d_pct": -0.005,
+                "dia_price": 420.00,
+                "dia_change_1d_pct": 0.003,
+            },
+        }
+    )
+    run = _make_run([_ok("statistics.dashboard", data)])
+    html = build_html_report(run, date="2026-01-15")
+    assert "index-tile" in html
+    assert "S&amp;P 500" in html or "S&P 500" in html
+    assert "NASDAQ" in html
+    assert "DOW" in html
+    assert "$545.20" in html
+    assert "$480.50" in html
+    assert "$420.00" in html
+    assert "+1.2%" in html
+    assert "pct-up" in html
+    assert "pct-down" in html
+
+
+def test_build_html_report_global_rates():
+    """Market conditions section shows global central bank rates."""
+    rates = json.dumps(
+        {
+            "trajectory": "HOLDING",
+            "current_rate": 4.50,
+            "global_rates": {
+                "ecb": 3.75,
+                "boe": 4.25,
+                "boj": 0.10,
+            },
+        }
+    )
+    run = _make_run([_ok("macro.rates", rates)])
+    html = build_html_report(run, date="2026-01-15")
+    assert "rates-grid" in html
+    assert "rate-tile" in html
+    assert "ECB" in html
+    assert "BOE" in html
+    assert "BOJ" in html
+    assert "3.75%" in html
+    assert "4.25%" in html
+    assert "0.10%" in html
+
+
+def test_build_html_report_headline_links():
+    """News headlines include clickable links and sources."""
+    data = json.dumps(
+        {
+            "sentiment": "BULLISH",
+            "total_articles": 10,
+            "bullish_count": 7,
+            "bearish_count": 2,
+            "neutral_count": 1,
+            "top_headlines": [
+                {
+                    "title": "Markets rally hard",
+                    "link": "https://example.com/article1",
+                    "source": "Reuters",
+                    "sentiment": "BULLISH",
+                },
+            ],
+        }
+    )
+    run = _make_run([_ok("news.summary", data)])
+    html = build_html_report(run, date="2026-01-15")
+    assert 'href="https://example.com/article1"' in html
+    assert 'target="_blank"' in html
+    assert "Reuters" in html
+    assert "hl-source" in html
+
+
+def test_build_html_report_geopolitical_event_links():
+    """Geopolitical events include clickable links."""
+    data = json.dumps(
+        {
+            "risk_level": "MEDIUM",
+            "total_events": 3,
+            "high_impact_count": 1,
+            "top_events": [
+                {
+                    "title": "Trade tensions escalate",
+                    "url": "https://example.com/geo1",
+                    "category": "trade",
+                    "impact": "HIGH",
+                    "sectors": ["technology"],
+                },
+            ],
+        }
+    )
+    run = _make_run([_ok("geopolitical.summary", data)])
+    html = build_html_report(run, date="2026-01-15")
+    assert 'href="https://example.com/geo1"' in html
+    assert "Trade tensions escalate" in html
+    assert "technology" in html
+    assert "geo-event" in html
+
+
+def test_build_html_report_strategy_detail_columns():
+    """Strategy table has Trades and Max DD columns."""
+    data = json.dumps(
+        [
+            {
+                "leveraged_ticker": "SOXL",
+                "improvement_reason": "Better Sharpe",
+                "backtest_sharpe": 1.80,
+                "backtest_win_rate": 0.70,
+                "backtest_total_return": 0.35,
+                "backtest_trade_count": 12,
+                "backtest_max_drawdown": -0.18,
+                "backtest_period": "2y",
+                "backtest_avg_gain": 0.12,
+                "backtest_avg_loss": -0.06,
+            }
+        ]
+    )
+    run = _make_run([_ok("strategy.proposals", data)])
+    html = build_html_report(run, date="2026-01-15")
+    assert "Trades" in html
+    assert "Max DD" in html
+    assert "12" in html
+    assert "-18.0%" in html
+    assert "2y" in html
+    assert "Sharpe ratio" in html
+    assert "avg gain" in html
+    assert "avg loss" in html
+
+
+def test_build_html_report_strategy_low_trade_count_warning():
+    """Strategy table warns when trade count is low."""
+    data = json.dumps(
+        [
+            {
+                "leveraged_ticker": "SOXL",
+                "improvement_reason": "Test entry",
+                "backtest_sharpe": 1.0,
+                "backtest_win_rate": 0.5,
+                "backtest_total_return": 0.1,
+                "backtest_trade_count": 3,
+            }
+        ]
+    )
+    run = _make_run([_ok("strategy.proposals", data)])
+    html = build_html_report(run, date="2026-01-15")
+    assert "trade-count-warn" in html
+
+
+def test_build_html_report_strategy_entry_exit_details():
+    """Strategy table shows entry/exit strategy and avg hold duration."""
+    data = json.dumps(
+        [
+            {
+                "leveraged_ticker": "SOXL",
+                "improvement_reason": "Better Sharpe",
+                "backtest_sharpe": 1.80,
+                "backtest_win_rate": 0.70,
+                "backtest_total_return": 0.35,
+                "backtest_trade_count": 12,
+                "backtest_max_drawdown": -0.18,
+                "backtest_total_days": 480,
+                "proposed_threshold": 0.10,
+                "current_threshold": 0.05,
+                "proposed_target": 0.15,
+                "current_target": 0.10,
+            }
+        ]
+    )
+    run = _make_run([_ok("strategy.proposals", data)])
+    html = build_html_report(run, date="2026-01-15")
+    assert "Avg Hold" in html
+    assert "~40d" in html  # 480 / 12 = 40 days
+    assert "strategy-entry-exit" in html
+    assert "buy at 10% drawdown from ATH" in html
+    assert "current: 5%" in html
+    assert "+15% profit target" in html
+    assert "current: +10%" in html
+
+
+def test_build_html_report_nav_menu():
+    """Report includes a sticky navigation menu with section links."""
+    run = _make_run()
+    html = build_html_report(run, date="2026-01-15")
+    assert "nav-menu" in html
+    assert 'href="#signals"' in html
+    assert 'href="#sentiment"' in html
+    assert 'href="#market"' in html
+    assert 'href="#geopolitical"' in html
+    assert 'href="#strategy"' in html
+    assert 'href="#research"' in html
+    assert 'href="#modules"' in html
+    assert 'aria-label="Report sections"' in html
+
+
+def test_build_html_report_section_ids():
+    """All major sections have anchor IDs for navigation."""
+    run = _make_run(
+        [
+            _ok(
+                "etf.signals",
+                json.dumps(
+                    [
+                        {
+                            "leveraged_ticker": "TQQQ",
+                            "underlying_ticker": "QQQ",
+                            "state": "WATCH",
+                            "underlying_drawdown_pct": -0.03,
+                        }
+                    ]
+                ),
+            ),
+            _ok(
+                "news.summary",
+                json.dumps(
+                    {
+                        "sentiment": "BULLISH",
+                        "total_articles": 10,
+                        "bullish_count": 7,
+                        "bearish_count": 2,
+                        "neutral_count": 1,
+                    }
+                ),
+            ),
+            _ok(
+                "statistics.dashboard",
+                json.dumps(
+                    {"risk_indicators": {"risk_assessment": "LOW"}},
+                ),
+            ),
+            _ok(
+                "geopolitical.summary",
+                json.dumps(
+                    {"risk_level": "LOW", "total_events": 1},
+                ),
+            ),
+            _ok(
+                "strategy.proposals",
+                json.dumps(
+                    [
+                        {
+                            "leveraged_ticker": "SOXL",
+                            "improvement_reason": "Good",
+                            "proposed_threshold": 0.10,
+                            "proposed_target": 0.15,
+                        }
+                    ]
+                ),
+            ),
+        ]
+    )
+    html = build_html_report(run, date="2026-01-15")
+    assert 'id="signals"' in html
+    assert 'id="sentiment"' in html
+    assert 'id="market"' in html
+    assert 'id="geopolitical"' in html
+    assert 'id="strategy"' in html
+    assert 'id="research"' in html
+    assert 'id="modules"' in html
+
+
+def test_build_html_report_strategy_research_section():
+    """Strategy research section summarizes optimization exploration."""
+    data = json.dumps(
+        [
+            {
+                "leveraged_ticker": "SOXL",
+                "improvement_reason": "Better Sharpe",
+                "proposed_threshold": 0.10,
+                "proposed_target": 0.15,
+            },
+            {
+                "leveraged_ticker": "TQQQ",
+                "improvement_reason": "Lower DD",
+                "proposed_threshold": 0.07,
+                "proposed_target": 0.10,
+            },
+        ]
+    )
+    run = _make_run([_ok("strategy.proposals", data)])
+    html = build_html_report(run, date="2026-01-15")
+    assert "Strategy Research" in html
+    assert "2 ETF(s)" in html
+    assert "SOXL" in html
+    assert "TQQQ" in html
+    assert "sector-badge" in html
+
+
+def test_build_html_report_israel_timezone():
+    """Report header shows IST timezone indicator."""
+    run = _make_run()
+    html = build_html_report(run, date="2026-01-15")
+    assert "IST" in html
+
+
+def test_build_html_report_modern_card_style():
+    """Cards use modern styling with shadows and rounded corners."""
+    run = _make_run()
+    html = build_html_report(run, date="2026-01-15")
+    assert "border-radius: 8px" in html
+    assert "box-shadow" in html
 
 
 # --- Index tests ---

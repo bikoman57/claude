@@ -99,6 +99,18 @@ def fetch_feed(feed: RSSFeed) -> list[NewsArticle]:
     return articles
 
 
+def _dedup_articles(articles: list[NewsArticle]) -> list[NewsArticle]:
+    """Remove duplicate articles by normalized title."""
+    seen: set[str] = set()
+    unique: list[NewsArticle] = []
+    for article in articles:
+        key = article.title.strip().lower()
+        if key not in seen:
+            seen.add(key)
+            unique.append(article)
+    return unique
+
+
 def fetch_all_feeds(
     feeds: list[RSSFeed] | None = None,
 ) -> list[NewsArticle]:
@@ -108,4 +120,4 @@ def fetch_all_feeds(
     for feed in target_feeds:
         with contextlib.suppress(Exception):
             all_articles.extend(fetch_feed(feed))
-    return all_articles
+    return _dedup_articles(all_articles)

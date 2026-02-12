@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 
 import httpx
 import yfinance as yf
+from dotenv import load_dotenv
 
 _FRED_BASE = "https://api.stlouisfed.org/fred/series/observations"
 
@@ -106,6 +107,7 @@ def fetch_fred_history(
 
 def fetch_dashboard() -> MacroDashboard:
     """Fetch full macro dashboard."""
+    load_dotenv()
     vix = fetch_vix()
     fred_key = os.environ.get("FRED_API_KEY", "")
     cpi = None

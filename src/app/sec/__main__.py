@@ -6,6 +6,8 @@ import sys
 import time
 from dataclasses import asdict
 
+from dotenv import load_dotenv
+
 from app.sec.filings import fetch_recent_filings
 from app.sec.holdings import (
     get_all_unique_holdings,
@@ -110,6 +112,7 @@ def cmd_recent() -> int:
 
 
 def main() -> None:
+    load_dotenv()
     if len(sys.argv) < 2:
         print(USAGE, file=sys.stderr)  # noqa: T201
         sys.exit(1)

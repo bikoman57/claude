@@ -73,6 +73,7 @@ def cmd_summary() -> int:
         "top_events": [
             {
                 "title": e.title,
+                "url": e.url,
                 "category": e.category,
                 "impact": e.impact,
                 "sectors": list(e.affected_sectors),

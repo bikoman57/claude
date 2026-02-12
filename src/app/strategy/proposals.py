@@ -36,6 +36,12 @@ class StrategyProposal:
     backtest_sharpe: float | None
     backtest_win_rate: float | None
     backtest_total_return: float
+    backtest_trade_count: int
+    backtest_max_drawdown: float
+    backtest_total_days: int
+    backtest_avg_gain: float | None
+    backtest_avg_loss: float | None
+    backtest_period: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -135,6 +141,12 @@ def _make_proposal(
         backtest_sharpe=best.sharpe_ratio,
         backtest_win_rate=best.win_rate,
         backtest_total_return=best.total_return,
+        backtest_trade_count=len(best.trades),
+        backtest_max_drawdown=best.max_drawdown,
+        backtest_total_days=best.total_days,
+        backtest_avg_gain=best.avg_gain,
+        backtest_avg_loss=best.avg_loss,
+        backtest_period=best.config.period,
     )
 
 

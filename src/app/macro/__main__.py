@@ -5,6 +5,8 @@ import os
 import sys
 from dataclasses import asdict
 
+from dotenv import load_dotenv
+
 from app.macro.fed import build_fed_summary, get_upcoming_fomc
 from app.macro.indicators import (
     fetch_dashboard,
@@ -31,8 +33,17 @@ def cmd_dashboard() -> int:
     return 0
 
 
+_GLOBAL_RATE_SERIES: dict[str, str] = {
+    "ecb": "ECBDFR",
+    "boe": "IUDSOIA",
+    "boj": "IRSTCB01JPM156N",
+    "boc": "IRSTCB01CAM156N",
+    "rba": "IRSTCB01AUM156N",
+}
+
+
 def cmd_rates() -> int:
-    """Print Fed rates and trajectory."""
+    """Print Fed rates, trajectory, and global central bank rates."""
     fred_key = os.environ.get("FRED_API_KEY", "")
     if not fred_key:
         print(  # noqa: T201
@@ -43,7 +54,16 @@ def cmd_rates() -> int:
     rate = fetch_fred_latest("FEDFUNDS", fred_key)
     history = fetch_fred_history("FEDFUNDS", fred_key, limit=6)
     summary = build_fed_summary(rate, history)
-    print(json.dumps(asdict(summary), indent=2))  # noqa: T201
+
+    output: dict[str, object] = asdict(summary)
+
+    # Fetch global central bank rates
+    global_rates: dict[str, float | None] = {}
+    for bank, series_id in _GLOBAL_RATE_SERIES.items():
+        global_rates[bank] = fetch_fred_latest(series_id, fred_key)
+    output["global_rates"] = global_rates
+
+    print(json.dumps(output, indent=2))  # noqa: T201
     return 0
 
 
@@ -68,6 +88,7 @@ def cmd_calendar() -> int:
 
 
 def main() -> None:
+    load_dotenv()
     if len(sys.argv) < 2:
         print(USAGE, file=sys.stderr)  # noqa: T201
         sys.exit(1)

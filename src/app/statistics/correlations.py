@@ -16,6 +16,12 @@ class RiskIndicators:
     oil_change_5d_pct: float | None
     dxy_price: float | None
     dxy_change_5d_pct: float | None
+    spy_price: float | None
+    spy_change_1d_pct: float | None
+    qqq_price: float | None
+    qqq_change_1d_pct: float | None
+    dia_price: float | None
+    dia_change_1d_pct: float | None
     flight_to_safety: bool
     risk_assessment: str
     as_of: str
@@ -43,8 +49,9 @@ class StatisticsSummary:
 
 def _fetch_price_and_change(
     ticker: str,
+    days: int = 5,
 ) -> tuple[float | None, float | None]:
-    """Fetch latest price and 5-day change for a ticker."""
+    """Fetch latest price and N-day change for a ticker."""
     try:
         t = yf.Ticker(ticker)
         hist = t.history(period="1mo")
@@ -52,8 +59,8 @@ def _fetch_price_and_change(
             return None, None
         closes = hist["Close"]
         price = float(closes.iloc[-1])
-        idx_5 = min(5, len(closes) - 1)
-        change = (closes.iloc[-1] - closes.iloc[-idx_5]) / closes.iloc[-idx_5]
+        idx = min(days, len(closes) - 1)
+        change = (closes.iloc[-1] - closes.iloc[-idx]) / closes.iloc[-idx]
         return price, float(change)
     except Exception:
         return None, None
@@ -64,6 +71,11 @@ def fetch_risk_indicators() -> RiskIndicators:
     gold_price, gold_change = _fetch_price_and_change("GLD")
     oil_price, oil_change = _fetch_price_and_change("USO")
     dxy_price, dxy_change = _fetch_price_and_change("DX-Y.NYB")
+
+    # Major indices — 1-day change
+    spy_price, spy_change = _fetch_price_and_change("SPY", days=1)
+    qqq_price, qqq_change = _fetch_price_and_change("QQQ", days=1)
+    dia_price, dia_change = _fetch_price_and_change("DIA", days=1)
 
     # Flight to safety: gold up AND VIX rising
     flight = False
@@ -95,6 +107,12 @@ def fetch_risk_indicators() -> RiskIndicators:
         oil_change_5d_pct=oil_change,
         dxy_price=dxy_price,
         dxy_change_5d_pct=dxy_change,
+        spy_price=spy_price,
+        spy_change_1d_pct=spy_change,
+        qqq_price=qqq_price,
+        qqq_change_1d_pct=qqq_change,
+        dia_price=dia_price,
+        dia_change_1d_pct=dia_change,
         flight_to_safety=flight,
         risk_assessment=assessment,
         as_of=datetime.now(tz=UTC).isoformat(timespec="seconds"),
