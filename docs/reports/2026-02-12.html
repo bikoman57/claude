@@ -78,7 +78,7 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
 .top-bar { background: var(--bg-dark); color: #fff;
   padding: 0 clamp(16px, 3vw, 48px);
   margin: 0 calc(-1 * clamp(16px, 3vw, 48px));
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center;
   position: sticky; top: 0; z-index: 100;
   min-height: 56px; flex-wrap: wrap; }
 .top-bar h1 { color: #fff; font-size: 16px; font-weight: 600;
@@ -470,7 +470,7 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 </div>
 
 <header class="header">
-<span>2026-02-12 &bull; 16:19 IST</span>
+<span>2026-02-12 &bull; 16:26 IST</span>
 <div class="header-status"><span class="ok">19</span>/19 OK &bull; <span class="fail">0</span> failed</div>
 </header>
 
@@ -502,8 +502,8 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 </div>
 <div class="kpi-card kpi-bar-green">
 <div class="kpi-icon"><span class="material-symbols-outlined">public</span></div><div class="kpi-label">Geopolitical</div>
-<div class="kpi-value">130</div>
-<div class="kpi-sub"><span class="badge badge-green">LOW</span> 130 events</div>
+<div class="kpi-value">100</div>
+<div class="kpi-sub"><span class="badge badge-green">LOW</span> 100 events</div>
 </div>
 <div class="kpi-card kpi-bar-red">
 <div class="kpi-icon"><span class="material-symbols-outlined">newspaper</span></div><div class="kpi-label">News</div>
@@ -691,21 +691,21 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 <h2><span class="section-icon"><span class="material-symbols-outlined">newspaper</span></span> Sentiment Analysis</h2>
 <div class="card">
 <p>News Sentiment: <span class="badge badge-red">BEARISH</span></p>
-<div class="sentiment-bar" role="img" aria-label="Sentiment: 47 bullish, 60 bearish, 267 neutral"><div class="sentiment-fill-bullish" style="width:12.6%"></div><div class="sentiment-fill-bearish" style="width:16.0%"></div><div class="sentiment-fill-neutral" style="width:71.4%"></div></div>
-<div class="sentiment-counts"><span class="sentiment-count-bullish">47 bullish</span><span class="sentiment-count-bearish">60 bearish</span><span>267 neutral</span></div>
+<div class="sentiment-bar" role="img" aria-label="Sentiment: 49 bullish, 59 bearish, 266 neutral"><div class="sentiment-fill-bullish" style="width:13.1%"></div><div class="sentiment-fill-bearish" style="width:15.8%"></div><div class="sentiment-fill-neutral" style="width:71.1%"></div></div>
+<div class="sentiment-counts"><span class="sentiment-count-bullish">49 bullish</span><span class="sentiment-count-bearish">59 bearish</span><span>266 neutral</span></div>
 <p class="mt-12"><strong>Top headlines</strong></p>
 <ul class="headline-list">
 <li><span class="hl-marker hl-bull">Bull</span><a href="https://www.bloomberg.com/news/articles/2026-02-12/emerging-market-stocks-rally-for-fourth-day-led-by-korean-tech" target="_blank" rel="noopener">Emerging Market Stocks Rally for Fourth Day, Led by Korean Tech</a><span class="hl-source">Bloomberg Markets</span></li>
 <li><span class="hl-marker hl-neu">Neu</span><a href="https://www.bloomberg.com/news/videos/2026-02-12/the-opening-trade-2-12-2026-video" target="_blank" rel="noopener">Nuveen to Buy Schroders in Near £10 Billion Deal | The Opening Trade 2/12/2026</a><span class="hl-source">Bloomberg Markets</span></li>
-<li><span class="hl-marker hl-bear">Bear</span><a href="https://www.bloomberg.com/news/articles/2026-02-12/ai-driven-debt-binge-threatens-to-disrupt-passive-credit-funds" target="_blank" rel="noopener">AI-Driven Debt Binge Threatens to Disrupt Passive Credit Funds</a><span class="hl-source">Bloomberg Markets</span></li>
 <li><span class="hl-marker hl-bull">Bull</span><a href="https://www.wsj.com/finance/stocks/big-tech-accounting-creates-a-blind-spot-in-the-ai-boom-e2d7d1eb?mod=rss_markets_main" target="_blank" rel="noopener">Big Tech Accounting Creates a Blind Spot in the AI Boom</a><span class="hl-source">WSJ Markets</span></li>
 <li><span class="hl-marker hl-bear">Bear</span><a href="https://www.wsj.com/opinion/ai-stock-market-software-companies-selloff-02bef5d0?mod=rss_markets_main" target="_blank" rel="noopener">Opinion | The AI Stock Market Rout</a><span class="hl-source">WSJ Markets</span></li>
+<li><span class="hl-marker hl-bull">Bull</span><a href="https://www.cnbc.com/2026/02/12/mizuho-td-cowen-upgrade-shopify-say-ai-fears-are-overdone-and-llm-strategy-builds-long-term-value.html" target="_blank" rel="noopener">Mizuho, TD Cowen upgrade Shopify, say AI fears are overdone and LLM strategy builds long-term value</a><span class="hl-source">CNBC Top News</span></li>
 </ul>
 <div class="sector-badges">
-<span class="sector-badge">tech (75)</span>
+<span class="sector-badge">tech (71)</span>
 <span class="sector-badge">finance (50)</span>
-<span class="sector-badge">energy (27)</span>
-<span class="sector-badge">semiconductors (14)</span>
+<span class="sector-badge">energy (26)</span>
+<span class="sector-badge">semiconductors (12)</span>
 <span class="sector-badge">healthcare (10)</span>
 </div>
 <p class="mt-12">Officials Tone: <span class="badge badge-yellow">HAWKISH</span>
@@ -741,33 +741,32 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 <section id="geopolitical">
 <h2><span class="section-icon"><span class="material-symbols-outlined">public</span></span> Geopolitical Risk</h2>
 <div class="card">
-<p>Risk Level: <span class="badge badge-green">LOW</span> &mdash; 130 events tracked (0 high-impact)</p>
+<p>Risk Level: <span class="badge badge-green">LOW</span> &mdash; 100 events tracked (0 high-impact)</p>
 <div class="sector-badges">
 <span class="sector-badge">energy (100)</span>
 <span class="sector-badge">defense (50)</span>
 <span class="sector-badge">finance (50)</span>
-<span class="sector-badge">general (30)</span>
 </div>
-<p class="mt-8"><span class="badge badge-gray">MILITARY (50)</span> <span class="badge badge-gray">SANCTIONS (50)</span> <span class="badge badge-gray">ELECTIONS (30)</span></p>
+<p class="mt-8"><span class="badge badge-gray">MILITARY (50)</span> <span class="badge badge-gray">SANCTIONS (50)</span></p>
 <div class="geo-events">
 <div class="geo-event">
-<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://auto.economictimes.indiatimes.com/news/industry/rolls-royce-expands-operations-in-india-focus-on-defence-engine-co-development-and-local-manufacturing/128258082" target="_blank" rel="noopener">Rolls - Royce Expands Operations in India : Focus on Defence Engine Co - Development and Local Manufacturing , ETAuto</a></div>
+<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://www.freiepresse.de/nachrichten/welt/kloeckner-mit-israelischer-militaerbegleitung-im-gazastreifen-artikel14134811" target="_blank" rel="noopener">Klöckner mit israelischer Militärbegleitung im Gazastreifen</a></div>
 <div class="geo-meta">MILITARY &bull; Sectors: energy, defense</div>
 </div>
 <div class="geo-event">
-<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://www.cleveland.com/open/2026/02/ohio-lawmaker-wants-state-to-pony-up-cash-to-reduce-property-tax-bills-capitol-letter.html" target="_blank" rel="noopener">Ohio lawmaker wants state to pony up cash to reduce property tax bills : Capitol Letter</a></div>
+<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://thanhnien.vn/nhu-anh-trang-sang-ngoi-185260201111822425.htm" target="_blank" rel="noopener">Như ánh trăng sáng ngời</a></div>
 <div class="geo-meta">MILITARY &bull; Sectors: energy, defense</div>
 </div>
 <div class="geo-event">
-<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://rus.delfi.lv/57862/v-mire/120106490/massirovannaya-ataka-na-kiev-dnepr-i-odessu-raneny-deti-tysyachi-domov-snova-bez-otopleniya" target="_blank" rel="noopener">Массированная атака на Киев , Днепр и Одессу : ранены дети , тысячи домов снова без отопления</a></div>
+<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://www.lemonde.fr/politique/article/2026/02/12/proces-des-assistants-parlementaires-du-fn-l-abandon-de-la-rhetorique-antijuges-un-signe-des-temps_6666472_823448.html" target="_blank" rel="noopener">Procès des assistants parlementaires du FN  : labandon de la rhétorique antijuges , un signe des temps</a></div>
 <div class="geo-meta">MILITARY &bull; Sectors: energy, defense</div>
 </div>
 <div class="geo-event">
-<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://www.bctv.org/2026/02/12/alvernia-theatre-professor-recognized-for-innovative-teaching-excellence-award/" target="_blank" rel="noopener">Alvernia Theatre Professor Recognized for Innovative Teaching Excellence Award</a></div>
+<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://az.trend.az/azerbaijan/society/4152747.html" target="_blank" rel="noopener">Müdafiə Nazirliyi gənc əsgərlərin yaxınlarına müraciət etdi</a></div>
 <div class="geo-meta">MILITARY &bull; Sectors: energy, defense</div>
 </div>
 <div class="geo-event">
-<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://www.mersinhaber.com/haber-canakkale-geliboluda-durgun-sulardan-gecis-egitimi-gerceklestirildi/544153" target="_blank" rel="noopener">Çanakkale Geliboluda Durgun Sulardan Geçiş Eğitimi Gerçekleştirildi</a></div>
+<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://www.globalsecurity.org/military/library/news/2026/02/mil-260211-eeas01.htm" target="_blank" rel="noopener">Foreign Affairs Council ( Defence ): Press remarks by High Representative Kaja Kallas upon arrival</a></div>
 <div class="geo-meta">MILITARY &bull; Sectors: energy, defense</div>
 </div>
 </div>
@@ -821,17 +820,17 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 <div class="module-grid">
 <span class="module-pill module-pill-ok">&#10003; etf.signals <span class="pill-dur">0.9s</span></span>
 <span class="module-pill module-pill-ok">&#10003; etf.active <span class="pill-dur">0.8s</span></span>
-<span class="module-pill module-pill-ok">&#10003; macro.dashboard <span class="pill-dur">3.2s</span></span>
-<span class="module-pill module-pill-ok">&#10003; macro.yields <span class="pill-dur">2.1s</span></span>
-<span class="module-pill module-pill-ok">&#10003; macro.rates <span class="pill-dur">3.7s</span></span>
-<span class="module-pill module-pill-ok">&#10003; macro.calendar <span class="pill-dur">0.9s</span></span>
-<span class="module-pill module-pill-ok">&#10003; sec.recent <span class="pill-dur">11.7s</span></span>
-<span class="module-pill module-pill-ok">&#10003; sec.institutional <span class="pill-dur">3.1s</span></span>
-<span class="module-pill module-pill-ok">&#10003; geopolitical.summary <span class="pill-dur">29.0s</span></span>
-<span class="module-pill module-pill-ok">&#10003; social.summary <span class="pill-dur">1.0s</span></span>
-<span class="module-pill module-pill-ok">&#10003; news.summary <span class="pill-dur">4.9s</span></span>
-<span class="module-pill module-pill-ok">&#10003; statistics.dashboard <span class="pill-dur">2.7s</span></span>
-<span class="module-pill module-pill-ok">&#10003; strategy.proposals <span class="pill-dur">36.1s</span></span>
+<span class="module-pill module-pill-ok">&#10003; macro.dashboard <span class="pill-dur">3.0s</span></span>
+<span class="module-pill module-pill-ok">&#10003; macro.yields <span class="pill-dur">1.9s</span></span>
+<span class="module-pill module-pill-ok">&#10003; macro.rates <span class="pill-dur">4.7s</span></span>
+<span class="module-pill module-pill-ok">&#10003; macro.calendar <span class="pill-dur">0.8s</span></span>
+<span class="module-pill module-pill-ok">&#10003; sec.recent <span class="pill-dur">10.7s</span></span>
+<span class="module-pill module-pill-ok">&#10003; sec.institutional <span class="pill-dur">2.7s</span></span>
+<span class="module-pill module-pill-ok">&#10003; geopolitical.summary <span class="pill-dur">22.1s</span></span>
+<span class="module-pill module-pill-ok">&#10003; social.summary <span class="pill-dur">0.8s</span></span>
+<span class="module-pill module-pill-ok">&#10003; news.summary <span class="pill-dur">5.1s</span></span>
+<span class="module-pill module-pill-ok">&#10003; statistics.dashboard <span class="pill-dur">2.9s</span></span>
+<span class="module-pill module-pill-ok">&#10003; strategy.proposals <span class="pill-dur">38.7s</span></span>
 <span class="module-pill module-pill-ok">&#10003; strategy.backtest-all <span class="pill-dur">5.2s</span></span>
 <span class="module-pill module-pill-ok">&#10003; strategy.forecast <span class="pill-dur">0.8s</span></span>
 <span class="module-pill module-pill-ok">&#10003; strategy.verify <span class="pill-dur">0.8s</span></span>
@@ -846,7 +845,7 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 </main>
 
 <footer class="footer">
-<span>Generated 2026-02-12 16:19 IST &mdash; not financial advice.</span>
+<span>Generated 2026-02-12 16:26 IST &mdash; not financial advice.</span>
 </footer>
 
 </body>
