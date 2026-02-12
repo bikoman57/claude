@@ -3,40 +3,40 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#16192b">
+<meta name="theme-color" content="#1a2332">
 <meta name="description" content="Backtest trade logs and equity curves">
 <title>Trade Logs 2026-02-12</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Playfair+Display:wght@400;500;600;700;800&amp;family=Source+Sans+3:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
-<style>/* === Editorial / Financial Times Design === */
+<style>/* === Fintech Dashboard Design === */
 :root {
-  --bg-primary: #f8f6f1;
+  --bg-primary: #f5f7fa;
   --bg-secondary: #ffffff;
-  --bg-tertiary: #f0ece3;
-  --bg-dark: #16192b;
-  --border-primary: #d4c9b8;
-  --border-light: #e8dfcf;
-  --border-hover: #990f3d;
+  --bg-tertiary: #eef1f6;
+  --bg-dark: #1a2332;
+  --border-primary: #dce1e8;
+  --border-light: #e8ecf1;
+  --border-hover: #2563eb;
   --text-primary: #1a1a1a;
   --text-secondary: #4a4a4a;
   --text-muted: #7a7a7a;
-  --accent: #990f3d;
-  --accent-light: #fce4ec;
-  --success: #0a7c42;
-  --success-bg: #e8f5e9;
-  --warning: #b86e00;
-  --warning-bg: #fff8e1;
-  --danger: #c62828;
-  --danger-bg: #ffebee;
-  --info: #1565c0;
-  --info-bg: #e3f2fd;
-  --purple: #6a1b9a;
-  --purple-bg: #f3e5f5;
-  --neutral: #78909c;
-  --font-serif: 'Playfair Display', Georgia, serif;
-  --font-sans: 'Source Sans 3', -apple-system, sans-serif;
+  --accent: #2563eb;
+  --accent-light: #eff6ff;
+  --success: #16a34a;
+  --success-bg: #f0fdf4;
+  --warning: #d97706;
+  --warning-bg: #fffbeb;
+  --danger: #dc2626;
+  --danger-bg: #fef2f2;
+  --info: #2563eb;
+  --info-bg: #eff6ff;
+  --purple: #7c3aed;
+  --purple-bg: #f5f3ff;
+  --neutral: #94a3b8;
+  --font-serif: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', 'Consolas', monospace;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -50,7 +50,7 @@ h1 { font-family: var(--font-serif); color: var(--text-primary);
   font-size: 26px; font-weight: 700; letter-spacing: -0.01em; }
 h2 { font-family: var(--font-serif); color: var(--text-primary);
   margin-bottom: 16px; font-size: 20px; font-weight: 700;
-  padding-bottom: 8px; border-bottom: 2px solid var(--accent);
+  padding-bottom: 8px; border-bottom: 2px solid var(--border-primary);
   display: inline-block; }
 
 /* Material icon sizing */
@@ -74,47 +74,42 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
 .mt-16 { margin-top: 16px; }
 .text-muted { color: var(--text-muted); }
 
-/* Navigation menu */
-.nav-menu { position: sticky; top: 0; z-index: 100;
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-light);
+/* Top bar — unified navy header with navigation */
+.top-bar { background: var(--bg-dark); color: #fff;
   padding: 0 clamp(16px, 3vw, 48px);
   margin: 0 calc(-1 * clamp(16px, 3vw, 48px));
-  display: flex; gap: 0; overflow-x: auto;
-  -webkit-overflow-scrolling: touch; }
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  min-height: 56px; flex-wrap: wrap; }
+.top-bar h1 { color: #fff; font-size: 16px; font-weight: 600;
+  letter-spacing: -0.01em; white-space: nowrap; margin-right: 24px; }
+
+/* Navigation menu */
+.nav-menu { display: flex; gap: 0; overflow-x: auto;
+  -webkit-overflow-scrolling: touch; margin-left: auto; }
 .nav-menu a { font-family: var(--font-mono); font-size: 11px;
   font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
-  color: var(--text-muted); white-space: nowrap;
-  padding: 14px 16px; border-bottom: 2px solid transparent;
+  color: rgba(255,255,255,0.65); white-space: nowrap;
+  padding: 18px 14px; border-bottom: 2px solid transparent;
   transition: color 0.15s, border-color 0.15s; }
-.nav-menu a:hover, .nav-menu a:focus { color: var(--accent);
-  border-bottom-color: var(--accent); text-decoration: none; }
-.nav-menu a.nav-active { color: var(--accent);
-  border-bottom-color: var(--accent); }
-.nav-menu .nav-divider { width: 1px; background: var(--border-light);
-  margin: 8px 0; flex-shrink: 0; }
-
-/* Masthead */
-.masthead { background: var(--bg-dark); color: #fff;
-  padding: 20px clamp(16px, 3vw, 48px);
-  margin: 0 calc(-1 * clamp(16px, 3vw, 48px)) 0;
-  display: flex; justify-content: space-between; align-items: center; }
-.masthead h1 { color: #fff; }
-.masthead-meta { font-size: 13px; opacity: 0.7; text-align: right; }
-.masthead-rule { height: 4px; background: var(--accent);
-  margin: 0 calc(-1 * clamp(16px, 3vw, 48px)) 0; }
+.nav-menu a:hover, .nav-menu a:focus { color: #fff;
+  border-bottom-color: #fff; text-decoration: none; }
+.nav-menu a.nav-active { color: #fff;
+  border-bottom-color: #fff; }
+.nav-menu .nav-divider { width: 1px; background: rgba(255,255,255,0.2);
+  margin: 12px 0; flex-shrink: 0; }
 
 /* Header / datebar */
 .header { display: flex; align-items: center; justify-content: space-between;
   border-bottom: 1px solid var(--border-primary); padding: 12px 0;
   margin-bottom: 28px; flex-wrap: wrap; gap: 8px;
   font-size: 13px; color: var(--text-muted); }
-.header-status { font-size: 0.9em; font-family: var(--font-serif);
-  font-style: italic; color: var(--text-secondary); }
+.header-status { font-size: 0.9em; font-family: var(--font-sans);
+  color: var(--text-secondary); }
 
 /* Executive summary / lede */
 .exec-summary { margin-bottom: 32px; padding-bottom: 28px;
-  border-bottom: 2px solid var(--text-primary); }
+  border-bottom: 1px solid var(--border-primary); }
 .exec-summary p { margin-bottom: 8px; }
 .exec-summary .headline { font-family: var(--font-serif);
   font-size: 28px; font-weight: 700; line-height: 1.3;
@@ -128,10 +123,10 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
   gap: 16px; margin-bottom: 32px; }
 .kpi-card { padding: 20px 24px;
   background: var(--bg-secondary); border: 1px solid var(--border-light);
-  border-radius: 8px; position: relative; overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  border-radius: 10px; position: relative; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 .kpi-card::before { content: ''; position: absolute; left: 0; top: 0;
-  bottom: 0; width: 4px; }
+  width: 100%; height: 3px; }
 .kpi-bar-green::before { background: var(--success); }
 .kpi-bar-yellow::before { background: var(--warning); }
 .kpi-bar-red::before { background: var(--danger); }
@@ -159,14 +154,14 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
 
 /* Cards */
 .card { background: var(--bg-secondary); border: 1px solid var(--border-light);
-  padding: 24px; margin-bottom: 24px; border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  padding: 24px; margin-bottom: 24px; border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 
 /* Grid layouts */
 .grid-2col { display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px; }
 
 /* Badges */
-.badge { display: inline-block; padding: 3px 10px; border-radius: 3px;
+.badge { display: inline-block; padding: 3px 10px; border-radius: 12px;
   font-family: var(--font-mono); font-size: 10px; font-weight: 600;
   letter-spacing: 0.06em; text-transform: uppercase; }
 .badge-green { background: var(--success-bg); color: var(--success); }
@@ -177,12 +172,13 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
 
 /* Tables */
 table { border-collapse: collapse; width: 100%; }
-th { font-family: var(--font-mono); text-align: left; padding: 10px 14px;
-  color: var(--text-muted); font-weight: 600; font-size: 10px;
+th { font-family: var(--font-mono); text-align: left; padding: 12px 14px;
+  color: var(--text-secondary); font-weight: 600; font-size: 10px;
   text-transform: uppercase; letter-spacing: 0.08em;
-  border-bottom: 2px solid var(--text-primary); }
+  background: var(--bg-tertiary); border-bottom: 2px solid var(--border-primary); }
 td { padding: 12px 14px; border-bottom: 1px solid var(--border-light); }
-tbody tr:hover { background: var(--bg-tertiary); }
+tbody tr:nth-child(even) { background: #fafbfc; }
+tbody tr:hover { background: #f0f4f8; }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
 .pct-up { color: var(--success); }
 .pct-down { color: var(--danger); }
@@ -192,15 +188,18 @@ tbody tr:hover { background: var(--bg-tertiary); }
   grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
   gap: 16px; margin-bottom: 16px; }
 .signal-card { background: var(--bg-secondary); border: 1px solid var(--border-light);
-  padding: 16px 20px; border-left: 4px solid var(--border-light);
-  border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-.signal-card-signal { border-left-color: var(--success);
-  border-left-width: 5px; background: var(--success-bg); }
+  padding: 16px 20px; border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); position: relative;
+  overflow: hidden; }
+.signal-card::before { content: ''; position: absolute; left: 0; top: 0;
+  width: 100%; height: 3px; background: var(--border-light); }
+.signal-card-signal::before { background: var(--success); }
+.signal-card-signal { background: var(--success-bg); }
 .signal-card-signal .signal-ticker { font-size: 1.35em; }
-.signal-card-alert { border-left-color: var(--warning); }
-.signal-card-active { border-left-color: var(--info); }
-.signal-card-watch { border-left-color: var(--neutral); }
-.signal-card-target { border-left-color: var(--purple); }
+.signal-card-alert::before { background: var(--warning); }
+.signal-card-active::before { background: var(--info); }
+.signal-card-watch::before { background: var(--neutral); }
+.signal-card-target::before { background: var(--purple); }
 .signal-header { display: flex; justify-content: space-between;
   align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
 .signal-ticker { font-family: var(--font-mono); font-size: 15px;
@@ -303,8 +302,8 @@ details[open] summary { margin-bottom: 8px; }
   display: flex; gap: 12px; flex-wrap: wrap; }
 
 /* Standfirst highlight */
-.highlight { background: linear-gradient(transparent 60%, var(--accent-light) 60%);
-  padding: 0 2px; }
+.highlight { background: var(--accent-light);
+  padding: 1px 4px; border-radius: 2px; }
 
 /* Lede kicker */
 .kicker { font-family: var(--font-mono); font-size: 11px; font-weight: 600;
@@ -366,7 +365,7 @@ details[open] summary { margin-bottom: 8px; }
 
 /* Footer */
 .footer { margin-top: 40px; padding: 20px 0;
-  border-top: 3px solid var(--text-primary); font-size: 12px;
+  border-top: 1px solid var(--border-primary); font-size: 12px;
   color: var(--text-muted); display: flex; justify-content: space-between;
   flex-wrap: wrap; gap: 8px; }
 a { color: var(--accent); text-decoration: none; font-weight: 600; }
@@ -380,8 +379,8 @@ a:hover { text-decoration: underline; }
   gap: 12px; margin-top: 16px; }
 .report-card { background: var(--bg-secondary); border: 1px solid var(--border-light);
   padding: 16px; text-align: center; position: relative;
-  transition: border-color 0.15s ease; border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  transition: border-color 0.15s ease; border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 .report-card:hover { border-color: var(--accent); }
 .report-card a { font-family: var(--font-serif); font-size: 1.1em;
   font-weight: 600; }
@@ -432,12 +431,11 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 @media print {
   body { background: #fff; color: #000; max-width: 100%;
     font-size: 11pt; }
-  .masthead { background: #000; }
-  .masthead-rule { background: #000; }
+  .top-bar { background: #000; }
   .card, .signal-card, .kpi-card, .exec-summary, .report-card {
     background: #fff; border-color: #ccc; box-shadow: none;
     break-inside: avoid; }
-  .skip-nav, .nav-menu { display: none; }
+  .skip-nav, .top-bar { display: none; }
   details[open] > summary { display: none; }
   details > *:not(summary) { display: block !important; }
   details:not([open]) { display: block; }
@@ -453,16 +451,13 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 </head>
 <body>
 <a href="#main-content" class="skip-nav">Skip to main content</a>
-<div class="masthead">
-<h1>Trade Logs & Equity Curve</h1>
-<div class="masthead-meta">Multi-Strategy Backtest Results<br>ATH, RSI, Bollinger, MA Dip</div>
-</div>
-<div class="masthead-rule"></div>
-
+<div class="top-bar">
+<h1>Swing Trading Report</h1>
 <nav class="nav-menu" aria-label="Report navigation"><a href="2026-02-12.html">Dashboard</a><a href="trade-logs-2026-02-12.html" class="nav-active">Trade Logs</a><a href="forecasts-2026-02-12.html">Forecasts</a><a href="../index.html">All Reports</a></nav>
+</div>
 
 <header class="header">
-<span>2026-02-12 &bull; 11:08 IST</span>
+<span>2026-02-12 &bull; 15:51 IST</span>
 </header>
 
 <main id="main-content">
@@ -786,7 +781,7 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 </main>
 
 <footer class="footer">
-<span>Generated 2026-02-12 11:08 IST &mdash; backtested, not live trades.</span>
+<span>Generated 2026-02-12 15:51 IST &mdash; backtested, not live trades.</span>
 </footer>
 
 <script>
@@ -796,34 +791,34 @@ new Chart(ctx, {
   data: {
     labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
     datasets: [
-      {label:"TQQQ (ATH)",data:[10000.0, 11193.17, 9321.44, 10563.57, 11885.28, 9922.42, 8073.61, 9273.16, 10278.73, 11109.25],borderColor:"#990f3d",backgroundColor:"#990f3d22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"TQQQ (RSI)",data:[10000.0, 11182.92, 12507.31, 16353.87],borderColor:"#0a7c42",backgroundColor:"#0a7c4222",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"TQQQ (Bollinger)",data:[10000.0, 11034.89, 9033.81, 7541.87, 6136.62, 7975.04, 8895.44, 9907.93, 10269.08],borderColor:"#1565c0",backgroundColor:"#1565c022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"TQQQ (MA Dip)",data:[10000.0, 11333.03, 12588.13, 14265.56, 11909.59, 13409.03, 9919.95, 12970.78, 14817.06, 16579.41, 17919.03],borderColor:"#b86e00",backgroundColor:"#b86e0022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"UPRO (ATH)",data:[10000.0, 11297.15, 12579.93, 10058.18, 12646.38, 14236.65, 15708.68],borderColor:"#6a1b9a",backgroundColor:"#6a1b9a22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"UPRO (RSI)",data:[10000.0, 11073.19, 13922.58],borderColor:"#00838f",backgroundColor:"#00838f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"UPRO (Bollinger)",data:[10000.0, 11121.02, 12434.7, 13904.19, 15483.75, 12852.57, 14231.91, 11732.37, 14819.57, 16469.19, 18213.96, 19373.6],borderColor:"#c62828",backgroundColor:"#c6282822",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"UPRO (MA Dip)",data:[10000.0, 11429.89, 9138.68, 11490.27, 12943.15],borderColor:"#37474f",backgroundColor:"#37474f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"SOXL (ATH)",data:[10000.0, 11004.69, 12645.57, 10539.45, 12808.28, 14491.06, 16498.8, 18155.62, 20215.91, 17015.84, 12059.35, 18778.2, 23596.1, 19736.65, 22763.26, 26510.74],borderColor:"#990f3d",backgroundColor:"#990f3d22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"SOXL (RSI)",data:[10000.0, 7758.28, 10983.88],borderColor:"#0a7c42",backgroundColor:"#0a7c4222",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"SOXL (Bollinger)",data:[10000.0, 7642.47, 8424.68, 5909.05, 7298.16, 8309.32, 9143.75, 7696.34, 5454.5, 8152.51, 9484.46, 10964.75],borderColor:"#1565c0",backgroundColor:"#1565c022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"SOXL (MA Dip)",data:[10000.0, 11607.32, 13192.13, 9252.92, 10602.88, 12085.31, 13828.51, 10647.53, 11937.46, 13139.46, 14959.93, 16824.02, 18699.25, 20821.23, 17012.93, 14451.78, 16300.26, 13195.87, 9448.96, 14122.79, 17746.25, 19742.6, 22967.99, 26490.12],borderColor:"#b86e00",backgroundColor:"#b86e0022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"TNA (ATH)",data:[10000.0, 11051.98, 12665.5, 14205.38, 11873.83, 9976.77, 11567.41],borderColor:"#6a1b9a",backgroundColor:"#6a1b9a22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"TQQQ (ATH)",data:[10000.0, 11193.17, 9321.44, 10563.56, 11885.28, 9922.42, 8073.61, 9273.16, 10278.72, 11109.24],borderColor:"#2563eb",backgroundColor:"#2563eb22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"TQQQ (RSI)",data:[10000.0, 11182.93, 12507.31, 16353.87],borderColor:"#0a7c42",backgroundColor:"#0a7c4222",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"TQQQ (Bollinger)",data:[10000.0, 11034.89, 9033.81, 7541.87, 6136.62, 7975.04, 8895.44, 9907.92, 10269.07],borderColor:"#1565c0",backgroundColor:"#1565c022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"TQQQ (MA Dip)",data:[10000.0, 11333.03, 12588.13, 14265.56, 11909.59, 13409.03, 9919.95, 12970.78, 14817.07, 16579.42, 17919.04],borderColor:"#b86e00",backgroundColor:"#b86e0022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"UPRO (ATH)",data:[10000.0, 11297.15, 12579.93, 10058.17, 12646.37, 14236.64, 15708.67],borderColor:"#6a1b9a",backgroundColor:"#6a1b9a22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"UPRO (RSI)",data:[10000.0, 11073.19, 13922.57],borderColor:"#00838f",backgroundColor:"#00838f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"UPRO (Bollinger)",data:[10000.0, 11121.03, 12434.71, 13904.19, 15483.75, 12852.57, 14231.9, 11732.36, 14819.56, 16469.18, 18213.95, 19373.59],borderColor:"#c62828",backgroundColor:"#c6282822",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"UPRO (MA Dip)",data:[10000.0, 11429.9, 9138.68, 11490.27, 12943.14],borderColor:"#37474f",backgroundColor:"#37474f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"SOXL (ATH)",data:[10000.0, 11004.7, 12645.58, 10539.45, 12808.28, 14491.05, 16498.79, 18155.62, 20215.9, 17015.83, 12059.35, 18778.19, 23596.08, 19736.63, 22763.24, 26510.72],borderColor:"#2563eb",backgroundColor:"#2563eb22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"SOXL (RSI)",data:[10000.0, 7758.28, 10983.87],borderColor:"#0a7c42",backgroundColor:"#0a7c4222",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"SOXL (Bollinger)",data:[10000.0, 7642.47, 8424.67, 5909.05, 7298.16, 8309.32, 9143.75, 7696.34, 5454.5, 8152.51, 9484.46, 10964.75],borderColor:"#1565c0",backgroundColor:"#1565c022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"SOXL (MA Dip)",data:[10000.0, 11607.33, 13192.13, 9252.93, 10602.89, 12085.33, 13828.51, 10647.53, 11937.47, 13139.46, 14959.94, 16824.02, 18699.26, 20821.23, 17012.93, 14451.77, 16300.26, 13195.87, 9448.96, 14122.79, 17746.25, 19742.6, 22967.98, 26490.12],borderColor:"#b86e00",backgroundColor:"#b86e0022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"TNA (ATH)",data:[10000.0, 11051.98, 12665.51, 14205.39, 11873.83, 9976.78, 11567.42],borderColor:"#6a1b9a",backgroundColor:"#6a1b9a22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
       {label:"TNA (RSI)",data:[10000.0, 8358.68, 9430.26, 7923.6, 9944.16],borderColor:"#00838f",backgroundColor:"#00838f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"TNA (Bollinger)",data:[10000.0, 11082.59, 12738.55, 14287.32, 12047.8, 10122.94, 12704.35, 14812.87, 16378.05, 18143.06],borderColor:"#c62828",backgroundColor:"#c6282822",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"TNA (MA Dip)",data:[10000.0, 11215.81, 9457.74, 6954.22, 7931.78, 9050.11, 10046.24, 11647.97],borderColor:"#37474f",backgroundColor:"#37474f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"TECL (ATH)",data:[10000.0, 11137.48, 8694.37, 9673.4, 7934.2, 6366.29, 7399.11, 8216.1, 9149.43],borderColor:"#990f3d",backgroundColor:"#990f3d22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"TECL (RSI)",data:[10000.0, 11137.48, 8936.57, 11917.7],borderColor:"#0a7c42",backgroundColor:"#0a7c4222",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"TECL (Bollinger)",data:[10000.0, 8297.98, 9361.65, 7909.79, 8726.36, 10035.07, 11694.42, 9591.85, 7696.38, 10263.79, 11397.1, 12894.06, 14358.79],borderColor:"#1565c0",backgroundColor:"#1565c022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"TECL (MA Dip)",data:[10000.0, 11187.03, 8724.59, 9601.45, 10592.24, 11700.29, 13034.48, 10690.98, 11772.9, 9013.13, 12199.38, 13427.03, 15820.09, 17848.25, 19849.6, 22104.46],borderColor:"#b86e00",backgroundColor:"#b86e0022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"FAS (ATH)",data:[10000.0, 11064.1, 12183.87, 14689.55],borderColor:"#6a1b9a",backgroundColor:"#6a1b9a22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"FAS (RSI)",data:[10000.0, 11235.03, 13545.58],borderColor:"#00838f",backgroundColor:"#00838f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"FAS (Bollinger)",data:[10000.0, 11205.69, 12341.63, 13654.9, 15524.8, 13019.42, 14627.36, 17635.57, 19538.32, 22012.92, 25443.99, 24783.98],borderColor:"#c62828",backgroundColor:"#c6282822",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"TNA (Bollinger)",data:[10000.0, 11082.59, 12738.56, 14287.33, 12047.8, 10122.95, 12704.35, 14812.87, 16378.05, 18143.06],borderColor:"#c62828",backgroundColor:"#c6282822",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"TNA (MA Dip)",data:[10000.0, 11215.81, 9457.74, 6954.22, 7931.77, 9050.11, 10046.24, 11647.96],borderColor:"#37474f",backgroundColor:"#37474f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"TECL (ATH)",data:[10000.0, 11137.48, 8694.37, 9673.4, 7934.2, 6366.3, 7399.11, 8216.1, 9149.43],borderColor:"#2563eb",backgroundColor:"#2563eb22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"TECL (RSI)",data:[10000.0, 11137.48, 8936.57, 11917.69],borderColor:"#0a7c42",backgroundColor:"#0a7c4222",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"TECL (Bollinger)",data:[10000.0, 8297.98, 9361.66, 7909.8, 8726.36, 10035.07, 11694.43, 9591.86, 7696.38, 10263.79, 11397.1, 12894.06, 14358.79],borderColor:"#1565c0",backgroundColor:"#1565c022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"TECL (MA Dip)",data:[10000.0, 11187.03, 8724.59, 9601.45, 10592.23, 11700.28, 13034.48, 10690.98, 11772.9, 9013.13, 12199.38, 13427.04, 15820.1, 17848.26, 19849.61, 22104.47],borderColor:"#b86e00",backgroundColor:"#b86e0022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"FAS (ATH)",data:[10000.0, 11064.1, 12183.87, 14689.56],borderColor:"#6a1b9a",backgroundColor:"#6a1b9a22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"FAS (RSI)",data:[10000.0, 11235.03, 13545.59],borderColor:"#00838f",backgroundColor:"#00838f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"FAS (Bollinger)",data:[10000.0, 11205.69, 12341.62, 13654.9, 15524.8, 13019.42, 14627.36, 17635.57, 19538.32, 22012.91, 25443.99, 24783.98],borderColor:"#c62828",backgroundColor:"#c6282822",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
       {label:"FAS (MA Dip)",data:[10000.0, 11369.4, 12520.07, 9771.38, 11859.07, 13261.7, 14715.47],borderColor:"#37474f",backgroundColor:"#37474f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"LABU (ATH)",data:[10000.0, 8322.67, 9521.73, 10491.49, 7931.51, 9663.26],borderColor:"#990f3d",backgroundColor:"#990f3d22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"LABU (RSI)",data:[10000.0, 11383.56, 9417.36, 10791.45],borderColor:"#0a7c42",backgroundColor:"#0a7c4222",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"LABU (Bollinger)",data:[10000.0, 8377.48, 9536.55, 10614.43, 12143.66, 13380.46, 10617.41, 8783.54, 10065.15, 11263.26],borderColor:"#1565c0",backgroundColor:"#1565c022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"LABU (MA Dip)",data:[10000.0, 11292.95, 13011.11, 14885.63, 12630.48, 14267.22, 15939.88, 11850.03, 9803.26, 11233.65, 12360.83, 10297.89, 11831.62],borderColor:"#b86e00",backgroundColor:"#b86e0022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"LABU (ATH)",data:[10000.0, 8322.68, 9521.73, 10491.49, 7931.51, 9663.25],borderColor:"#2563eb",backgroundColor:"#2563eb22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"LABU (RSI)",data:[10000.0, 11383.57, 9417.37, 10791.46],borderColor:"#0a7c42",backgroundColor:"#0a7c4222",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"LABU (Bollinger)",data:[10000.0, 8377.48, 9536.56, 10614.44, 12143.66, 13380.47, 10617.42, 8783.55, 10065.16, 11263.27],borderColor:"#1565c0",backgroundColor:"#1565c022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"LABU (MA Dip)",data:[10000.0, 11292.95, 13011.11, 14885.63, 12630.47, 14267.21, 15939.86, 11850.02, 9803.25, 11233.64, 12360.82, 10297.89, 11831.61],borderColor:"#b86e00",backgroundColor:"#b86e0022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
       {label:"UCO (ATH)",data:[10000.0, 11010.72, 12637.81, 13974.03, 15505.76, 12410.78, 13696.23, 15182.17, 16984.09, 19096.02],borderColor:"#6a1b9a",backgroundColor:"#6a1b9a22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
       {label:"UCO (RSI)",data:[10000.0, 11060.93],borderColor:"#00838f",backgroundColor:"#00838f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
       {label:"UCO (Bollinger)",data:[10000.0, 11050.97, 9092.96, 10054.38, 8369.83, 9257.81, 10216.69, 11365.13, 12736.16],borderColor:"#c62828",backgroundColor:"#c6282822",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
@@ -835,7 +830,7 @@ new Chart(ctx, {
     maintainAspectRatio: false,
     interaction: { mode: 'index', intersect: false },
     plugins: {
-      title: { display: true, text: 'Equity Curve — $10,000 Starting Capital', font: { size: 16, family: 'Playfair Display' } },
+      title: { display: true, text: 'Equity Curve — $10,000 Starting Capital', font: { size: 16, family: 'Inter' } },
       tooltip: {
         callbacks: {
           label: function(ctx) {
