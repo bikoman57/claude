@@ -7,7 +7,12 @@ import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
 
-from app.scheduler.html_report import build_html_report, build_index_html
+from app.scheduler.html_report import (
+    build_forecasts_html,
+    build_html_report,
+    build_index_html,
+    build_trade_logs_html,
+)
 from app.scheduler.runner import SchedulerRun
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[3]
@@ -57,6 +62,21 @@ def write_report(
     report_html = build_html_report(run, date=report_date)
     report_path = _REPORTS_DIR / f"{report_date}.html"
     report_path.write_text(report_html, encoding="utf-8")
+
+    # Generate trade logs page from backtest data
+    outputs: dict[str, str] = {}
+    for result in run.results:
+        if result.success and result.output.strip():
+            outputs[result.name] = result.output.strip()
+    trade_logs_html = build_trade_logs_html(outputs, date=report_date)
+    if trade_logs_html:
+        trade_logs_path = _REPORTS_DIR / f"trade-logs-{report_date}.html"
+        trade_logs_path.write_text(trade_logs_html, encoding="utf-8")
+
+    forecasts_html = build_forecasts_html(outputs, date=report_date)
+    if forecasts_html:
+        forecasts_path = _REPORTS_DIR / f"forecasts-{report_date}.html"
+        forecasts_path.write_text(forecasts_html, encoding="utf-8")
 
     all_dates = _discover_report_dates()
     index_html = build_index_html(all_dates)

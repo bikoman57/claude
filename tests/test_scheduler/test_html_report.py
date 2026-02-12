@@ -5,7 +5,12 @@ import subprocess as sp
 from pathlib import Path
 from unittest.mock import patch
 
-from app.scheduler.html_report import build_html_report, build_index_html
+from app.scheduler.html_report import (
+    build_forecasts_html,
+    build_html_report,
+    build_index_html,
+    build_trade_logs_html,
+)
 from app.scheduler.publisher import (
     _discover_report_dates,
     git_publish,
@@ -855,6 +860,9 @@ def test_build_html_report_strategy_entry_exit_details():
         [
             {
                 "leveraged_ticker": "SOXL",
+                "strategy_type": "rsi_oversold",
+                "strategy_description": "Buy when RSI(14) drops below threshold",
+                "threshold_label": "RSI level",
                 "improvement_reason": "Better Sharpe",
                 "backtest_sharpe": 1.80,
                 "backtest_win_rate": 0.70,
@@ -862,7 +870,7 @@ def test_build_html_report_strategy_entry_exit_details():
                 "backtest_trade_count": 12,
                 "backtest_max_drawdown": -0.18,
                 "backtest_total_days": 480,
-                "proposed_threshold": 0.10,
+                "proposed_threshold": 30.0,
                 "current_threshold": 0.05,
                 "proposed_target": 0.15,
                 "current_target": 0.10,
@@ -874,17 +882,25 @@ def test_build_html_report_strategy_entry_exit_details():
     assert "Avg Hold" in html
     assert "~40d" in html  # 480 / 12 = 40 days
     assert "strategy-entry-exit" in html
-    assert "buy at 10% drawdown from ATH" in html
-    assert "current: 5%" in html
+    assert "RSI level" in html
+    assert "RSI" in html
     assert "+15% profit target" in html
     assert "current: +10%" in html
 
 
 def test_build_html_report_nav_menu():
-    """Report includes a sticky navigation menu with section links."""
+    """Report includes unified nav with cross-page and section links."""
     run = _make_run()
     html = build_html_report(run, date="2026-01-15")
     assert "nav-menu" in html
+    # Cross-page links
+    assert "2026-01-15.html" in html
+    assert "trade-logs-2026-01-15.html" in html
+    assert "forecasts-2026-01-15.html" in html
+    assert "../index.html" in html
+    # Dashboard should be active
+    assert "nav-active" in html
+    # Section anchors (only on dashboard)
     assert 'href="#signals"' in html
     assert 'href="#sentiment"' in html
     assert 'href="#market"' in html
@@ -892,7 +908,7 @@ def test_build_html_report_nav_menu():
     assert 'href="#strategy"' in html
     assert 'href="#research"' in html
     assert 'href="#modules"' in html
-    assert 'aria-label="Report sections"' in html
+    assert 'aria-label="Report navigation"' in html
 
 
 def test_build_html_report_section_ids():
@@ -1135,6 +1151,247 @@ def test_nojekyll_created(tmp_path, monkeypatch):
     assert (tmp_path / "docs" / ".nojekyll").exists()
 
 
+# --- Trade logs page tests ---
+
+
+def test_build_trade_logs_html_with_data():
+    """Trade logs page generates with equity chart and trade table."""
+    backtest_data = json.dumps(
+        [
+            {
+                "leveraged_ticker": "TQQQ",
+                "underlying_ticker": "QQQ",
+                "leverage": 3.0,
+                "entry_threshold": 0.05,
+                "profit_target": 0.10,
+                "period": "2y",
+                "total_days": 500,
+                "total_return": 0.35,
+                "sharpe_ratio": 1.5,
+                "win_rate": 0.7,
+                "max_drawdown": 0.12,
+                "avg_gain": 0.08,
+                "avg_loss": -0.04,
+                "trade_count": 5,
+                "trades": [
+                    {
+                        "entry_day": 10,
+                        "exit_day": 30,
+                        "entry_price": 450.0,
+                        "exit_price": 470.0,
+                        "drawdown_at_entry": 0.06,
+                        "leveraged_return": 0.12,
+                        "exit_reason": "target",
+                    },
+                    {
+                        "entry_day": 50,
+                        "exit_day": 80,
+                        "entry_price": 440.0,
+                        "exit_price": 420.0,
+                        "drawdown_at_entry": 0.08,
+                        "leveraged_return": -0.05,
+                        "exit_reason": "stop",
+                    },
+                ],
+                "equity_curve": [10000.0, 11200.0, 10640.0],
+            },
+        ]
+    )
+    outputs = {"strategy.backtest-all": backtest_data}
+    result = build_trade_logs_html(outputs, date="2026-01-15")
+    assert "<!DOCTYPE html>" in result
+    assert "equityChart" in result
+    assert "chart.js" in result.lower() or "Chart" in result
+    assert "TQQQ" in result
+    assert "QQQ" in result
+    assert "$450.00" in result
+    assert "$470.00" in result
+    assert "TARGET" in result
+    assert "Trade Logs" in result
+    assert "Equity Curve" in result
+    assert "10000" in result
+    assert "11200" in result
+
+
+def test_build_trade_logs_html_empty():
+    """Trade logs returns empty string when no backtest data."""
+    result = build_trade_logs_html({}, date="2026-01-15")
+    assert result == ""
+
+
+def test_build_trade_logs_html_summary_table():
+    """Trade logs page has a summary table with key metrics."""
+    backtest_data = json.dumps(
+        [
+            {
+                "leveraged_ticker": "UPRO",
+                "underlying_ticker": "SPY",
+                "leverage": 3.0,
+                "entry_threshold": 0.05,
+                "profit_target": 0.10,
+                "period": "2y",
+                "total_days": 500,
+                "total_return": 0.25,
+                "sharpe_ratio": 1.2,
+                "win_rate": 0.65,
+                "max_drawdown": 0.10,
+                "trade_count": 8,
+                "trades": [],
+                "equity_curve": [10000.0],
+            },
+        ]
+    )
+    outputs = {"strategy.backtest-all": backtest_data}
+    result = build_trade_logs_html(outputs, date="2026-01-15")
+    assert "Strategy Performance Summary" in result
+    assert "UPRO" in result
+    assert "SPY" in result
+    assert "1.200" in result  # sharpe
+    assert "65.0%" in result  # win rate
+    assert "+25.0%" in result  # total return
+
+
+def test_build_trade_logs_html_multiple_etfs():
+    """Trade logs page shows multiple ETF equity curves."""
+    backtest_data = json.dumps(
+        [
+            {
+                "leveraged_ticker": "TQQQ",
+                "underlying_ticker": "QQQ",
+                "leverage": 3.0,
+                "entry_threshold": 0.05,
+                "profit_target": 0.10,
+                "period": "2y",
+                "total_days": 500,
+                "total_return": 0.35,
+                "sharpe_ratio": 1.5,
+                "win_rate": 0.7,
+                "max_drawdown": 0.12,
+                "trade_count": 3,
+                "trades": [],
+                "equity_curve": [10000.0, 11000.0, 12000.0],
+            },
+            {
+                "leveraged_ticker": "SOXL",
+                "underlying_ticker": "SOXX",
+                "leverage": 3.0,
+                "entry_threshold": 0.08,
+                "profit_target": 0.10,
+                "period": "2y",
+                "total_days": 500,
+                "total_return": 0.50,
+                "sharpe_ratio": 1.8,
+                "win_rate": 0.75,
+                "max_drawdown": 0.15,
+                "trade_count": 4,
+                "trades": [],
+                "equity_curve": [10000.0, 11500.0, 13000.0, 15000.0],
+            },
+        ]
+    )
+    outputs = {"strategy.backtest-all": backtest_data}
+    result = build_trade_logs_html(outputs, date="2026-01-15")
+    assert "TQQQ" in result
+    assert "SOXL" in result
+    # Both should be in chart datasets
+    assert "12000" in result
+    assert "15000" in result
+
+
+# --- Market-Moving Events tests ---
+
+
+def test_build_html_report_market_risks_section():
+    """Market risks section shows when geopolitical events exist."""
+    data = json.dumps(
+        {
+            "risk_level": "MEDIUM",
+            "total_events": 30,
+            "high_impact_count": 2,
+            "events_by_category": {
+                "TRADE_WAR": 15,
+                "MILITARY": 10,
+                "SANCTIONS": 5,
+            },
+            "affected_sectors": {"tech": 20, "energy": 10},
+        }
+    )
+    run = _make_run([_ok("geopolitical.summary", data)])
+    html = build_html_report(run, date="2026-01-15")
+    assert "Market-Moving Events" in html
+    assert 'id="risks"' in html
+    assert "Trade Wars" in html
+    assert "Military Conflicts" in html
+    assert "Economic Sanctions" in html
+    assert "TQQQ" in html  # affected ETF badge
+    assert "supply chain" in html.lower() or "tariff" in html.lower()
+
+
+def test_build_html_report_market_risks_empty():
+    """Market risks section hidden when no geopolitical data."""
+    run = _make_run()
+    html = build_html_report(run, date="2026-01-15")
+    assert "Market-Moving Events" not in html
+
+
+def test_build_html_report_nav_has_risks_link():
+    """Nav menu includes risks link."""
+    run = _make_run()
+    html = build_html_report(run, date="2026-01-15")
+    assert 'href="#risks"' in html
+
+
+def test_build_html_report_trade_logs_link():
+    """Nav includes link to trade logs page."""
+    run = _make_run()
+    html = build_html_report(run, date="2026-01-15")
+    assert "trade-logs-2026-01-15.html" in html
+    assert "Trade Logs" in html
+
+
+# --- Publisher trade logs test ---
+
+
+def test_write_report_generates_trade_logs(tmp_path, monkeypatch):
+    """Publisher generates trade-logs HTML alongside the report."""
+    monkeypatch.setattr(
+        "app.scheduler.publisher._DOCS_DIR",
+        tmp_path / "docs",
+    )
+    monkeypatch.setattr(
+        "app.scheduler.publisher._REPORTS_DIR",
+        tmp_path / "docs" / "reports",
+    )
+    backtest_data = json.dumps(
+        [
+            {
+                "leveraged_ticker": "TQQQ",
+                "underlying_ticker": "QQQ",
+                "leverage": 3.0,
+                "entry_threshold": 0.05,
+                "profit_target": 0.10,
+                "period": "2y",
+                "total_days": 500,
+                "total_return": 0.35,
+                "sharpe_ratio": 1.5,
+                "win_rate": 0.7,
+                "max_drawdown": 0.12,
+                "trade_count": 3,
+                "trades": [],
+                "equity_curve": [10000.0, 11000.0, 12000.0],
+            },
+        ]
+    )
+    run = _make_run([_ok("strategy.backtest-all", backtest_data)])
+    write_report(run, date="2026-01-15")
+
+    trade_logs_path = tmp_path / "docs" / "reports" / "trade-logs-2026-01-15.html"
+    assert trade_logs_path.exists()
+    content = trade_logs_path.read_text()
+    assert "TQQQ" in content
+    assert "equityChart" in content
+
+
 # --- Git publish tests ---
 
 
@@ -1160,3 +1417,190 @@ def test_git_publish_failure(monkeypatch):
     ):
         result = git_publish()
     assert result is False
+
+
+# --- Trade logs nav bar test ---
+
+
+def test_build_trade_logs_html_has_nav():
+    """Trade logs page should include unified nav bar."""
+    data = json.dumps(
+        [
+            {
+                "leveraged_ticker": "TQQQ",
+                "underlying_ticker": "QQQ",
+                "strategy_type": "ath_mean_reversion",
+                "leverage": 3.0,
+                "entry_threshold": 0.05,
+                "profit_target": 0.10,
+                "period": "2y",
+                "total_days": 500,
+                "total_return": 0.25,
+                "sharpe_ratio": 1.2,
+                "win_rate": 0.65,
+                "max_drawdown": 0.10,
+                "trade_count": 2,
+                "trades": [
+                    {
+                        "entry_day": 10,
+                        "exit_day": 20,
+                        "entry_date": "2024-06-15",
+                        "exit_date": "2024-06-28",
+                        "entry_price": 100.0,
+                        "exit_price": 110.0,
+                        "drawdown_at_entry": 0.06,
+                        "leveraged_return": 0.30,
+                        "exit_reason": "target",
+                    },
+                ],
+                "equity_curve": [10000.0, 13000.0],
+            },
+        ]
+    )
+    outputs = {"strategy.backtest-all": data}
+    html = build_trade_logs_html(outputs, date="2026-02-12")
+    assert html
+    assert "nav-menu" in html
+    assert "2026-02-12.html" in html  # Dashboard link
+    assert "forecasts-2026-02-12.html" in html  # Forecasts link
+    # Date columns should show actual dates
+    assert "2024-06-15" in html
+    assert "2024-06-28" in html
+    assert "Entry Date" in html
+
+
+# --- Forecasts page tests ---
+
+
+def test_build_forecasts_html_basic():
+    """Forecasts page should render forecast table."""
+    forecast_data = json.dumps(
+        {
+            "date": "2026-02-12",
+            "forecasts": [
+                {
+                    "leveraged_ticker": "TQQQ",
+                    "underlying_ticker": "QQQ",
+                    "signal_state": "SIGNAL",
+                    "current_drawdown_pct": -0.06,
+                    "confidence_level": "MEDIUM",
+                    "entry_probability": 0.72,
+                    "expected_return_pct": 0.025,
+                    "expected_hold_days": 12,
+                    "best_strategy": "ath_mean_reversion",
+                    "factor_scores": {},
+                },
+                {
+                    "leveraged_ticker": "UPRO",
+                    "underlying_ticker": "SPY",
+                    "signal_state": "WATCH",
+                    "current_drawdown_pct": -0.02,
+                    "confidence_level": "LOW",
+                    "entry_probability": 0.18,
+                    "expected_return_pct": -0.08,
+                    "expected_hold_days": 20,
+                    "best_strategy": "rsi_oversold",
+                    "factor_scores": {},
+                },
+            ],
+            "actionable_count": 1,
+        }
+    )
+    outputs = {"strategy.forecast": forecast_data}
+    html = build_forecasts_html(outputs, date="2026-02-12")
+    assert html
+    assert "TQQQ" in html
+    assert "UPRO" in html
+    assert "nav-menu" in html
+    assert "Forecast Predictions" in html
+    assert "Entry Prob" in html
+    assert "actionable" in html
+
+
+def test_build_forecasts_html_with_accuracy():
+    """Forecasts page should show accuracy KPIs when data available."""
+    forecast_data = json.dumps(
+        {
+            "date": "2026-02-12",
+            "forecasts": [
+                {
+                    "leveraged_ticker": "TQQQ",
+                    "underlying_ticker": "QQQ",
+                    "signal_state": "SIGNAL",
+                    "current_drawdown_pct": -0.06,
+                    "confidence_level": "MEDIUM",
+                    "entry_probability": 0.72,
+                    "expected_return_pct": 0.025,
+                    "expected_hold_days": 12,
+                    "best_strategy": "ath_mean_reversion",
+                    "factor_scores": {},
+                },
+            ],
+            "actionable_count": 1,
+        }
+    )
+    accuracy_data = json.dumps(
+        {
+            "total_verifications": 20,
+            "correct_count": 14,
+            "hit_rate": 0.70,
+            "recent_hit_rate": 0.80,
+            "trend": "IMPROVING",
+        }
+    )
+    outputs = {
+        "strategy.forecast": forecast_data,
+        "strategy.verify": accuracy_data,
+    }
+    html = build_forecasts_html(outputs, date="2026-02-12")
+    assert html
+    assert "Forecast Accuracy" in html
+    assert "Hit Rate" in html
+    assert "Trend" in html
+    # IMPROVING maps to TARGET badge (green)
+    assert "badge-green" in html
+
+
+def test_build_forecasts_html_empty():
+    """Empty forecast data should return empty string."""
+    html = build_forecasts_html({}, date="2026-02-12")
+    assert html == ""
+
+
+def test_write_report_generates_forecasts(tmp_path, monkeypatch):
+    """Publisher generates forecasts HTML alongside the report."""
+    monkeypatch.setattr(
+        "app.scheduler.publisher._DOCS_DIR",
+        tmp_path / "docs",
+    )
+    monkeypatch.setattr(
+        "app.scheduler.publisher._REPORTS_DIR",
+        tmp_path / "docs" / "reports",
+    )
+    forecast_data = json.dumps(
+        {
+            "date": "2026-01-15",
+            "forecasts": [
+                {
+                    "leveraged_ticker": "TQQQ",
+                    "underlying_ticker": "QQQ",
+                    "signal_state": "SIGNAL",
+                    "current_drawdown_pct": -0.06,
+                    "confidence_level": "MEDIUM",
+                    "entry_probability": 0.72,
+                    "expected_return_pct": 0.025,
+                    "expected_hold_days": 12,
+                    "best_strategy": "ath_mean_reversion",
+                    "factor_scores": {},
+                },
+            ],
+            "actionable_count": 1,
+        }
+    )
+    run = _make_run([_ok("strategy.forecast", forecast_data)])
+    write_report(run, date="2026-01-15")
+
+    forecasts_path = tmp_path / "docs" / "reports" / "forecasts-2026-01-15.html"
+    assert forecasts_path.exists()
+    content = forecasts_path.read_text()
+    assert "TQQQ" in content

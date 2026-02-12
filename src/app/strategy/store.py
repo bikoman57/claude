@@ -37,7 +37,20 @@ def load_backtest(path: Path) -> BacktestResult:
     data = json.loads(path.read_text())
 
     config = BacktestConfig(**data["config"])
-    trades = tuple(BacktestTrade(**t) for t in data["trades"])
+    trades = tuple(
+        BacktestTrade(
+            entry_day=t["entry_day"],
+            exit_day=t["exit_day"],
+            entry_price=t["entry_price"],
+            exit_price=t["exit_price"],
+            drawdown_at_entry=t["drawdown_at_entry"],
+            leveraged_return=t["leveraged_return"],
+            exit_reason=t["exit_reason"],
+            entry_date=t.get("entry_date", ""),
+            exit_date=t.get("exit_date", ""),
+        )
+        for t in data["trades"]
+    )
 
     return BacktestResult(
         config=config,

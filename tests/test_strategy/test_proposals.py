@@ -3,7 +3,12 @@ from __future__ import annotations
 from unittest.mock import patch
 
 from app.etf.universe import ETFMapping
-from app.strategy.backtest import BacktestConfig, BacktestResult, BacktestTrade
+from app.strategy.backtest import (
+    BacktestConfig,
+    BacktestResult,
+    BacktestTrade,
+    StrategyType,
+)
 from app.strategy.proposals import (
     PerETFBreakdown,
     StrategyProposal,
@@ -33,6 +38,7 @@ def _make_result(
     win_rate: float | None = 0.7,
     total_return: float = 0.25,
     trade_count: int = 5,
+    strategy_type: str = StrategyType.ATH_MEAN_REVERSION,
 ) -> BacktestResult:
     config = BacktestConfig(
         underlying_ticker="QQQ",
@@ -41,6 +47,7 @@ def _make_result(
         profit_target=target,
         stop_loss=0.15,
         period="2y",
+        strategy_type=strategy_type,
     )
     trades = tuple(
         BacktestTrade(
@@ -70,6 +77,9 @@ def _make_result(
 def test_proposal_dataclass():
     p = StrategyProposal(
         leveraged_ticker="TQQQ",
+        strategy_type="ath_mean_reversion",
+        strategy_description="Buy when underlying draws down from ATH",
+        threshold_label="drawdown %",
         current_threshold=0.05,
         proposed_threshold=0.07,
         current_target=0.10,
@@ -78,8 +88,15 @@ def test_proposal_dataclass():
         backtest_sharpe=1.5,
         backtest_win_rate=0.7,
         backtest_total_return=0.25,
+        backtest_trade_count=5,
+        backtest_max_drawdown=0.10,
+        backtest_total_days=500,
+        backtest_avg_gain=0.08,
+        backtest_avg_loss=-0.03,
+        backtest_period="2y",
     )
     assert p.proposed_threshold == 0.07
+    assert p.strategy_type == "ath_mean_reversion"
 
 
 def test_per_etf_breakdown_dataclass():
@@ -90,9 +107,11 @@ def test_per_etf_breakdown_dataclass():
         best_result=result,
         best_threshold=0.05,
         best_target=0.10,
+        best_strategy_type="ath_mean_reversion",
     )
     assert breakdown.best_threshold == 0.05
     assert len(breakdown.results) == 1
+    assert breakdown.best_strategy_type == "ath_mean_reversion"
 
 
 def test_make_proposal_no_change():
@@ -105,6 +124,7 @@ def test_make_proposal_no_change():
         best_result=result,
         best_threshold=0.05,
         best_target=0.10,
+        best_strategy_type="ath_mean_reversion",
     )
     proposal = _make_proposal(mapping, breakdown)
     assert proposal is None
@@ -120,11 +140,12 @@ def test_make_proposal_different_threshold():
         best_result=result,
         best_threshold=0.07,
         best_target=0.10,
+        best_strategy_type="ath_mean_reversion",
     )
     proposal = _make_proposal(mapping, breakdown)
     assert proposal is not None
     assert proposal.proposed_threshold == 0.07
-    assert "entry" in proposal.improvement_reason
+    assert "drawdown" in proposal.improvement_reason
 
 
 def test_make_proposal_different_target():
@@ -137,11 +158,35 @@ def test_make_proposal_different_target():
         best_result=result,
         best_threshold=0.05,
         best_target=0.15,
+        best_strategy_type="ath_mean_reversion",
     )
     proposal = _make_proposal(mapping, breakdown)
     assert proposal is not None
     assert proposal.proposed_target == 0.15
     assert "target" in proposal.improvement_reason
+
+
+def test_make_proposal_different_strategy():
+    """Different strategy type → proposal generated even if params same."""
+    mapping = _make_mapping(drawdown_threshold=0.05, profit_target=0.10)
+    result = _make_result(
+        threshold=30.0,
+        target=0.10,
+        sharpe=2.0,
+        strategy_type=StrategyType.RSI_OVERSOLD,
+    )
+    breakdown = PerETFBreakdown(
+        mapping=mapping,
+        results=(result,),
+        best_result=result,
+        best_threshold=30.0,
+        best_target=0.10,
+        best_strategy_type="rsi_oversold",
+    )
+    proposal = _make_proposal(mapping, breakdown)
+    assert proposal is not None
+    assert proposal.strategy_type == "rsi_oversold"
+    assert "RSI" in proposal.threshold_label
 
 
 def test_make_proposal_no_best():
@@ -153,6 +198,7 @@ def test_make_proposal_no_best():
         best_result=None,
         best_threshold=None,
         best_target=None,
+        best_strategy_type=None,
     )
     proposal = _make_proposal(mapping, breakdown)
     assert proposal is None
@@ -160,19 +206,23 @@ def test_make_proposal_no_best():
 
 @patch("app.strategy.proposals.run_backtest")
 def test_optimize_single_etf(mock_run):
-    """Test optimization picks best Sharpe."""
+    """Test optimization picks best Sharpe across strategies."""
     low_sharpe = _make_result(threshold=0.03, sharpe=0.5)
-    high_sharpe = _make_result(threshold=0.07, sharpe=2.0)
+    high_sharpe = _make_result(
+        threshold=30.0,
+        sharpe=2.5,
+        strategy_type=StrategyType.RSI_OVERSOLD,
+    )
 
-    results_iter = iter([low_sharpe, high_sharpe] + [None] * 20)
+    results_iter = iter([low_sharpe, high_sharpe] + [None] * 100)
     mock_run.side_effect = lambda cfg: next(results_iter)
 
     mapping = _make_mapping()
     breakdown = optimize_single_etf(mapping)
 
     assert breakdown.best_result is not None
-    assert breakdown.best_result.sharpe_ratio == 2.0
-    assert breakdown.best_threshold == 0.07
+    assert breakdown.best_result.sharpe_ratio == 2.5
+    assert breakdown.best_strategy_type == "rsi_oversold"
 
 
 @patch("app.strategy.proposals.run_backtest")
@@ -184,4 +234,5 @@ def test_optimize_all_none(mock_run):
 
     assert breakdown.best_result is None
     assert breakdown.best_threshold is None
+    assert breakdown.best_strategy_type is None
     assert len(breakdown.results) == 0

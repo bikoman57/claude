@@ -39,6 +39,18 @@ MODULE_COMMANDS: list[tuple[str, list[str]]] = [
         [sys.executable, "-m", "app.strategy", "proposals"],
     ),
     (
+        "strategy.backtest-all",
+        [sys.executable, "-m", "app.strategy", "backtest-all"],
+    ),
+    (
+        "strategy.forecast",
+        [sys.executable, "-m", "app.strategy", "forecast"],
+    ),
+    (
+        "strategy.verify",
+        [sys.executable, "-m", "app.strategy", "verify"],
+    ),
+    (
         "history.weights",
         [sys.executable, "-m", "app.history", "weights"],
     ),
@@ -90,8 +102,8 @@ def run_module(
         return ModuleResult(
             name=name,
             success=result.returncode == 0,
-            output=result.stdout[:5000],
-            error=result.stderr[:2000],
+            output=result.stdout[:500_000],
+            error=result.stderr[:5000],
             duration_seconds=duration,
         )
     except subprocess.TimeoutExpired:

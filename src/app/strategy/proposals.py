@@ -4,12 +4,38 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 
 from app.etf.universe import ETF_UNIVERSE, ETFMapping
-from app.strategy.backtest import BacktestConfig, BacktestResult, run_backtest
+from app.strategy.backtest import (
+    STRATEGY_DESCRIPTIONS,
+    THRESHOLD_LABELS,
+    BacktestConfig,
+    BacktestResult,
+    StrategyType,
+    run_backtest,
+)
 
-_THRESHOLDS = [0.03, 0.05, 0.07, 0.10, 0.12, 0.15]
-_PROFIT_TARGETS = [0.08, 0.10, 0.15]
 _STOP_LOSS = 0.15
 _PERIOD = "2y"
+
+# Per-strategy parameter grids
+# entry_threshold values to test per strategy type
+_STRATEGY_PARAMS: dict[StrategyType, dict[str, list[float]]] = {
+    StrategyType.ATH_MEAN_REVERSION: {
+        "thresholds": [0.03, 0.05, 0.07, 0.10, 0.12, 0.15],
+        "targets": [0.08, 0.10, 0.15],
+    },
+    StrategyType.RSI_OVERSOLD: {
+        "thresholds": [25.0, 30.0, 35.0],
+        "targets": [0.08, 0.10, 0.15],
+    },
+    StrategyType.BOLLINGER_LOWER: {
+        "thresholds": [1.5, 2.0, 2.5],
+        "targets": [0.08, 0.10, 0.15],
+    },
+    StrategyType.MA_DIP: {
+        "thresholds": [0.02, 0.03, 0.05, 0.07],
+        "targets": [0.08, 0.10, 0.15],
+    },
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -21,6 +47,7 @@ class PerETFBreakdown:
     best_result: BacktestResult | None
     best_threshold: float | None
     best_target: float | None
+    best_strategy_type: str | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -28,6 +55,9 @@ class StrategyProposal:
     """Proposed strategy change based on backtest results."""
 
     leveraged_ticker: str
+    strategy_type: str
+    strategy_description: str
+    threshold_label: str
     current_threshold: float
     proposed_threshold: float
     current_target: float
@@ -56,23 +86,30 @@ class ProposalsSummary:
 def optimize_single_etf(
     mapping: ETFMapping,
     period: str = _PERIOD,
+    strategy_types: list[StrategyType] | None = None,
 ) -> PerETFBreakdown:
-    """Test multiple thresholds and targets for one ETF."""
+    """Test multiple strategies, thresholds, and targets for one ETF."""
+    types_to_test = strategy_types or list(StrategyType)
     results: list[BacktestResult] = []
 
-    for threshold in _THRESHOLDS:
-        for target in _PROFIT_TARGETS:
-            config = BacktestConfig(
-                underlying_ticker=mapping.underlying_ticker,
-                leverage=mapping.leverage,
-                entry_threshold=threshold,
-                profit_target=target,
-                stop_loss=_STOP_LOSS,
-                period=period,
-            )
-            result = run_backtest(config)
-            if result is not None and result.trades:
-                results.append(result)
+    for stype in types_to_test:
+        params = _STRATEGY_PARAMS.get(stype)
+        if params is None:
+            continue
+        for threshold in params["thresholds"]:
+            for target in params["targets"]:
+                config = BacktestConfig(
+                    underlying_ticker=mapping.underlying_ticker,
+                    leverage=mapping.leverage,
+                    entry_threshold=threshold,
+                    profit_target=target,
+                    stop_loss=_STOP_LOSS,
+                    period=period,
+                    strategy_type=stype,
+                )
+                result = run_backtest(config)
+                if result is not None and result.trades:
+                    results.append(result)
 
     # Find best by Sharpe ratio, falling back to win rate
     best: BacktestResult | None = None
@@ -91,6 +128,7 @@ def optimize_single_etf(
         best_result=best,
         best_threshold=(best.config.entry_threshold if best is not None else None),
         best_target=(best.config.profit_target if best is not None else None),
+        best_strategy_type=(best.config.strategy_type if best is not None else None),
     )
 
 
@@ -98,24 +136,30 @@ def _make_proposal(
     mapping: ETFMapping,
     breakdown: PerETFBreakdown,
 ) -> StrategyProposal | None:
-    """Generate a proposal if backtest suggests different parameters."""
+    """Generate a proposal if backtest suggests different parameters or strategy."""
     best = breakdown.best_result
     if best is None:
         return None
+
+    stype = StrategyType(best.config.strategy_type)
+    is_different_strategy = stype != StrategyType.ATH_MEAN_REVERSION
 
     threshold_diff = abs(
         best.config.entry_threshold - mapping.drawdown_threshold,
     )
     target_diff = abs(best.config.profit_target - mapping.profit_target)
 
-    # Only propose if meaningfully different
-    if threshold_diff < 0.005 and target_diff < 0.005:
+    # Propose if different strategy OR meaningfully different parameters
+    if not is_different_strategy and threshold_diff < 0.005 and target_diff < 0.005:
         return None
 
     reasons: list[str] = []
-    if threshold_diff >= 0.005:
+    if is_different_strategy:
+        reasons.append(f"strategy: {STRATEGY_DESCRIPTIONS.get(stype, stype)}")
+    threshold_label = THRESHOLD_LABELS.get(stype, "threshold")
+    if threshold_diff >= 0.005 or is_different_strategy:
         reasons.append(
-            f"entry {best.config.entry_threshold:.0%} vs "
+            f"{threshold_label}: {best.config.entry_threshold} vs "
             f"current {mapping.drawdown_threshold:.0%}",
         )
     if target_diff >= 0.005:
@@ -133,6 +177,9 @@ def _make_proposal(
 
     return StrategyProposal(
         leveraged_ticker=mapping.leveraged_ticker,
+        strategy_type=best.config.strategy_type,
+        strategy_description=STRATEGY_DESCRIPTIONS.get(stype, str(stype)),
+        threshold_label=threshold_label,
         current_threshold=mapping.drawdown_threshold,
         proposed_threshold=best.config.entry_threshold,
         current_target=mapping.profit_target,

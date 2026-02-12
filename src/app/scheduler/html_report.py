@@ -107,6 +107,10 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
   transition: color 0.15s, border-color 0.15s; }
 .nav-menu a:hover, .nav-menu a:focus { color: var(--accent);
   border-bottom-color: var(--accent); text-decoration: none; }
+.nav-menu a.nav-active { color: var(--accent);
+  border-bottom-color: var(--accent); }
+.nav-menu .nav-divider { width: 1px; background: var(--border-light);
+  margin: 8px 0; flex-shrink: 0; }
 
 /* Masthead */
 .masthead { background: var(--bg-dark); color: #fff;
@@ -1432,8 +1436,16 @@ def _section_strategy(outputs: dict[str, str]) -> str:
     data = _parse_output(outputs["strategy.proposals"])
     if not isinstance(data, list) or not data:
         return ""
+    # Strategy type short labels
+    strategy_short: dict[str, str] = {
+        "ath_mean_reversion": "ATH",
+        "rsi_oversold": "RSI",
+        "bollinger_lower": "Bollinger",
+        "ma_dip": "MA Dip",
+    }
+
     rows: list[str] = []
-    for p in data[:8]:
+    for p in data[:12]:
         if not isinstance(p, dict):
             continue
         ticker = html.escape(str(p.get("leveraged_ticker", "?")))
@@ -1445,6 +1457,10 @@ def _section_strategy(outputs: dict[str, str]) -> str:
         ret = p.get("backtest_total_return", None)
         ret_str = _fmt_pct(ret, signed=True) if isinstance(ret, (int, float)) else "N/A"
         ret_cls = _pct_class(ret)
+
+        # Strategy type badge
+        stype = str(p.get("strategy_type", "ath_mean_reversion"))
+        stype_label = strategy_short.get(stype, stype)
 
         # Trade count
         trades = p.get("backtest_trade_count", None)
@@ -1468,6 +1484,7 @@ def _section_strategy(outputs: dict[str, str]) -> str:
 
         rows.append(
             f"<tr><td><strong>{ticker}</strong></td>"
+            f'<td><span class="badge badge-gray">{html.escape(stype_label)}</span></td>'
             f"<td>{reason}</td>"
             f'<td class="num">{html.escape(sharpe_str)}</td>'
             f'<td class="num">{html.escape(wr_str)}</td>'
@@ -1482,16 +1499,22 @@ def _section_strategy(outputs: dict[str, str]) -> str:
         proposed_target = p.get("proposed_target", None)
         current_threshold = p.get("current_threshold", None)
         current_target = p.get("current_target", None)
+        threshold_label = str(p.get("threshold_label", "drawdown %"))
+        strategy_desc = str(p.get("strategy_description", ""))
 
         detail_parts: list[str] = []
+        if strategy_desc:
+            detail_parts.append(
+                f'<span><span class="label">Strategy:</span> '
+                f"{html.escape(strategy_desc)}</span>",
+            )
         if isinstance(proposed_threshold, (int, float)):
-            entry_str = f"buy at {proposed_threshold:.0%} drawdown from ATH"
+            entry_str = f"{threshold_label}: {proposed_threshold}"
             if isinstance(current_threshold, (int, float)):
-                entry_str += f" (current: {current_threshold:.0%})"
+                entry_str += f" (current: {current_threshold})"
             entry_esc = html.escape(entry_str)
             detail_parts.append(
-                f'<span><span class="label">Entry:</span>'
-                f" {entry_esc}</span>",
+                f'<span><span class="label">Entry:</span> {entry_esc}</span>',
             )
         if isinstance(proposed_target, (int, float)):
             exit_str = f"+{proposed_target:.0%} profit target"
@@ -1499,18 +1522,16 @@ def _section_strategy(outputs: dict[str, str]) -> str:
                 exit_str += f" (current: +{current_target:.0%})"
             exit_esc = html.escape(exit_str)
             detail_parts.append(
-                f'<span><span class="label">Exit:</span>'
-                f" {exit_esc}</span>",
+                f'<span><span class="label">Exit:</span> {exit_esc}</span>',
             )
         if avg_hold:
             hold_esc = html.escape(avg_hold)
             detail_parts.append(
-                f'<span><span class="label">Avg Hold:</span>'
-                f" {hold_esc}</span>",
+                f'<span><span class="label">Avg Hold:</span> {hold_esc}</span>',
             )
         if detail_parts:
             rows.append(
-                '<tr><td colspan="8"><div class="strategy-entry-exit">'
+                '<tr><td colspan="9"><div class="strategy-entry-exit">'
                 + "".join(detail_parts)
                 + "</div></td></tr>",
             )
@@ -1526,9 +1547,10 @@ def _section_strategy(outputs: dict[str, str]) -> str:
 
     analysis_parts: list[str] = [
         f"<p>Backtests run over <strong>{html.escape(period)}</strong> "
-        "of historical data. Strategy optimizer tests entry thresholds "
-        "(3-15%) and profit targets (8-15%) to find optimal parameters "
-        "for each ETF based on Sharpe ratio.</p>",
+        "of historical data. Strategy optimizer tests <strong>4 strategy "
+        "types</strong> (ATH Mean-Reversion, RSI Oversold, Bollinger Lower, "
+        "MA Dip) with multiple parameter combinations per ETF, "
+        "ranked by Sharpe ratio.</p>",
     ]
     if isinstance(avg_gain, (int, float)) or isinstance(avg_loss, (int, float)):
         note_parts: list[str] = []
@@ -1546,7 +1568,8 @@ def _section_strategy(outputs: dict[str, str]) -> str:
         f"<h2>{_section_icon('strategy')}Strategy Backtest Results</h2>\n"
         '<div class="card">\n' + "\n".join(analysis_parts) + '\n<table class="mt-12">\n'
         "<thead><tr>"
-        '<th scope="col">ETF</th><th scope="col">Proposal</th>'
+        '<th scope="col">ETF</th><th scope="col">Strategy</th>'
+        '<th scope="col">Proposal</th>'
         '<th scope="col">Sharpe</th><th scope="col">Win Rate</th>'
         '<th scope="col">Return</th><th scope="col">Trades</th>'
         '<th scope="col">Max DD</th><th scope="col">Avg Hold</th>'
@@ -1702,19 +1725,15 @@ def _section_strategy_research(outputs: dict[str, str]) -> str:
     if not isinstance(data, list) or not data:
         return ""
 
-    # Gather unique thresholds and targets tested
-    thresholds: set[float] = set()
-    targets: set[float] = set()
+    # Gather unique strategies, tickers tested
+    strategies: set[str] = set()
     tickers: list[str] = []
     for p in data:
         if not isinstance(p, dict):
             continue
-        t = p.get("proposed_threshold")
-        if isinstance(t, (int, float)):
-            thresholds.add(t)
-        tg = p.get("proposed_target")
-        if isinstance(tg, (int, float)):
-            targets.add(tg)
+        st = str(p.get("strategy_type", ""))
+        if st:
+            strategies.add(st)
         tk = str(p.get("leveraged_ticker", ""))
         if tk and tk not in tickers:
             tickers.append(tk)
@@ -1722,28 +1741,30 @@ def _section_strategy_research(outputs: dict[str, str]) -> str:
     if not tickers:
         return ""
 
+    strategy_labels = {
+        "ath_mean_reversion": "ATH Mean-Reversion",
+        "rsi_oversold": "RSI Oversold",
+        "bollinger_lower": "Bollinger Lower",
+        "ma_dip": "MA Dip",
+    }
+
     parts: list[str] = [
         '<p class="kicker">Strategy Research</p>',
-        "<p>The strategy optimizer explored "
-        f"<strong>{len(tickers)} ETF(s)</strong> testing "
-        "entry thresholds from 3% to 15% and profit targets from 8% to 15%. "
+        "<p>The multi-strategy optimizer explored "
+        f"<strong>{len(tickers)} ETF(s)</strong> across "
+        f"<strong>{len(strategies) or 4} strategy types</strong> "
+        "(ATH drawdown, RSI oversold, Bollinger band, MA dip) "
+        "with multiple parameter combinations each. "
         "Results are ranked by risk-adjusted returns (Sharpe ratio).</p>",
     ]
 
-    if thresholds:
-        sorted_t = sorted(thresholds)
-        t_range = f"{sorted_t[0]:.0%}&ndash;{sorted_t[-1]:.0%}"
-        parts.append(
-            f'<p class="mt-8">Optimal entries found in the '
-            f"<strong>{t_range}</strong> drawdown range</p>",
+    if strategies:
+        strat_badges = " ".join(
+            f'<span class="badge badge-gray">'
+            f"{html.escape(strategy_labels.get(s, s))}</span>"
+            for s in sorted(strategies)
         )
-
-    if targets:
-        sorted_tg = sorted(targets)
-        tg_range = f"+{sorted_tg[0]:.0%}&ndash;+{sorted_tg[-1]:.0%}"
-        parts.append(
-            f"<p>Optimal profit targets in the <strong>{tg_range}</strong> range</p>",
-        )
+        parts.append(f'<p class="mt-8">Strategies tested: {strat_badges}</p>')
 
     etf_badges = " ".join(
         f'<span class="sector-badge">{html.escape(t)}</span>' for t in tickers[:8]
@@ -1758,19 +1779,44 @@ def _section_strategy_research(outputs: dict[str, str]) -> str:
     )
 
 
-def _nav_menu() -> str:
-    """Render the sticky navigation menu."""
-    links = [
-        ("#signals", "Signals"),
-        ("#sentiment", "Sentiment"),
-        ("#market", "Market"),
-        ("#geopolitical", "Geopolitical"),
-        ("#strategy", "Strategy"),
-        ("#research", "Research"),
-        ("#modules", "Modules"),
+def _page_nav(date: str, active_page: str) -> str:
+    """Render a unified sticky navigation bar with cross-page links.
+
+    Args:
+        date: Report date string (YYYY-MM-DD) for building page hrefs.
+        active_page: One of "dashboard", "trade-logs", "forecasts".
+    """
+    pages = [
+        (f"{date}.html", "Dashboard", "dashboard"),
+        (f"trade-logs-{date}.html", "Trade Logs", "trade-logs"),
+        (f"forecasts-{date}.html", "Forecasts", "forecasts"),
+        ("../index.html", "All Reports", "index"),
     ]
-    items = "".join(f'<a href="{href}">{label}</a>' for href, label in links)
-    return f'<nav class="nav-menu" aria-label="Report sections">{items}</nav>\n'
+    page_items = []
+    for href, label, key in pages:
+        cls = ' class="nav-active"' if key == active_page else ""
+        page_items.append(f'<a href="{html.escape(href)}"{cls}>{label}</a>')
+
+    parts = "".join(page_items)
+
+    # Section anchors only on dashboard page
+    if active_page == "dashboard":
+        section_links = [
+            ("#signals", "Signals"),
+            ("#sentiment", "Sentiment"),
+            ("#market", "Market"),
+            ("#risks", "Risks"),
+            ("#geopolitical", "Geopolitical"),
+            ("#strategy", "Strategy"),
+            ("#research", "Research"),
+            ("#modules", "Modules"),
+        ]
+        sections = "".join(
+            f'<a href="{href}">{label}</a>' for href, label in section_links
+        )
+        parts += '<span class="nav-divider"></span>' + sections
+
+    return f'<nav class="nav-menu" aria-label="Report navigation">{parts}</nav>\n'
 
 
 def build_html_report(
@@ -1797,6 +1843,7 @@ def build_html_report(
     signal_cards = _section_etf_signals(outputs, signals)
     sentiment = _section_sentiment(outputs)
     conditions = _section_market_conditions(outputs)
+    market_risks = _section_market_risks(outputs)
     geopolitical = _section_geopolitical(outputs)
     strategy = _section_strategy(outputs)
     research = _section_strategy_research(outputs)
@@ -1811,7 +1858,7 @@ def build_html_report(
         '<div class="masthead-rule"></div>\n'
     )
 
-    nav = _nav_menu()
+    nav = _page_nav(report_date, "dashboard")
 
     header = (
         '<header class="header">\n'
@@ -1839,7 +1886,6 @@ def build_html_report(
         f"<span>Generated {html.escape(report_date)} "
         f"{html.escape(report_time)} &mdash; "
         "not financial advice.</span>\n"
-        '<span><a href="../index.html">All Reports</a></span>\n'
         "</footer>\n"
     )
 
@@ -1852,6 +1898,7 @@ def build_html_report(
         kpi,
         signal_cards,
         mid,
+        market_risks,
         geopolitical,
         strategy,
         research,
@@ -1905,4 +1952,632 @@ def build_index_html(report_dates: list[str]) -> str:
         title="Trading Reports",
         body=body,
         description="Leveraged ETF swing trading dashboard reports",
+    )
+
+
+# --- Market-Moving Events Watchlist ---
+
+_RISK_CONTEXT: dict[str, dict[str, str | list[str]]] = {
+    "TRADE_WAR": {
+        "label": "Trade Wars & Tariff Escalation",
+        "why": (
+            "Tariffs and trade restrictions directly impact tech supply chains, "
+            "semiconductor exports, and manufacturing costs."
+        ),
+        "affected_etfs": ["TQQQ", "SOXL", "TECL"],
+        "market_impact": (
+            "Bearish for tech/semis; potential rotation to "
+            "financials and domestic-focused sectors."
+        ),
+    },
+    "MILITARY": {
+        "label": "Military Conflicts & Defense",
+        "why": (
+            "Military escalation drives oil prices higher and creates "
+            "broad risk-off sentiment. Defense sector benefits."
+        ),
+        "affected_etfs": ["UCO", "TQQQ", "UPRO"],
+        "market_impact": (
+            "Oil spikes, flight to safety (bonds, gold), tech selloff on risk aversion."
+        ),
+    },
+    "SANCTIONS": {
+        "label": "Economic Sanctions",
+        "why": (
+            "Sanctions disrupt energy supply, banking channels, "
+            "and cross-border trade flows."
+        ),
+        "affected_etfs": ["UCO", "FAS"],
+        "market_impact": (
+            "Energy volatility, banking sector stress, commodity price dislocations."
+        ),
+    },
+    "ECON_TARIFF": {
+        "label": "Tariff Policy Changes",
+        "why": (
+            "Tariff announcements create immediate supply chain "
+            "repricing across affected sectors."
+        ),
+        "affected_etfs": ["SOXL", "TECL", "TQQQ"],
+        "market_impact": (
+            "Semiconductor and tech hardware most exposed; "
+            "consumer prices and margins compressed."
+        ),
+    },
+    "ELECTION": {
+        "label": "Major Elections & Political Shifts",
+        "why": (
+            "Elections introduce policy uncertainty affecting "
+            "regulation, taxation, and trade agreements."
+        ),
+        "affected_etfs": ["UPRO", "FAS", "TNA"],
+        "market_impact": (
+            "Broad market volatility around election dates; "
+            "sector rotation based on expected policy winners."
+        ),
+    },
+    "TERRITORY": {
+        "label": "Territorial Disputes & Sovereignty",
+        "why": (
+            "Territorial conflicts (e.g., Taiwan, South China Sea) "
+            "threaten critical semiconductor supply chains."
+        ),
+        "affected_etfs": ["SOXL", "TQQQ", "TECL"],
+        "market_impact": (
+            "Extreme downside risk for semis if Taiwan escalates; "
+            "broad tech exposure via supply chain dependencies."
+        ),
+    },
+}
+
+
+def _section_market_risks(outputs: dict[str, str]) -> str:
+    """Render Market-Moving Events Watchlist with risk context."""
+    geo = _parse_output(outputs.get("geopolitical.summary", ""))
+    if not isinstance(geo, dict):
+        return ""
+
+    cats = geo.get("events_by_category", {})
+    if not isinstance(cats, dict) or not cats:
+        return ""
+
+    parts: list[str] = [
+        '<p class="kicker">Events Watchlist</p>',
+        "<p>Ongoing world events being monitored for potential "
+        "market impact. Each theme is tracked via GDELT global "
+        "event data and classified by affected sectors.</p>",
+    ]
+
+    for cat_key, count in sorted(
+        cats.items(),
+        key=lambda x: x[1] if isinstance(x[1], (int, float)) else 0,
+        reverse=True,
+    ):
+        ctx = _RISK_CONTEXT.get(str(cat_key))
+        if ctx is None:
+            continue
+
+        label = html.escape(str(ctx["label"]))
+        why = html.escape(str(ctx["why"]))
+        impact = html.escape(str(ctx["market_impact"]))
+        etfs = ctx.get("affected_etfs", [])
+        etf_badges = ""
+        if isinstance(etfs, list):
+            etf_badges = " ".join(
+                f'<span class="badge badge-blue">{html.escape(str(e))}</span>'
+                for e in etfs
+            )
+
+        event_count = int(count) if isinstance(count, (int, float)) else 0
+        count_badge = (
+            _badge("HIGH")
+            if event_count > 20
+            else (_badge("MEDIUM") if event_count > 5 else _badge("LOW"))
+        )
+
+        parts.append(
+            '<div style="padding:12px 0;'
+            'border-bottom:1px solid var(--border-light)">'
+            f"<p><strong>{label}</strong> "
+            f'{count_badge} <span class="text-muted">'
+            f"({event_count} events)</span></p>"
+            f'<p style="font-size:13px;color:var(--text-secondary)'
+            f';margin-top:4px">{why}</p>'
+            f'<p style="font-size:12px;color:var(--text-muted)'
+            f';margin-top:4px">'
+            f'<span class="label">Impact:</span> {impact}</p>'
+            f'<div style="margin-top:6px">{etf_badges}</div>'
+            "</div>",
+        )
+
+    if len(parts) <= 2:
+        return ""
+
+    return (
+        '<section id="risks">\n'
+        f"<h2>{_section_icon('globe')}Market-Moving Events</h2>\n"
+        '<div class="card">\n' + "\n".join(parts) + "\n</div>\n"
+        "</section>\n"
+    )
+
+
+# --- Trade Logs Page ---
+
+_CHART_COLORS: list[str] = [
+    "#990f3d",  # accent red
+    "#0a7c42",  # green
+    "#1565c0",  # blue
+    "#b86e00",  # amber
+    "#6a1b9a",  # purple
+    "#00838f",  # teal
+    "#c62828",  # red
+    "#37474f",  # dark gray
+]
+
+
+def build_trade_logs_html(
+    outputs: dict[str, str],
+    *,
+    date: str = "",
+) -> str:
+    """Build trade logs page with Chart.js equity curve."""
+    report_date = date or datetime.now(tz=_ISRAEL_TZ).strftime("%Y-%m-%d")
+    report_time = datetime.now(tz=_ISRAEL_TZ).strftime("%H:%M IST")
+
+    data = _parse_output(outputs.get("strategy.backtest-all", ""))
+    if not isinstance(data, list) or not data:
+        return ""
+
+    # Build Chart.js datasets
+    chart_datasets: list[str] = []
+    all_rows: list[str] = []
+    summary_rows: list[str] = []
+
+    strat_short: dict[str, str] = {
+        "ath_mean_reversion": "ATH",
+        "rsi_oversold": "RSI",
+        "bollinger_lower": "Bollinger",
+        "ma_dip": "MA Dip",
+    }
+
+    for idx, etf in enumerate(data):
+        if not isinstance(etf, dict):
+            continue
+
+        ticker = str(etf.get("leveraged_ticker", "?"))
+        underlying = str(etf.get("underlying_ticker", "?"))
+        stype = str(etf.get("strategy_type", "ath_mean_reversion"))
+        stype_label = strat_short.get(stype, stype)
+        equity = etf.get("equity_curve", [])
+        trades = etf.get("trades", [])
+        total_ret = etf.get("total_return", 0)
+        sharpe = etf.get("sharpe_ratio")
+        win_rate = etf.get("win_rate")
+        max_dd = etf.get("max_drawdown", 0)
+        trade_count = etf.get("trade_count", 0)
+        threshold = etf.get("entry_threshold", 0)
+        profit_target = etf.get("profit_target", 0)
+
+        color = _CHART_COLORS[idx % len(_CHART_COLORS)]
+        chart_label = f"{ticker} ({stype_label})"
+
+        if isinstance(equity, list) and equity:
+            equity_json = json.dumps(equity)
+            labels_json = json.dumps(list(range(len(equity))))
+            chart_datasets.append(
+                "{"
+                f'label:"{html.escape(chart_label)}",'
+                f"data:{equity_json},"
+                f'borderColor:"{color}",'
+                f'backgroundColor:"{color}22",'
+                "borderWidth:2,"
+                "pointRadius:3,"
+                "pointHoverRadius:5,"
+                "tension:0.1,"
+                "fill:false"
+                "}",
+            )
+
+        # Summary row
+        ret_cls = _pct_class(total_ret)
+        sharpe_str = f"{sharpe:.3f}" if isinstance(sharpe, (int, float)) else "N/A"
+        wr_str = _fmt_pct(win_rate) if isinstance(win_rate, (int, float)) else "N/A"
+        ret_str = _fmt_pct(total_ret, signed=True)
+        dd_str = _fmt_pct(max_dd)
+        summary_rows.append(
+            f"<tr><td><strong>{html.escape(ticker)}</strong></td>"
+            f"<td>{html.escape(underlying)}</td>"
+            f'<td><span class="badge badge-gray">'
+            f"{html.escape(stype_label)}</span></td>"
+            f'<td class="num">{threshold}</td>'
+            f'<td class="num">{_fmt_pct(profit_target)}</td>'
+            f'<td class="num">{trade_count}</td>'
+            f'<td class="num">{html.escape(sharpe_str)}</td>'
+            f'<td class="num">{html.escape(wr_str)}</td>'
+            f'<td class="num {ret_cls}">{html.escape(ret_str)}</td>'
+            f'<td class="num">{html.escape(dd_str)}</td></tr>',
+        )
+
+        # Individual trade rows
+        if isinstance(trades, list):
+            for i, t in enumerate(trades):
+                if not isinstance(t, dict):
+                    continue
+                t_ret = t.get("leveraged_return", 0)
+                t_cls = _pct_class(t_ret)
+                win = isinstance(t_ret, (int, float)) and t_ret > 0
+                reason = str(t.get("exit_reason", ""))
+                reason_badge = _badge(
+                    "TARGET"
+                    if reason == "target"
+                    else "ALERT"
+                    if reason == "stop"
+                    else "WATCH",
+                )
+                dd_entry = t.get("drawdown_at_entry", 0)
+                entry_dt = t.get("entry_date") or str(t.get("entry_day", ""))
+                exit_dt = t.get("exit_date") or str(t.get("exit_day", ""))
+                all_rows.append(
+                    f"<tr>"
+                    f"<td>{html.escape(ticker)}</td>"
+                    f"<td>{html.escape(stype_label)}</td>"
+                    f'<td class="num">{i + 1}</td>'
+                    f'<td class="num">{html.escape(entry_dt)}</td>'
+                    f'<td class="num">{html.escape(exit_dt)}</td>'
+                    f'<td class="num">${t.get("entry_price", 0):.2f}</td>'
+                    f'<td class="num">${t.get("exit_price", 0):.2f}</td>'
+                    f'<td class="num">{_fmt_pct(dd_entry)}</td>'
+                    f'<td class="num {t_cls}">'
+                    f"{_fmt_pct(t_ret, signed=True)}</td>"
+                    f"<td>{reason_badge}</td>"
+                    f"<td>{'W' if win else 'L'}</td>"
+                    f"</tr>",
+                )
+
+    if not chart_datasets:
+        return ""
+
+    # Find max labels length for chart
+    max_labels = 0
+    for etf in data:
+        if isinstance(etf, dict):
+            eq = etf.get("equity_curve", [])
+            if isinstance(eq, list) and len(eq) > max_labels:
+                max_labels = len(eq)
+    labels_json = json.dumps(list(range(max_labels)))
+
+    chart_js = (
+        "<script>\n"
+        "const ctx = document.getElementById('equityChart').getContext('2d');\n"
+        "new Chart(ctx, {\n"
+        "  type: 'line',\n"
+        "  data: {\n"
+        f"    labels: {labels_json},\n"
+        "    datasets: [\n      " + ",\n      ".join(chart_datasets) + "\n    ]\n"
+        "  },\n"
+        "  options: {\n"
+        "    responsive: true,\n"
+        "    maintainAspectRatio: false,\n"
+        "    interaction: { mode: 'index', intersect: false },\n"
+        "    plugins: {\n"
+        "      title: { display: true,"
+        " text: 'Equity Curve — $10,000 Starting Capital',"
+        " font: { size: 16, family: 'Playfair Display' } },\n"
+        "      tooltip: {\n"
+        "        callbacks: {\n"
+        "          label: function(ctx) {\n"
+        "            return ctx.dataset.label + ': $' +"
+        " ctx.parsed.y.toLocaleString();\n"
+        "          }\n"
+        "        }\n"
+        "      }\n"
+        "    },\n"
+        "    scales: {\n"
+        "      x: { title: { display: true, text: 'Trade #' },"
+        " ticks: { maxTicksLimit: 20 } },\n"
+        "      y: { title: { display: true, text: 'Portfolio Value ($)' },"
+        " ticks: { callback: function(v) {"
+        " return '$' + v.toLocaleString(); } } }\n"
+        "    }\n"
+        "  }\n"
+        "});\n"
+        "</script>\n"
+    )
+
+    masthead = (
+        '<div class="masthead">\n'
+        "<h1>Trade Logs & Equity Curve</h1>\n"
+        '<div class="masthead-meta">Multi-Strategy Backtest Results<br>'
+        "ATH, RSI, Bollinger, MA Dip</div>\n"
+        "</div>\n"
+        '<div class="masthead-rule"></div>\n'
+    )
+
+    nav = _page_nav(report_date, "trade-logs")
+
+    header = (
+        '<header class="header">\n'
+        f"<span>{html.escape(report_date)} &bull; "
+        f"{html.escape(report_time)}</span>\n"
+        "</header>\n"
+    )
+
+    summary_table = (
+        "<section>\n"
+        "<h2>Strategy Performance Summary</h2>\n"
+        '<div class="card">\n'
+        "<p>Each ETF is backtested across 4 strategy types "
+        "(ATH mean-reversion, RSI oversold, Bollinger band, MA dip) "
+        "over 2 years of historical data. Exits at profit target or stop loss.</p>\n"
+        '<table class="mt-12">\n<thead><tr>'
+        '<th scope="col">ETF</th>'
+        '<th scope="col">Underlying</th>'
+        '<th scope="col">Strategy</th>'
+        '<th scope="col">Entry</th>'
+        '<th scope="col">Target</th>'
+        '<th scope="col">Trades</th>'
+        '<th scope="col">Sharpe</th>'
+        '<th scope="col">Win Rate</th>'
+        '<th scope="col">Return</th>'
+        '<th scope="col">Max DD</th>'
+        "</tr></thead>\n<tbody>\n"
+        + "\n".join(summary_rows)
+        + "\n</tbody></table>\n</div>\n</section>\n"
+    )
+
+    chart_section = (
+        "<section>\n"
+        "<h2>Equity Curve</h2>\n"
+        '<div class="card">\n'
+        '<div style="position:relative;height:450px">\n'
+        '<canvas id="equityChart"></canvas>\n'
+        "</div>\n</div>\n</section>\n"
+    )
+
+    trade_table = (
+        "<section>\n"
+        "<h2>Individual Trade Log</h2>\n"
+        '<div class="card">\n'
+        '<table class="mt-12">\n<thead><tr>'
+        '<th scope="col">ETF</th>'
+        '<th scope="col">Strategy</th>'
+        '<th scope="col">#</th>'
+        '<th scope="col">Entry Date</th>'
+        '<th scope="col">Exit Date</th>'
+        '<th scope="col">Entry $</th>'
+        '<th scope="col">Exit $</th>'
+        '<th scope="col">DD at Entry</th>'
+        '<th scope="col">Return</th>'
+        '<th scope="col">Exit Reason</th>'
+        '<th scope="col">W/L</th>'
+        "</tr></thead>\n<tbody>\n"
+        + "\n".join(all_rows)
+        + "\n</tbody></table>\n</div>\n</section>\n"
+    )
+
+    footer = (
+        '<footer class="footer">\n'
+        f"<span>Generated {html.escape(report_date)} "
+        f"{html.escape(report_time)} &mdash; "
+        "backtested, not live trades.</span>\n"
+        "</footer>\n"
+    )
+
+    body_parts = [
+        masthead,
+        nav,
+        header,
+        '<main id="main-content">\n',
+        summary_table,
+        chart_section,
+        trade_table,
+        "</main>\n",
+        footer,
+    ]
+
+    chart_cdn = (
+        '<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist'
+        '/chart.umd.min.js"></script>\n'
+    )
+
+    # Insert Chart.js CDN before </head> and chart script before </body>
+    return (
+        _html_page(
+            title=f"Trade Logs {report_date}",
+            body="\n".join(p for p in body_parts if p),
+            description="Backtest trade logs and equity curves",
+        )
+        .replace("</head>", f"{chart_cdn}</head>", 1)
+        .replace("</body>", f"{chart_js}</body>", 1)
+    )
+
+
+def build_forecasts_html(
+    outputs: dict[str, str],
+    *,
+    date: str = "",
+) -> str:
+    """Build the forecasts page with entry probability table and accuracy KPIs."""
+    report_date = date or datetime.now(tz=_ISRAEL_TZ).strftime("%Y-%m-%d")
+    report_time = datetime.now(tz=_ISRAEL_TZ).strftime("%H:%M IST")
+
+    forecast_raw = _parse_output(outputs.get("strategy.forecast", ""))
+    accuracy_raw = _parse_output(outputs.get("strategy.verify", ""))
+
+    # Parse forecasts
+    forecasts: list[dict[str, object]] = []
+    actionable_count = 0
+    if isinstance(forecast_raw, dict):
+        fc_list = forecast_raw.get("forecasts", [])
+        if isinstance(fc_list, list):
+            forecasts = [f for f in fc_list if isinstance(f, dict)]
+        ac_raw = forecast_raw.get("actionable_count", 0)
+        actionable_count = int(ac_raw) if isinstance(ac_raw, (int, float)) else 0
+
+    if not forecasts:
+        return ""
+
+    # Parse accuracy data
+    accuracy: dict[str, object] = {}
+    if isinstance(accuracy_raw, dict):
+        accuracy = accuracy_raw
+
+    # Build accuracy KPI strip
+    accuracy_section = ""
+    tv_raw = accuracy.get("total_verifications", 0)
+    total_verif = int(tv_raw) if isinstance(tv_raw, (int, float)) else 0
+    if total_verif > 0:
+        hr_raw = accuracy.get("hit_rate", 0)
+        hit_rate = float(hr_raw) if isinstance(hr_raw, (int, float)) else 0.0
+        recent_rate = accuracy.get("recent_hit_rate")
+        trend = str(accuracy.get("trend", "INSUFFICIENT"))
+
+        trend_badge_map: dict[str, str] = {
+            "IMPROVING": "TARGET",
+            "DECLINING": "ALERT",
+            "STABLE": "WATCH",
+            "INSUFFICIENT": "WATCH",
+        }
+        trend_badge = _badge(trend_badge_map.get(trend, "WATCH"))
+
+        kpis = [
+            '<div class="kpi-card">'
+            f'<div class="kpi-value">{_fmt_pct(hit_rate)}</div>'
+            '<div class="kpi-label">Hit Rate</div></div>',
+            '<div class="kpi-card">'
+            f'<div class="kpi-value">{total_verif}</div>'
+            '<div class="kpi-label">Verifications</div></div>',
+        ]
+        if isinstance(recent_rate, (int, float)):
+            kpis.append(
+                '<div class="kpi-card">'
+                f'<div class="kpi-value">{_fmt_pct(recent_rate)}</div>'
+                '<div class="kpi-label">Recent (10)</div></div>',
+            )
+        kpis.append(
+            '<div class="kpi-card">'
+            f'<div class="kpi-value">{trend_badge}</div>'
+            '<div class="kpi-label">Trend</div></div>',
+        )
+        accuracy_section = (
+            "<section>\n"
+            "<h2>Forecast Accuracy</h2>\n"
+            '<div class="kpi-strip">\n'
+            + "\n".join(kpis)
+            + "\n</div>\n</section>\n"
+        )
+
+    # Build forecast table rows
+    strat_short: dict[str, str] = {
+        "ath_mean_reversion": "ATH",
+        "rsi_oversold": "RSI",
+        "bollinger_lower": "Bollinger",
+        "ma_dip": "MA Dip",
+    }
+    forecast_rows: list[str] = []
+    for fc in forecasts:
+        ticker = str(fc.get("leveraged_ticker", "?"))
+        state = str(fc.get("signal_state", "WATCH"))
+        dd_raw = fc.get("current_drawdown_pct", 0)
+        drawdown = float(dd_raw) if isinstance(dd_raw, (int, float)) else 0.0
+        confidence = str(fc.get("confidence_level", "LOW"))
+        ep_raw = fc.get("entry_probability", 0)
+        entry_prob = float(ep_raw) if isinstance(ep_raw, (int, float)) else 0.0
+        er_raw = fc.get("expected_return_pct", 0)
+        exp_ret = float(er_raw) if isinstance(er_raw, (int, float)) else 0.0
+        hd_raw = fc.get("expected_hold_days", 0)
+        hold_days = int(hd_raw) if isinstance(hd_raw, (int, float)) else 0
+        strategy = str(fc.get("best_strategy", "ath_mean_reversion"))
+        stype_label = strat_short.get(strategy, strategy)
+
+        state_badge = _badge(
+            "TARGET" if state in ("SIGNAL", "ACTIVE", "TARGET") else
+            "ALERT" if state == "ALERT" else "WATCH",
+        )
+        conf_badge = _badge(
+            "TARGET" if confidence == "HIGH" else
+            "ALERT" if confidence == "MEDIUM" else "WATCH",
+        )
+        prob_cls = _pct_class(entry_prob - 0.5)  # green if >50%, red if <50%
+
+        forecast_rows.append(
+            f"<tr>"
+            f"<td><strong>{html.escape(ticker)}</strong></td>"
+            f"<td>{state_badge} {html.escape(state)}</td>"
+            f'<td class="num">{_fmt_pct(abs(drawdown))}</td>'
+            f"<td>{conf_badge}</td>"
+            f'<td class="num {prob_cls}">{_fmt_pct(entry_prob)}</td>'
+            f'<td class="num {_pct_class(exp_ret)}">'
+            f"{_fmt_pct(exp_ret, signed=True)}</td>"
+            f'<td class="num">{hold_days}d</td>'
+            f'<td><span class="badge badge-gray">'
+            f"{html.escape(stype_label)}</span></td>"
+            f"</tr>",
+        )
+
+    masthead = (
+        '<div class="masthead">\n'
+        "<h1>Forecast Predictions</h1>\n"
+        '<div class="masthead-meta">Entry Probability &amp; Expected Returns<br>'
+        "Signal-Based Forecasting</div>\n"
+        "</div>\n"
+        '<div class="masthead-rule"></div>\n'
+    )
+
+    nav = _page_nav(report_date, "forecasts")
+
+    header = (
+        '<header class="header">\n'
+        f"<span>{html.escape(report_date)} &bull; "
+        f"{html.escape(report_time)}</span>\n"
+        '<div class="header-status">'
+        f'<span class="ok">{actionable_count}</span> actionable'
+        f" / {len(forecasts)} total"
+        "</div>\n</header>\n"
+    )
+
+    forecast_table = (
+        "<section>\n"
+        "<h2>ETF Forecasts</h2>\n"
+        '<div class="card">\n'
+        "<p>Entry probability estimates based on signal state, "
+        "confidence factors, and historical backtest win rates. "
+        "Expected returns blend probability with average gain/loss.</p>\n"
+        '<table class="mt-12">\n<thead><tr>'
+        '<th scope="col">ETF</th>'
+        '<th scope="col">Signal</th>'
+        '<th scope="col">Drawdown</th>'
+        '<th scope="col">Confidence</th>'
+        '<th scope="col">Entry Prob</th>'
+        '<th scope="col">Exp Return</th>'
+        '<th scope="col">Hold Time</th>'
+        '<th scope="col">Strategy</th>'
+        "</tr></thead>\n<tbody>\n"
+        + "\n".join(forecast_rows)
+        + "\n</tbody></table>\n</div>\n</section>\n"
+    )
+
+    footer = (
+        '<footer class="footer">\n'
+        f"<span>Generated {html.escape(report_date)} "
+        f"{html.escape(report_time)} &mdash; "
+        "forecasts are probabilistic, not guarantees.</span>\n"
+        "</footer>\n"
+    )
+
+    body_parts = [
+        masthead,
+        nav,
+        header,
+        '<main id="main-content">\n',
+        accuracy_section,
+        forecast_table,
+        "</main>\n",
+        footer,
+    ]
+
+    return _html_page(
+        title=f"Forecasts {report_date}",
+        body="\n".join(p for p in body_parts if p),
+        description=f"ETF entry probability forecasts for {report_date}",
     )
