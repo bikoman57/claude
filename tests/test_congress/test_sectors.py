@@ -98,8 +98,12 @@ def _make_rating(
 def test_sector_aggregation_bullish():
     # Multiple big buys in tech with A-tier member
     trades = [
-        _make_trade(member="Big Buyer", ticker="AAPL", amount_low=100000, amount_high=250000),
-        _make_trade(member="Big Buyer", ticker="MSFT", amount_low=100000, amount_high=250000),
+        _make_trade(
+            member="Big Buyer", ticker="AAPL", amount_low=100000, amount_high=250000
+        ),
+        _make_trade(
+            member="Big Buyer", ticker="MSFT", amount_low=100000, amount_high=250000
+        ),
     ]
     ratings = [_make_rating(name="Big Buyer", tier=MemberTier.A)]
     sectors = aggregate_sectors(trades, ratings, sentiment_threshold=50000)
@@ -146,12 +150,20 @@ def test_sector_aggregation_neutral_no_trades():
 
 def test_member_weight_applied():
     # A-tier buy should outweigh F-tier buy
-    trades_a = [_make_trade(member="A-Tier", ticker="AAPL", amount_low=50000, amount_high=100000)]
+    trades_a = [
+        _make_trade(
+            member="A-Tier", ticker="AAPL", amount_low=50000, amount_high=100000
+        )
+    ]
     ratings_a = [_make_rating(name="A-Tier", tier=MemberTier.A)]
     sectors_a = aggregate_sectors(trades_a, ratings_a)
     tech_a = next(s for s in sectors_a if s.sector == "tech")
 
-    trades_f = [_make_trade(member="F-Tier", ticker="AAPL", amount_low=50000, amount_high=100000)]
+    trades_f = [
+        _make_trade(
+            member="F-Tier", ticker="AAPL", amount_low=50000, amount_high=100000
+        )
+    ]
     ratings_f = [_make_rating(name="F-Tier", tier=MemberTier.F)]
     sectors_f = aggregate_sectors(trades_f, ratings_f)
     tech_f = next(s for s in sectors_f if s.sector == "tech")
@@ -198,5 +210,7 @@ def test_get_sector_sentiment_for_underlying():
             trade_count=12,
         ),
     ]
-    assert get_sector_sentiment_for_underlying(sectors, "QQQ") == SectorSentiment.BULLISH
-    assert get_sector_sentiment_for_underlying(sectors, "XLF") == SectorSentiment.NEUTRAL
+    result_qqq = get_sector_sentiment_for_underlying(sectors, "QQQ")
+    assert result_qqq == SectorSentiment.BULLISH
+    result_xlf = get_sector_sentiment_for_underlying(sectors, "XLF")
+    assert result_xlf == SectorSentiment.NEUTRAL

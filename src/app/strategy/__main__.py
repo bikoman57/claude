@@ -359,7 +359,7 @@ def _cmd_forecast() -> int:
         return 1
 
     report = generate_forecast(signals_data, backtest_data)
-    path = save_forecast(report)
+    save_forecast(report)
 
     output = asdict(report)
     # Trim factor_scores for cleaner stdout (scheduler parses this as JSON)

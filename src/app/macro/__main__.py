@@ -62,7 +62,7 @@ def cmd_rates() -> int:
     for bank, series_id in _GLOBAL_RATE_SERIES.items():
         try:
             global_rates[bank] = fetch_fred_latest(series_id, fred_key)
-        except Exception:  # noqa: BLE001
+        except Exception:
             global_rates[bank] = None
     output["global_rates"] = global_rates
 
