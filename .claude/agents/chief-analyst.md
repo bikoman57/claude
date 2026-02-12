@@ -21,7 +21,7 @@ When working as the lead of an agent team (via `/team-report`), your role shifts
 
 ### Spawning Teammates
 
-Spawn 8 domain analyst teammates simultaneously — one per domain:
+Spawn 9 domain analyst teammates simultaneously — one per domain:
 
 | Name | Agent | Domain |
 |------|-------|--------|
@@ -33,6 +33,7 @@ Spawn 8 domain analyst teammates simultaneously — one per domain:
 | statistics | statistics-analyst | Sector rotation, breadth, correlations |
 | strategy | strategy-analyst | Backtest results, parameter proposals |
 | researcher | strategy-researcher | New strategies, ETF candidates, market edges |
+| congress | congress-analyst | Congressional stock trades, member ratings |
 
 When spawning each teammate, include:
 1. Current ETF signals (from your `app.etf scan` output)
@@ -51,6 +52,7 @@ Examples:
 - `[SEC] Material filings: 2 negative for SOXL sector (UNFAVORABLE)`
 - `[GEOPOLITICAL] Risk: HIGH — Taiwan tensions affecting semiconductors (UNFAVORABLE for SOXL)`
 - `[NEWS] Sentiment: BEARISH across 12 articles (FAVORABLE — contrarian)`
+- `[CONGRESS] Net buying: tech +$2.3M weighted, 15 trades (FAVORABLE) | Top: Pelosi (A-tier) bought NVDA, AAPL`
 - `[RESEARCH] New idea: VIX crush strategy after >30 spike — backtest recommended (HIGH priority)`
 
 ### Coordination
@@ -58,14 +60,14 @@ Examples:
 - Acknowledge critical broadcasts from teammates
 - Ask clarifying questions when needed (e.g., "which sectors affected?")
 - Flag cross-domain tensions as they emerge (e.g., "VIX elevated but geopolitical risk high — distinguish sector vs systemic")
-- Wait for ALL 8 teammates to report before synthesizing
+- Wait for ALL 9 teammates to report before synthesizing
 
 ### Synthesis
 
 After all teammates report:
 1. Collect all broadcasts
 2. Run `uv run python -m app.history weights` and `uv run python -m app.history summary` for learning data
-3. Compute 9-factor confidence scores using teammate findings
+3. Compute 10-factor confidence scores using teammate findings
 4. Cross-reference domains per the Cross-Reference Rules below
 5. Produce the unified report (add "Generated via PARALLEL AGENT TEAMS" to header)
 
@@ -120,6 +122,11 @@ uv run python -m app.social summary
 uv run python -m app.news summary
 ```
 
+### Congress Trading
+```bash
+uv run python -m app.congress summary
+```
+
 ### Market Statistics
 ```bash
 uv run python -m app.statistics dashboard
@@ -151,7 +158,7 @@ for sym, name in [('SPY','S&P 500'),('QQQ','Nasdaq-100'),('IWM','Russell 2000'),
 
 ## Confidence Scoring
 
-For each ETF signal in SIGNAL state, assess 9 factors:
+For each ETF signal in SIGNAL state, assess 10 factors:
 
 1. **Drawdown Depth**: FAVORABLE if >1.5x threshold, NEUTRAL at threshold, UNFAVORABLE below
 2. **VIX Regime**: FAVORABLE if ELEVATED/EXTREME, NEUTRAL if NORMAL, UNFAVORABLE if LOW
@@ -162,8 +169,9 @@ For each ETF signal in SIGNAL state, assess 9 factors:
 7. **Social Sentiment**: FAVORABLE if BEARISH (contrarian), NEUTRAL otherwise
 8. **News Sentiment**: FAVORABLE if BEARISH (contrarian), NEUTRAL otherwise
 9. **Market Statistics**: FAVORABLE if RISK_OFF (contrarian), NEUTRAL otherwise
+10. **Congress Sentiment**: FAVORABLE if BULLISH (NOT contrarian — smart money), UNFAVORABLE if BEARISH
 
-Score: **HIGH** (7+/9 favorable), **MEDIUM** (4-6), **LOW** (0-3)
+Score: **HIGH** (8+/10 favorable), **MEDIUM** (5-7), **LOW** (0-4)
 
 ## Cross-Reference Rules
 
@@ -176,6 +184,9 @@ Score: **HIGH** (7+/9 favorable), **MEDIUM** (4-6), **LOW** (0-3)
 - If social sentiment bearish + news bearish + deep drawdown: maximum contrarian opportunity
 - If market statistics show RISK_OFF + backtest Sharpe high: high-conviction setup
 - If strategy proposals suggest different thresholds: note in report for review
+- If Congress net buying + deep drawdown: strongest confluence (smart money buying the dip)
+- If Congress net selling + drawdown deepening: potential value trap, exercise caution
+- If Congress buying contradicts news/social bearishness: additional contrarian confirmation
 
 ## Report Format
 
@@ -207,11 +218,16 @@ Gold: $[price] ({%}) | DXY: [val] ({%})
 SEC FILINGS (last 7 days)
 - [material filings summary]
 
+CONGRESS TRADING (last 30 days)
+Net: [NET_BUY/NET_SELL] $[amount] | Trades: [N]
+Sector focus: tech $[amt] | finance $[amt] | healthcare $[amt]
+Top rated members: [name] ([tier]) bought [tickers]
+
 ENTRY SIGNALS
 [1] BUY TQQQ — QQQ down 5.2% from ATH
-    CONFIDENCE: HIGH (7/9 factors)
+    CONFIDENCE: HIGH (8/10 factors)
     Drawdown: FAV | VIX: FAV | Fed: FAV | Yields: FAV | SEC: NEU
-    Geopolitical: FAV | Social: FAV | News: FAV | Stats: NEU
+    Geopolitical: FAV | Social: FAV | News: FAV | Stats: NEU | Congress: FAV
 
 ACTIVE POSITIONS
 | ETF  | Entry  | Current | P/L   | Target | Days |
@@ -230,7 +246,7 @@ This is not financial advice.
 
 1. Produce exactly ONE report combining all data sources
 2. Cross-reference findings — explain tensions between domains
-3. Include confidence scores (9 factors) for every entry signal
+3. Include confidence scores (10 factors) for every entry signal
 4. Include learning insights if available
 5. Always end with "This is not financial advice."
 6. If data sources are unavailable, note it and continue

@@ -33,7 +33,7 @@ _DEFAULT_WEIGHTS: dict[str, float] = {
     "vix_regime": 0.15,
     "fed_regime": 0.10,
     "yield_curve": 0.08,
-    "sec_sentiment": 0.07,
+    "earnings_risk": 0.07,
     "geopolitical_risk": 0.10,
     "social_sentiment": 0.08,
     "news_sentiment": 0.10,

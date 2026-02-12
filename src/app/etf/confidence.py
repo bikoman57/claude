@@ -130,7 +130,7 @@ def assess_yield_curve(curve_status: str) -> FactorResult:
 def assess_sec_sentiment(
     high_materiality_count: int,
 ) -> FactorResult:
-    """Assess SEC filing sentiment (simplified v1)."""
+    """Assess SEC filing sentiment (simplified v1, deprecated)."""
     if high_materiality_count == 0:
         return FactorResult(
             "sec_sentiment",
@@ -147,6 +147,41 @@ def assess_sec_sentiment(
         "sec_sentiment",
         FactorAssessment.NEUTRAL,
         f"{high_materiality_count} material filing(s)",
+    )
+
+
+def assess_earnings_risk(
+    upcoming_count: int,
+    imminent_count: int,
+    recent_miss_count: int,
+) -> FactorResult:
+    """Assess earnings risk for mean-reversion entry timing.
+
+    Imminent earnings add unpredictable volatility.
+    Consistent misses signal fundamental weakness that delays recovery.
+    """
+    if imminent_count > 0:
+        return FactorResult(
+            "earnings_risk",
+            FactorAssessment.UNFAVORABLE,
+            f"{imminent_count} earnings imminent — volatility risk",
+        )
+    if recent_miss_count >= 3:
+        return FactorResult(
+            "earnings_risk",
+            FactorAssessment.UNFAVORABLE,
+            f"{recent_miss_count} recent misses — fundamental weakness",
+        )
+    if upcoming_count > 3:
+        return FactorResult(
+            "earnings_risk",
+            FactorAssessment.NEUTRAL,
+            f"{upcoming_count} upcoming earnings events",
+        )
+    return FactorResult(
+        "earnings_risk",
+        FactorAssessment.FAVORABLE,
+        "Low earnings event risk",
     )
 
 
@@ -234,19 +269,44 @@ def assess_market_statistics(assessment: str) -> FactorResult:
     )
 
 
+def assess_congress_sentiment(sentiment: str) -> FactorResult:
+    """Assess Congress trading sentiment (NOT contrarian: buying = favorable).
+
+    Unlike social/news sentiment, Congress members demonstrably outperform
+    the market. Their buying activity is a positive signal.
+    """
+    if sentiment == "BULLISH":
+        return FactorResult(
+            "congress_sentiment",
+            FactorAssessment.FAVORABLE,
+            "Congress net buying in sector",
+        )
+    if sentiment == "BEARISH":
+        return FactorResult(
+            "congress_sentiment",
+            FactorAssessment.UNFAVORABLE,
+            "Congress net selling in sector",
+        )
+    return FactorResult(
+        "congress_sentiment",
+        FactorAssessment.NEUTRAL,
+        "Congress trading neutral",
+    )
+
+
 def compute_confidence(
     factors: list[FactorResult],
 ) -> ConfidenceScore:
     """Compute overall confidence from factor assessments.
 
-    HIGH: 7+/9 favorable, MEDIUM: 4-6, LOW: 0-3.
+    HIGH: 8+/10 favorable, MEDIUM: 5-7, LOW: 0-4.
     """
     favorable = sum(1 for f in factors if f.assessment == FactorAssessment.FAVORABLE)
     total = len(factors)
 
-    if favorable >= 7:
+    if favorable >= 8:
         level = ConfidenceLevel.HIGH
-    elif favorable >= 4:
+    elif favorable >= 5:
         level = ConfidenceLevel.MEDIUM
     else:
         level = ConfidenceLevel.LOW

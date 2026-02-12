@@ -9,11 +9,12 @@ FACTOR_NAMES = [
     "vix_regime",
     "fed_regime",
     "yield_curve",
-    "sec_sentiment",
+    "earnings_risk",
     "geopolitical_risk",
     "social_sentiment",
     "news_sentiment",
     "market_statistics",
+    "congress_sentiment",
 ]
 
 

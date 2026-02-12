@@ -82,7 +82,7 @@ def test_build_html_report_header():
     assert "Dashboard" in html
     assert ">1</span>/2 OK" in html
     assert ">1</span> failed" in html
-    assert "masthead" in html
+    assert "top-bar" in html
 
 
 def test_build_html_report_kpi_vix():
@@ -1512,7 +1512,7 @@ def test_build_forecasts_html_basic():
     assert "TQQQ" in html
     assert "UPRO" in html
     assert "nav-menu" in html
-    assert "Forecast Predictions" in html
+    assert "Forecasts" in html
     assert "Entry Prob" in html
     assert "actionable" in html
 

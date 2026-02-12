@@ -38,7 +38,7 @@ _GLOBAL_RATE_SERIES: dict[str, str] = {
     "boe": "IUDSOIA",
     "boj": "IRSTCB01JPM156N",
     "boc": "IRSTCB01CAM156N",
-    "rba": "IRSTCB01AUM156N",
+    "rba": "IRSTCI01AUM156N",
 }
 
 
@@ -60,7 +60,10 @@ def cmd_rates() -> int:
     # Fetch global central bank rates
     global_rates: dict[str, float | None] = {}
     for bank, series_id in _GLOBAL_RATE_SERIES.items():
-        global_rates[bank] = fetch_fred_latest(series_id, fred_key)
+        try:
+            global_rates[bank] = fetch_fred_latest(series_id, fred_key)
+        except Exception:  # noqa: BLE001
+            global_rates[bank] = None
     output["global_rates"] = global_rates
 
     print(json.dumps(output, indent=2))  # noqa: T201

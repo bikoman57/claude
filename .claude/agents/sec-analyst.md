@@ -21,6 +21,8 @@ When working as a teammate in an agent team, after running your CLIs and complet
 ```
 [SEC] Material filings: {count} ({assessment}) — {summary of most impactful}
 [SEC] Institutional: {key moves from 13F data} ({assessment for affected sectors})
+[SEC] Earnings risk: {count} upcoming in 14d, {imminent} imminent ({assessment})
+[SEC] Recent track: {beats} beats, {misses} misses — {key ticker warnings}
 ```
 2. **Watch** for ETF signals shared by the lead — focus your analysis on sectors with active signals
 3. **Respond** to any questions from the lead or other teammates
@@ -34,6 +36,9 @@ Run these CLI commands to get SEC data:
 - `uv run python -m app.sec filings <ticker>` — Recent filings for a specific stock
 - `uv run python -m app.sec institutional` — Recent 13F filings from major institutions
 - `uv run python -m app.sec recent` — All recent filings for index holdings
+- `uv run python -m app.sec earnings <ticker>` — Earnings calendar and history for one stock
+- `uv run python -m app.sec earnings-calendar` — Upcoming earnings for all holdings
+- `uv run python -m app.sec earnings-summary` — Recent earnings beats/misses summary
 
 ## Analysis Framework
 
@@ -53,6 +58,13 @@ Run these CLI commands to get SEC data:
 - **MEDIUM**: Quarterly reports, routine 13F updates
 - **LOW**: Administrative filings, minor amendments
 
+### Earnings Impact Assessment
+- **Imminent earnings** (< 3 days): High volatility risk — avoid new entries
+- **Near-term earnings** (< 7 days): Moderate catalyst risk
+- **Beat track record**: Companies consistently beating estimates show operational strength
+- **Miss track record**: Consistent misses signal fundamental weakness, delayed recovery
+- **EPS surprise %**: Large positive surprises = strong momentum, large negative = red flag
+
 ## Output Format
 
-Classify the overall SEC filing landscape as **FAVORABLE**, **UNFAVORABLE**, or **NEUTRAL** for mean-reversion entries. Note any material filings that could affect recovery timing.
+Classify the overall SEC + earnings landscape as **FAVORABLE**, **UNFAVORABLE**, or **NEUTRAL** for mean-reversion entries. Flag any imminent earnings (< 3 days) or concerning miss patterns that could affect recovery timing.

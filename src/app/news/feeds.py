@@ -30,13 +30,43 @@ class NewsArticle:
 
 FINANCIAL_FEEDS: list[RSSFeed] = [
     RSSFeed(
-        "Reuters Business",
-        "https://feeds.reuters.com/reuters/businessNews",
+        "Yahoo Finance",
+        "https://finance.yahoo.com/news/rssindex",
         "general",
     ),
     RSSFeed(
-        "AP Business",
-        "https://feeds.apnews.com/apf-business",
+        "Bloomberg Markets",
+        "https://feeds.bloomberg.com/markets/news.rss",
+        "finance",
+    ),
+    RSSFeed(
+        "MarketWatch",
+        "https://www.marketwatch.com/rss/topstories",
+        "general",
+    ),
+    RSSFeed(
+        "WSJ Markets",
+        "https://feeds.content.dowjones.io/public/rss/RSSMarketsMain",
+        "finance",
+    ),
+    RSSFeed(
+        "WSJ Business",
+        "https://feeds.content.dowjones.io/public/rss/WSJcomUSBusiness",
+        "general",
+    ),
+    RSSFeed(
+        "Financial Times",
+        "https://www.ft.com/markets?format=rss",
+        "finance",
+    ),
+    RSSFeed(
+        "Investing.com Stock Market",
+        "https://www.investing.com/rss/news_25.rss",
+        "general",
+    ),
+    RSSFeed(
+        "Investing.com Economy",
+        "https://www.investing.com/rss/news_14.rss",
         "general",
     ),
     RSSFeed(
@@ -51,12 +81,6 @@ FINANCIAL_FEEDS: list[RSSFeed] = [
         "general",
     ),
     RSSFeed(
-        "CNBC Tech",
-        "https://search.cnbc.com/rs/search/combinedcms/view.xml"
-        "?partnerId=wrss01&id=19854910",
-        "tech",
-    ),
-    RSSFeed(
         "CNBC Finance",
         "https://search.cnbc.com/rs/search/combinedcms/view.xml"
         "?partnerId=wrss01&id=10000664",
@@ -69,7 +93,8 @@ _DC_NAMESPACE = "{http://purl.org/dc/elements/1.1/}"
 
 def fetch_feed(feed: RSSFeed) -> list[NewsArticle]:
     """Fetch and parse an RSS feed into articles."""
-    with httpx.Client(timeout=10.0) as client:
+    headers = {"User-Agent": "Mozilla/5.0 (compatible; FinanceBot/1.0)"}
+    with httpx.Client(timeout=10.0, headers=headers) as client:
         resp = client.get(feed.url, follow_redirects=True)
         resp.raise_for_status()
 

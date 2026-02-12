@@ -8,6 +8,13 @@ from dataclasses import asdict
 
 from dotenv import load_dotenv
 
+from app.sec.earnings import (
+    classify_earnings_proximity,
+    classify_track_record,
+    compute_avg_surprise,
+    fetch_all_earnings_calendars,
+    fetch_earnings_calendar,
+)
 from app.sec.filings import fetch_recent_filings
 from app.sec.holdings import (
     get_all_unique_holdings,
@@ -17,9 +24,12 @@ from app.sec.institutional import fetch_institutional_filings
 
 USAGE = """\
 Usage:
-  uv run python -m app.sec filings <ticker>   Recent SEC filings
-  uv run python -m app.sec institutional      Recent 13F filings
-  uv run python -m app.sec recent             All index holdings filings
+  uv run python -m app.sec filings <ticker>      Recent SEC filings
+  uv run python -m app.sec institutional         Recent 13F filings
+  uv run python -m app.sec recent                All index holdings filings
+  uv run python -m app.sec earnings <ticker>     Earnings calendar and history
+  uv run python -m app.sec earnings-calendar     Upcoming earnings for all holdings
+  uv run python -m app.sec earnings-summary      Recent earnings beats/misses
 """
 
 
@@ -111,6 +121,73 @@ def cmd_recent() -> int:
     return 0
 
 
+def cmd_earnings(ticker: str) -> int:
+    """Show earnings calendar and history for one stock."""
+    holding = get_holding_by_ticker(ticker.upper())
+    if holding is None:
+        print(  # noqa: T201
+            f"Unknown ticker: {ticker}",
+            file=sys.stderr,
+        )
+        return 1
+    try:
+        cal = fetch_earnings_calendar(holding.ticker)
+        print(  # noqa: T201
+            json.dumps(asdict(cal), indent=2, default=str),
+        )
+        return 0
+    except Exception as e:
+        print(  # noqa: T201
+            f"Error fetching earnings: {e}",
+            file=sys.stderr,
+        )
+        return 1
+
+
+def cmd_earnings_calendar() -> int:
+    """Show upcoming earnings for all index holdings."""
+    holdings = get_all_unique_holdings()
+    calendars = fetch_all_earnings_calendars(holdings)
+
+    upcoming = [
+        c
+        for c in calendars
+        if c.days_until_earnings is not None and 0 < c.days_until_earnings <= 30
+    ]
+    upcoming.sort(key=lambda c: c.days_until_earnings or 9999)
+
+    if not upcoming:
+        print("No upcoming earnings in next 30 days.")  # noqa: T201
+        return 0
+
+    print("Upcoming earnings (next 30 days):")  # noqa: T201
+    for cal in upcoming:
+        proximity = classify_earnings_proximity(cal.days_until_earnings)
+        print(  # noqa: T201
+            f"  [{proximity:>8s}] {cal.ticker}: "
+            f"{cal.next_earnings_date} ({cal.days_until_earnings}d)",
+        )
+    return 0
+
+
+def cmd_earnings_summary() -> int:
+    """Show recent earnings beats/misses for all holdings."""
+    holdings = get_all_unique_holdings()
+    calendars = fetch_all_earnings_calendars(holdings)
+
+    print("Earnings track records:")  # noqa: T201
+    for cal in calendars:
+        if not cal.recent_events:
+            continue
+        track = classify_track_record(cal.recent_events)
+        avg = compute_avg_surprise(cal.recent_events)
+        avg_str = f"{avg:+.1%}" if avg is not None else "N/A"
+        print(  # noqa: T201
+            f"  {cal.ticker:>5s}: {track:<20s} (avg surprise: {avg_str})",
+        )
+    return 0
+
+
 def main() -> None:
     load_dotenv()
     if len(sys.argv) < 2:
@@ -126,6 +203,12 @@ def main() -> None:
             exit_code = cmd_institutional()
         case "recent":
             exit_code = cmd_recent()
+        case "earnings" if len(sys.argv) >= 3:
+            exit_code = cmd_earnings(sys.argv[2])
+        case "earnings-calendar":
+            exit_code = cmd_earnings_calendar()
+        case "earnings-summary":
+            exit_code = cmd_earnings_summary()
         case _:
             print(  # noqa: T201
                 f"Unknown command: {command}",

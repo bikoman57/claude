@@ -13,11 +13,11 @@ from app.etf.confidence import (
     FactorAssessment,
     FactorResult,
     assess_drawdown_depth,
+    assess_earnings_risk,
     assess_fed_regime,
     assess_geopolitical_risk,
     assess_market_statistics,
     assess_news_sentiment,
-    assess_sec_sentiment,
     assess_social_sentiment,
     assess_vix_regime,
     assess_yield_curve,
@@ -28,33 +28,33 @@ from app.scheduler.runner import SchedulerRun
 _ISRAEL_TZ = ZoneInfo("Asia/Jerusalem")
 
 _CSS = """\
-/* === Editorial / Financial Times Design === */
+/* === Fintech Dashboard Design === */
 :root {
-  --bg-primary: #f8f6f1;
+  --bg-primary: #f5f7fa;
   --bg-secondary: #ffffff;
-  --bg-tertiary: #f0ece3;
-  --bg-dark: #16192b;
-  --border-primary: #d4c9b8;
-  --border-light: #e8dfcf;
-  --border-hover: #990f3d;
+  --bg-tertiary: #eef1f6;
+  --bg-dark: #1a2332;
+  --border-primary: #dce1e8;
+  --border-light: #e8ecf1;
+  --border-hover: #2563eb;
   --text-primary: #1a1a1a;
   --text-secondary: #4a4a4a;
   --text-muted: #7a7a7a;
-  --accent: #990f3d;
-  --accent-light: #fce4ec;
-  --success: #0a7c42;
-  --success-bg: #e8f5e9;
-  --warning: #b86e00;
-  --warning-bg: #fff8e1;
-  --danger: #c62828;
-  --danger-bg: #ffebee;
-  --info: #1565c0;
-  --info-bg: #e3f2fd;
-  --purple: #6a1b9a;
-  --purple-bg: #f3e5f5;
-  --neutral: #78909c;
-  --font-serif: 'Playfair Display', Georgia, serif;
-  --font-sans: 'Source Sans 3', -apple-system, sans-serif;
+  --accent: #2563eb;
+  --accent-light: #eff6ff;
+  --success: #16a34a;
+  --success-bg: #f0fdf4;
+  --warning: #d97706;
+  --warning-bg: #fffbeb;
+  --danger: #dc2626;
+  --danger-bg: #fef2f2;
+  --info: #2563eb;
+  --info-bg: #eff6ff;
+  --purple: #7c3aed;
+  --purple-bg: #f5f3ff;
+  --neutral: #94a3b8;
+  --font-serif: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', 'Consolas', monospace;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -68,7 +68,7 @@ h1 { font-family: var(--font-serif); color: var(--text-primary);
   font-size: 26px; font-weight: 700; letter-spacing: -0.01em; }
 h2 { font-family: var(--font-serif); color: var(--text-primary);
   margin-bottom: 16px; font-size: 20px; font-weight: 700;
-  padding-bottom: 8px; border-bottom: 2px solid var(--accent);
+  padding-bottom: 8px; border-bottom: 2px solid var(--border-primary);
   display: inline-block; }
 
 /* Material icon sizing */
@@ -92,47 +92,42 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
 .mt-16 { margin-top: 16px; }
 .text-muted { color: var(--text-muted); }
 
-/* Navigation menu */
-.nav-menu { position: sticky; top: 0; z-index: 100;
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-light);
+/* Top bar — unified navy header with navigation */
+.top-bar { background: var(--bg-dark); color: #fff;
   padding: 0 clamp(16px, 3vw, 48px);
   margin: 0 calc(-1 * clamp(16px, 3vw, 48px));
-  display: flex; gap: 0; overflow-x: auto;
-  -webkit-overflow-scrolling: touch; }
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  min-height: 56px; flex-wrap: wrap; }
+.top-bar h1 { color: #fff; font-size: 16px; font-weight: 600;
+  letter-spacing: -0.01em; white-space: nowrap; margin-right: 24px; }
+
+/* Navigation menu */
+.nav-menu { display: flex; gap: 0; overflow-x: auto;
+  -webkit-overflow-scrolling: touch; margin-left: auto; }
 .nav-menu a { font-family: var(--font-mono); font-size: 11px;
   font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
-  color: var(--text-muted); white-space: nowrap;
-  padding: 14px 16px; border-bottom: 2px solid transparent;
+  color: rgba(255,255,255,0.65); white-space: nowrap;
+  padding: 18px 14px; border-bottom: 2px solid transparent;
   transition: color 0.15s, border-color 0.15s; }
-.nav-menu a:hover, .nav-menu a:focus { color: var(--accent);
-  border-bottom-color: var(--accent); text-decoration: none; }
-.nav-menu a.nav-active { color: var(--accent);
-  border-bottom-color: var(--accent); }
-.nav-menu .nav-divider { width: 1px; background: var(--border-light);
-  margin: 8px 0; flex-shrink: 0; }
-
-/* Masthead */
-.masthead { background: var(--bg-dark); color: #fff;
-  padding: 20px clamp(16px, 3vw, 48px);
-  margin: 0 calc(-1 * clamp(16px, 3vw, 48px)) 0;
-  display: flex; justify-content: space-between; align-items: center; }
-.masthead h1 { color: #fff; }
-.masthead-meta { font-size: 13px; opacity: 0.7; text-align: right; }
-.masthead-rule { height: 4px; background: var(--accent);
-  margin: 0 calc(-1 * clamp(16px, 3vw, 48px)) 0; }
+.nav-menu a:hover, .nav-menu a:focus { color: #fff;
+  border-bottom-color: #fff; text-decoration: none; }
+.nav-menu a.nav-active { color: #fff;
+  border-bottom-color: #fff; }
+.nav-menu .nav-divider { width: 1px; background: rgba(255,255,255,0.2);
+  margin: 12px 0; flex-shrink: 0; }
 
 /* Header / datebar */
 .header { display: flex; align-items: center; justify-content: space-between;
   border-bottom: 1px solid var(--border-primary); padding: 12px 0;
   margin-bottom: 28px; flex-wrap: wrap; gap: 8px;
   font-size: 13px; color: var(--text-muted); }
-.header-status { font-size: 0.9em; font-family: var(--font-serif);
-  font-style: italic; color: var(--text-secondary); }
+.header-status { font-size: 0.9em; font-family: var(--font-sans);
+  color: var(--text-secondary); }
 
 /* Executive summary / lede */
 .exec-summary { margin-bottom: 32px; padding-bottom: 28px;
-  border-bottom: 2px solid var(--text-primary); }
+  border-bottom: 1px solid var(--border-primary); }
 .exec-summary p { margin-bottom: 8px; }
 .exec-summary .headline { font-family: var(--font-serif);
   font-size: 28px; font-weight: 700; line-height: 1.3;
@@ -146,10 +141,10 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
   gap: 16px; margin-bottom: 32px; }
 .kpi-card { padding: 20px 24px;
   background: var(--bg-secondary); border: 1px solid var(--border-light);
-  border-radius: 8px; position: relative; overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  border-radius: 10px; position: relative; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 .kpi-card::before { content: ''; position: absolute; left: 0; top: 0;
-  bottom: 0; width: 4px; }
+  width: 100%; height: 3px; }
 .kpi-bar-green::before { background: var(--success); }
 .kpi-bar-yellow::before { background: var(--warning); }
 .kpi-bar-red::before { background: var(--danger); }
@@ -177,14 +172,14 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
 
 /* Cards */
 .card { background: var(--bg-secondary); border: 1px solid var(--border-light);
-  padding: 24px; margin-bottom: 24px; border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  padding: 24px; margin-bottom: 24px; border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 
 /* Grid layouts */
 .grid-2col { display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px; }
 
 /* Badges */
-.badge { display: inline-block; padding: 3px 10px; border-radius: 3px;
+.badge { display: inline-block; padding: 3px 10px; border-radius: 12px;
   font-family: var(--font-mono); font-size: 10px; font-weight: 600;
   letter-spacing: 0.06em; text-transform: uppercase; }
 .badge-green { background: var(--success-bg); color: var(--success); }
@@ -195,12 +190,13 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
 
 /* Tables */
 table { border-collapse: collapse; width: 100%; }
-th { font-family: var(--font-mono); text-align: left; padding: 10px 14px;
-  color: var(--text-muted); font-weight: 600; font-size: 10px;
+th { font-family: var(--font-mono); text-align: left; padding: 12px 14px;
+  color: var(--text-secondary); font-weight: 600; font-size: 10px;
   text-transform: uppercase; letter-spacing: 0.08em;
-  border-bottom: 2px solid var(--text-primary); }
+  background: var(--bg-tertiary); border-bottom: 2px solid var(--border-primary); }
 td { padding: 12px 14px; border-bottom: 1px solid var(--border-light); }
-tbody tr:hover { background: var(--bg-tertiary); }
+tbody tr:nth-child(even) { background: #fafbfc; }
+tbody tr:hover { background: #f0f4f8; }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
 .pct-up { color: var(--success); }
 .pct-down { color: var(--danger); }
@@ -210,15 +206,18 @@ tbody tr:hover { background: var(--bg-tertiary); }
   grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
   gap: 16px; margin-bottom: 16px; }
 .signal-card { background: var(--bg-secondary); border: 1px solid var(--border-light);
-  padding: 16px 20px; border-left: 4px solid var(--border-light);
-  border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-.signal-card-signal { border-left-color: var(--success);
-  border-left-width: 5px; background: var(--success-bg); }
+  padding: 16px 20px; border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); position: relative;
+  overflow: hidden; }
+.signal-card::before { content: ''; position: absolute; left: 0; top: 0;
+  width: 100%; height: 3px; background: var(--border-light); }
+.signal-card-signal::before { background: var(--success); }
+.signal-card-signal { background: var(--success-bg); }
 .signal-card-signal .signal-ticker { font-size: 1.35em; }
-.signal-card-alert { border-left-color: var(--warning); }
-.signal-card-active { border-left-color: var(--info); }
-.signal-card-watch { border-left-color: var(--neutral); }
-.signal-card-target { border-left-color: var(--purple); }
+.signal-card-alert::before { background: var(--warning); }
+.signal-card-active::before { background: var(--info); }
+.signal-card-watch::before { background: var(--neutral); }
+.signal-card-target::before { background: var(--purple); }
 .signal-header { display: flex; justify-content: space-between;
   align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
 .signal-ticker { font-family: var(--font-mono); font-size: 15px;
@@ -321,8 +320,8 @@ details[open] summary { margin-bottom: 8px; }
   display: flex; gap: 12px; flex-wrap: wrap; }
 
 /* Standfirst highlight */
-.highlight { background: linear-gradient(transparent 60%, var(--accent-light) 60%);
-  padding: 0 2px; }
+.highlight { background: var(--accent-light);
+  padding: 1px 4px; border-radius: 2px; }
 
 /* Lede kicker */
 .kicker { font-family: var(--font-mono); font-size: 11px; font-weight: 600;
@@ -384,7 +383,7 @@ details[open] summary { margin-bottom: 8px; }
 
 /* Footer */
 .footer { margin-top: 40px; padding: 20px 0;
-  border-top: 3px solid var(--text-primary); font-size: 12px;
+  border-top: 1px solid var(--border-primary); font-size: 12px;
   color: var(--text-muted); display: flex; justify-content: space-between;
   flex-wrap: wrap; gap: 8px; }
 a { color: var(--accent); text-decoration: none; font-weight: 600; }
@@ -398,8 +397,8 @@ a:hover { text-decoration: underline; }
   gap: 12px; margin-top: 16px; }
 .report-card { background: var(--bg-secondary); border: 1px solid var(--border-light);
   padding: 16px; text-align: center; position: relative;
-  transition: border-color 0.15s ease; border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  transition: border-color 0.15s ease; border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 .report-card:hover { border-color: var(--accent); }
 .report-card a { font-family: var(--font-serif); font-size: 1.1em;
   font-weight: 600; }
@@ -450,12 +449,11 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 @media print {
   body { background: #fff; color: #000; max-width: 100%;
     font-size: 11pt; }
-  .masthead { background: #000; }
-  .masthead-rule { background: #000; }
+  .top-bar { background: #000; }
   .card, .signal-card, .kpi-card, .exec-summary, .report-card {
     background: #fff; border-color: #ccc; box-shadow: none;
     break-inside: avoid; }
-  .skip-nav, .nav-menu { display: none; }
+  .skip-nav, .top-bar { display: none; }
   details[open] > summary { display: none; }
   details > *:not(summary) { display: block !important; }
   details:not([open]) { display: block; }
@@ -664,8 +662,7 @@ def _html_page(title: str, body: str, *, description: str = "") -> str:
         "<link"
         ' href="https://fonts.googleapis.com/css2?'
         "family=IBM+Plex+Mono:wght@400;500;600&amp;"
-        "family=Playfair+Display:wght@400;500;600;700;800&amp;"
-        'family=Source+Sans+3:wght@300;400;500;600;700&amp;display=swap"'
+        'family=Inter:wght@300;400;500;600;700&amp;display=swap"'
         ' rel="stylesheet">\n'
         "<link"
         ' href="https://fonts.googleapis.com/css2?'
@@ -677,7 +674,7 @@ def _html_page(title: str, body: str, *, description: str = "") -> str:
         '<html lang="en" dir="ltr">\n<head>\n'
         '<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-        '<meta name="theme-color" content="#16192b">\n'
+        '<meta name="theme-color" content="#1a2332">\n'
         f"{desc_tag}"
         f"<title>{html.escape(title)}</title>\n"
         f"{fonts}"
@@ -725,8 +722,38 @@ def _compute_signal_confidence(
         curve = str(yields.get("curve_status", "UNKNOWN"))
     factors.append(assess_yield_curve(curve))
 
-    # 5. SEC filings
-    factors.append(assess_sec_sentiment(0))
+    # 5. Earnings risk
+    try:
+        from app.sec.earnings import fetch_all_earnings_calendars
+        from app.sec.holdings import get_all_unique_holdings as _get_holdings
+
+        _holdings = _get_holdings()
+        _calendars = fetch_all_earnings_calendars(_holdings)
+        _upcoming = sum(
+            1
+            for c in _calendars
+            if c.days_until_earnings is not None and 0 < c.days_until_earnings <= 14
+        )
+        _imminent = sum(
+            1
+            for c in _calendars
+            if c.days_until_earnings is not None and 0 < c.days_until_earnings <= 3
+        )
+        _recent_misses = sum(
+            1
+            for c in _calendars
+            for e in c.recent_events[:2]
+            if e.surprise_pct is not None and e.surprise_pct < -0.05
+        )
+        factors.append(assess_earnings_risk(_upcoming, _imminent, _recent_misses))
+    except Exception:
+        factors.append(
+            FactorResult(
+                "earnings_risk",
+                FactorAssessment.NEUTRAL,
+                "Earnings data unavailable",
+            )
+        )
 
     # 6. Geopolitical
     geo = _parse_output(outputs.get("geopolitical.summary", ""))
@@ -1779,12 +1806,12 @@ def _section_strategy_research(outputs: dict[str, str]) -> str:
     )
 
 
-def _page_nav(date: str, active_page: str) -> str:
-    """Render a unified sticky navigation bar with cross-page links.
+def _page_header_bar(date: str, active_page: str) -> str:
+    """Render a unified navy top bar with title and navigation links.
 
     Args:
         date: Report date string (YYYY-MM-DD) for building page hrefs.
-        active_page: One of "dashboard", "trade-logs", "forecasts".
+        active_page: One of "dashboard", "trade-logs", "forecasts", "index".
     """
     pages = [
         (f"{date}.html", "Dashboard", "dashboard"),
@@ -1816,7 +1843,12 @@ def _page_nav(date: str, active_page: str) -> str:
         )
         parts += '<span class="nav-divider"></span>' + sections
 
-    return f'<nav class="nav-menu" aria-label="Report navigation">{parts}</nav>\n'
+    return (
+        '<div class="top-bar">\n'
+        "<h1>Swing Trading Report</h1>\n"
+        f'<nav class="nav-menu" aria-label="Report navigation">{parts}</nav>\n'
+        "</div>\n"
+    )
 
 
 def build_html_report(
@@ -1849,16 +1881,7 @@ def build_html_report(
     research = _section_strategy_research(outputs)
     modules = _section_module_status(run)
 
-    masthead = (
-        '<div class="masthead">\n'
-        "<h1>The Swing Trading Report</h1>\n"
-        '<div class="masthead-meta">Leveraged ETF Analysis<br>'
-        "Mean-Reversion System</div>\n"
-        "</div>\n"
-        '<div class="masthead-rule"></div>\n'
-    )
-
-    nav = _page_nav(report_date, "dashboard")
+    top_bar = _page_header_bar(report_date, "dashboard")
 
     header = (
         '<header class="header">\n'
@@ -1890,8 +1913,7 @@ def build_html_report(
     )
 
     body_parts = [
-        masthead,
-        nav,
+        top_bar,
         header,
         '<main id="main-content">\n',
         exec_summary,
@@ -1934,12 +1956,9 @@ def build_index_html(report_dates: list[str]) -> str:
     )
 
     body = (
-        '<div class="masthead">\n'
-        "<h1>The Swing Trading Report</h1>\n"
-        '<div class="masthead-meta">Leveraged ETF Analysis<br>'
-        "Report Archive</div>\n"
+        '<div class="top-bar">\n'
+        "<h1>Swing Trading Report</h1>\n"
         "</div>\n"
-        '<div class="masthead-rule"></div>\n'
         '<header class="header">\n'
         f"<span>{len(report_dates)} report(s)</span>\n"
         "</header>\n"
@@ -2104,7 +2123,7 @@ def _section_market_risks(outputs: dict[str, str]) -> str:
 # --- Trade Logs Page ---
 
 _CHART_COLORS: list[str] = [
-    "#990f3d",  # accent red
+    "#2563eb",  # accent blue
     "#0a7c42",  # green
     "#1565c0",  # blue
     "#b86e00",  # amber
@@ -2262,7 +2281,7 @@ def build_trade_logs_html(
         "    plugins: {\n"
         "      title: { display: true,"
         " text: 'Equity Curve — $10,000 Starting Capital',"
-        " font: { size: 16, family: 'Playfair Display' } },\n"
+        " font: { size: 16, family: 'Inter' } },\n"
         "      tooltip: {\n"
         "        callbacks: {\n"
         "          label: function(ctx) {\n"
@@ -2284,16 +2303,7 @@ def build_trade_logs_html(
         "</script>\n"
     )
 
-    masthead = (
-        '<div class="masthead">\n'
-        "<h1>Trade Logs & Equity Curve</h1>\n"
-        '<div class="masthead-meta">Multi-Strategy Backtest Results<br>'
-        "ATH, RSI, Bollinger, MA Dip</div>\n"
-        "</div>\n"
-        '<div class="masthead-rule"></div>\n'
-    )
-
-    nav = _page_nav(report_date, "trade-logs")
+    top_bar = _page_header_bar(report_date, "trade-logs")
 
     header = (
         '<header class="header">\n'
@@ -2364,8 +2374,7 @@ def build_trade_logs_html(
     )
 
     body_parts = [
-        masthead,
-        nav,
+        top_bar,
         header,
         '<main id="main-content">\n',
         summary_table,
@@ -2515,16 +2524,7 @@ def build_forecasts_html(
             f"</tr>",
         )
 
-    masthead = (
-        '<div class="masthead">\n'
-        "<h1>Forecast Predictions</h1>\n"
-        '<div class="masthead-meta">Entry Probability &amp; Expected Returns<br>'
-        "Signal-Based Forecasting</div>\n"
-        "</div>\n"
-        '<div class="masthead-rule"></div>\n'
-    )
-
-    nav = _page_nav(report_date, "forecasts")
+    top_bar = _page_header_bar(report_date, "forecasts")
 
     header = (
         '<header class="header">\n'
@@ -2566,8 +2566,7 @@ def build_forecasts_html(
     )
 
     body_parts = [
-        masthead,
-        nav,
+        top_bar,
         header,
         '<main id="main-content">\n',
         accuracy_section,

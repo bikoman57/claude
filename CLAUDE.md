@@ -45,27 +45,29 @@
 - `src/app/social/` — Reddit sentiment, Fed/SEC official statements, hawkish/dovish classification
 - `src/app/statistics/` — Sector rotation, market breadth, cross-asset correlations, risk indicators
 - `src/app/strategy/` — Backtesting engine, threshold optimization, strategy proposals
+- `src/app/congress/` — Congressional stock trade disclosures (STOCK Act), member performance ratings, sector aggregation
 - `src/app/scheduler/` — Daily runner, scheduled pre/post-market runs, HTML report publishing (GitHub Pages), Telegram delivery
 
 ### CLI Commands
 - `uv run python -m app.etf scan|drawdown|signals|active|stats|universe|enter|close`
 - `uv run python -m app.macro dashboard|rates|yields|calendar`
-- `uv run python -m app.sec filings|institutional|recent`
+- `uv run python -m app.sec filings|institutional|recent|earnings|earnings-calendar|earnings-summary`
 - `uv run python -m app.history outcomes|weights|summary|snapshots`
 - `uv run python -m app.news headlines|summary|journalists`
 - `uv run python -m app.geopolitical events|headlines|summary`
 - `uv run python -m app.social reddit|officials|summary`
 - `uv run python -m app.statistics sectors|breadth|risk|correlations|dashboard`
 - `uv run python -m app.strategy backtest|optimize|proposals|compare|history`
+- `uv run python -m app.congress trades|members|sectors|summary`
 - `uv run python -m app.scheduler daily|test-run|publish|pre-market|post-market|status`
 
 ### Agents & Skills
-- `.claude/agents/` — chief-analyst, drawdown-monitor, market-analyst, macro-analyst, sec-analyst, swing-screener, news-analyst, geopolitical-analyst, social-analyst, statistics-analyst, strategy-analyst, strategy-researcher
+- `.claude/agents/` — chief-analyst, drawdown-monitor, market-analyst, macro-analyst, sec-analyst, swing-screener, news-analyst, geopolitical-analyst, social-analyst, statistics-analyst, strategy-analyst, strategy-researcher, congress-analyst
 - `.claude/skills/` — unified-report, team-report, analyze-etf, scan-opportunities, market-report
 
 ### Agent Teams (Experimental)
 - Requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in `.claude/settings.json` (already enabled)
-- `/team-report` — parallel daily report: chief-analyst spawns 8 domain teammates, all run simultaneously
+- `/team-report` — parallel daily report: chief-analyst spawns 9 domain teammates, all run simultaneously
 - `/unified-report` — sequential fallback: chief-analyst runs all modules one by one
 - All domain analysts are team-aware: they broadcast key findings using `[DOMAIN] METRIC: value (assessment)` format
 - In-process mode only (Windows/VS Code) — use Shift+Up/Down to navigate teammates
@@ -73,7 +75,7 @@
 
 ### Data & State
 - Signal lifecycle: WATCH → ALERT → SIGNAL → ACTIVE → TARGET
-- Confidence scoring: 9 factors → HIGH/MEDIUM/LOW (drawdown, VIX, Fed, yields, SEC, geopolitical, social, news, statistics)
+- Confidence scoring: 10 factors → HIGH/MEDIUM/LOW (drawdown, VIX, Fed, yields, SEC, geopolitical, social, news, statistics, congress)
 - Factor weight learning: track trade outcomes, compute predictive weights over time
 - Runtime state persisted in `data/` (gitignored): signals.json, outcomes.json, history/, backtests/, scheduler_status.json
 - Configuration via environment variables (see `.env`)
