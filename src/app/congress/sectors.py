@@ -9,96 +9,31 @@ from enum import StrEnum
 
 from app.congress.fetcher import CongressTrade, TransactionType
 from app.congress.members import MemberRating, get_member_weight
+from app.sec.holdings import INDEX_HOLDINGS
 
-# Map individual stock tickers to sector categories
-TICKER_SECTOR_MAP: dict[str, str] = {
-    # Tech / QQQ / XLK
-    "AAPL": "tech",
-    "MSFT": "tech",
-    "GOOGL": "tech",
-    "GOOG": "tech",
-    "AMZN": "tech",
-    "META": "tech",
-    "NFLX": "tech",
-    "CRM": "tech",
-    "ADBE": "tech",
-    "ORCL": "tech",
-    "CSCO": "tech",
-    "IBM": "tech",
-    "NOW": "tech",
-    "UBER": "tech",
-    "ABNB": "tech",
-    "SNOW": "tech",
-    "PLTR": "tech",
-    "SHOP": "tech",
-    # Semiconductors / SOXX
-    "NVDA": "semiconductors",
-    "AMD": "semiconductors",
-    "AVGO": "semiconductors",
-    "QCOM": "semiconductors",
-    "TXN": "semiconductors",
-    "MU": "semiconductors",
-    "AMAT": "semiconductors",
-    "LRCX": "semiconductors",
-    "KLAC": "semiconductors",
-    "INTC": "semiconductors",
-    "MRVL": "semiconductors",
-    "ON": "semiconductors",
-    "TSM": "semiconductors",
-    "ARM": "semiconductors",
-    "ASML": "semiconductors",
-    # Financials / XLF
-    "JPM": "financials",
-    "BAC": "financials",
-    "WFC": "financials",
-    "GS": "financials",
-    "MS": "financials",
-    "C": "financials",
-    "BLK": "financials",
-    "SCHW": "financials",
-    "AXP": "financials",
-    "USB": "financials",
-    "PNC": "financials",
-    "COF": "financials",
-    "V": "financials",
-    "MA": "financials",
-    "PYPL": "financials",
-    # Biotech/Healthcare / XBI
-    "MRNA": "biotech",
-    "PFE": "biotech",
-    "JNJ": "biotech",
-    "ABBV": "biotech",
-    "LLY": "biotech",
-    "AMGN": "biotech",
-    "GILD": "biotech",
-    "BIIB": "biotech",
-    "REGN": "biotech",
-    "BMY": "biotech",
-    "UNH": "biotech",
-    "TMO": "biotech",
-    "ABT": "biotech",
-    "VRTX": "biotech",
-    "ISRG": "biotech",
-    # Energy / USO
-    "XOM": "energy",
-    "CVX": "energy",
-    "COP": "energy",
-    "SLB": "energy",
-    "EOG": "energy",
-    "MPC": "energy",
-    "OXY": "energy",
-    "PSX": "energy",
-    "VLO": "energy",
-    "HAL": "energy",
-    "DVN": "energy",
-    "PXD": "energy",
-    # Small Cap / IWM — broad small-cap names
-    "ROKU": "small_cap",
-    "ETSY": "small_cap",
-    "DKNG": "small_cap",
-    "PINS": "small_cap",
-    "SNAP": "small_cap",
+# Map underlying ETF → sector name (used to build ticker→sector map)
+_UNDERLYING_TO_SECTOR: dict[str, str] = {
+    "QQQ": "tech",
+    "SOXX": "semiconductors",
+    "XLF": "financials",
+    "XBI": "biotech",
+    "XLE": "energy",
+    "IWM": "small_cap",
+    # SPY and XLK are broad/overlap — handled by priority below
 }
+
+# Priority: more-specific index wins for stocks in multiple indices.
+# Lower number = higher priority (checked first).
+_INDEX_PRIORITY: tuple[str, ...] = (
+    "SOXX",  # semiconductor-specific
+    "XLE",   # energy-specific
+    "XBI",   # biotech-specific
+    "XLF",   # financials-specific
+    "IWM",   # small-cap-specific
+    "QQQ",   # broad tech (catches remaining tech names)
+    "XLK",   # tech select (subset of QQQ mostly)
+    "SPY",   # broadest — fallback
+)
 
 # Map sector categories to underlying ETF tickers from the universe
 SECTOR_TO_UNDERLYING: dict[str, str] = {
@@ -124,12 +59,42 @@ UNDERLYING_TO_LEVERAGED: dict[str, str] = {
 }
 
 
+def _build_ticker_map() -> dict[str, str]:
+    """Build ticker→sector map from SEC index holdings.
+
+    Uses index priority so more-specific indices win for stocks
+    that appear in multiple indices (e.g. NVDA → semiconductors, not tech).
+    """
+    result: dict[str, str] = {}
+    for index in _INDEX_PRIORITY:
+        sector = _UNDERLYING_TO_SECTOR.get(index)
+        if sector is None:
+            continue
+        for holding in INDEX_HOLDINGS.get(index, []):
+            if holding.ticker not in result:
+                result[holding.ticker] = sector
+    return result
+
+
+# Built once at import time from the SEC holdings data
+TICKER_SECTOR_MAP: dict[str, str] = _build_ticker_map()
+
+
 class SectorSentiment(StrEnum):
     """Sector-level sentiment from Congress trades."""
 
     BULLISH = "BULLISH"
     BEARISH = "BEARISH"
     NEUTRAL = "NEUTRAL"
+
+
+@dataclass(frozen=True, slots=True)
+class TickerDetail:
+    """Per-ticker trade detail within a sector."""
+
+    ticker: str
+    trade_count: int
+    net_usd: float
 
 
 @dataclass(frozen=True, slots=True)
@@ -147,6 +112,7 @@ class SectorAggregation:
     top_buyers: tuple[str, ...]
     top_sellers: tuple[str, ...]
     trade_count: int
+    top_tickers: tuple[TickerDetail, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -225,6 +191,16 @@ def aggregate_sectors(
     sector_sellers: dict[str, dict[str, float]] = defaultdict(
         lambda: defaultdict(float),
     )
+    # Per-ticker tracking within each sector
+    ticker_buys: dict[str, dict[str, float]] = defaultdict(
+        lambda: defaultdict(float),
+    )
+    ticker_sells: dict[str, dict[str, float]] = defaultdict(
+        lambda: defaultdict(float),
+    )
+    ticker_counts: dict[str, dict[str, int]] = defaultdict(
+        lambda: defaultdict(int),
+    )
 
     for trade in recent:
         sector = get_ticker_sector(trade.ticker)
@@ -232,19 +208,24 @@ def aggregate_sectors(
             sector = "broad_market"
 
         mid = (trade.amount_low + trade.amount_high) / 2
-        member_weight = get_member_weight(tier_lookup.get(trade.member_name, "C"))
+        member_weight = get_member_weight(
+            tier_lookup.get(trade.member_name, "C"),
+        )
         time_weight = _time_decay_weight(trade.trade_date, days)
         weighted_amount = mid * member_weight * time_weight
 
         is_buy = trade.transaction_type == TransactionType.PURCHASE
+        ticker_counts[sector][trade.ticker] += 1
         if is_buy:
             sector_buys[sector] += weighted_amount
             sector_buy_count[sector] += 1
             sector_buyers[sector][trade.member_name] += weighted_amount
+            ticker_buys[sector][trade.ticker] += weighted_amount
         else:
             sector_sells[sector] += weighted_amount
             sector_sell_count[sector] += 1
             sector_sellers[sector][trade.member_name] += weighted_amount
+            ticker_sells[sector][trade.ticker] += weighted_amount
 
     # Build aggregations for each tracked sector
     results: list[SectorAggregation] = []
@@ -269,6 +250,24 @@ def aggregate_sectors(
 
         leveraged = UNDERLYING_TO_LEVERAGED.get(underlying, "")
 
+        # Top tickers by trade count (max 5)
+        sec_tickers = ticker_counts.get(sector, {})
+        sec_buys = ticker_buys.get(sector, {})
+        sec_sells = ticker_sells.get(sector, {})
+        sorted_tickers = sorted(
+            sec_tickers.items(), key=lambda x: x[1], reverse=True,
+        )[:5]
+        top_ticker_details = tuple(
+            TickerDetail(
+                ticker=tk,
+                trade_count=cnt,
+                net_usd=round(
+                    sec_buys.get(tk, 0.0) - sec_sells.get(tk, 0.0), 2,
+                ),
+            )
+            for tk, cnt in sorted_tickers
+        )
+
         results.append(
             SectorAggregation(
                 sector=sector,
@@ -282,8 +281,10 @@ def aggregate_sectors(
                 top_buyers=tuple(top_b),
                 top_sellers=tuple(top_s),
                 trade_count=(
-                    sector_buy_count.get(sector, 0) + sector_sell_count.get(sector, 0)
+                    sector_buy_count.get(sector, 0)
+                    + sector_sell_count.get(sector, 0)
                 ),
+                top_tickers=top_ticker_details,
             ),
         )
 

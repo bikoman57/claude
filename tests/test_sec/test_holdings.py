@@ -9,15 +9,18 @@ from app.sec.holdings import (
 
 def test_get_holdings_qqq():
     holdings = get_holdings("QQQ")
-    assert len(holdings) == 8
+    assert len(holdings) == 21
     tickers = [h.ticker for h in holdings]
     assert "AAPL" in tickers
     assert "NVDA" in tickers
 
 
-def test_get_holdings_empty():
-    # IWM has no individual holdings tracked
-    assert get_holdings("IWM") == []
+def test_get_holdings_iwm():
+    # IWM has small-cap holdings tracked
+    holdings = get_holdings("IWM")
+    assert len(holdings) == 5
+    tickers = [h.ticker for h in holdings]
+    assert "ROKU" in tickers
 
 
 def test_get_holdings_unknown():

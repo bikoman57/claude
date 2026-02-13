@@ -55,6 +55,18 @@ MODULE_COMMANDS: list[tuple[str, list[str]]] = [
         [sys.executable, "-m", "app.congress", "summary"],
     ),
     (
+        "risk.dashboard",
+        [sys.executable, "-m", "app.risk", "dashboard"],
+    ),
+    (
+        "portfolio.dashboard",
+        [sys.executable, "-m", "app.portfolio", "dashboard"],
+    ),
+    (
+        "quant.summary",
+        [sys.executable, "-m", "app.quant", "summary"],
+    ),
+    (
         "history.weights",
         [sys.executable, "-m", "app.history", "weights"],
     ),

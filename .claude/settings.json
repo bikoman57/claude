@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
   "permissions": {
     "allow": [
       "Bash(uv sync*)",
@@ -25,7 +28,14 @@
       "Bash(uv run python -m app.news*)",
       "Bash(uv run python -m app.statistics*)",
       "Bash(uv run python -m app.strategy*)",
-      "Bash(uv run python -m app.scheduler*)"
+      "Bash(uv run python -m app.scheduler*)",
+      "Bash(uv run python -m app.risk*)",
+      "Bash(uv run python -m app.portfolio*)",
+      "Bash(uv run python -m app.quant*)",
+      "Bash(uv run python -m app.congress*)",
+      "Bash(uv run python -m app.agile*)",
+      "Bash(uv run python -m app.finops*)",
+      "Bash(uv run python -m app.devops*)"
     ],
     "deny": []
   }

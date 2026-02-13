@@ -15,6 +15,7 @@ FACTOR_NAMES = [
     "news_sentiment",
     "market_statistics",
     "congress_sentiment",
+    "portfolio_risk",
 ]
 
 

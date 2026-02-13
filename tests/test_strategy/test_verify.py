@@ -96,16 +96,28 @@ def test_trend_stable():
 # --- Verification integration tests ---
 
 
-def test_verify_forecasts_empty():
+def test_verify_forecasts_empty(tmp_path, monkeypatch):
     """Empty data should produce empty report."""
+    monkeypatch.setattr(
+        "app.strategy.verify._ACCURACY_PATH", tmp_path / "accuracy.json"
+    )
+    monkeypatch.setattr(
+        "app.strategy.forecast._FORECASTS_DIR", tmp_path / "forecasts"
+    )
     report = verify_forecasts([], [])
     assert report.total_verifications == 0
     assert report.hit_rate == 0.0
     assert report.trend == Trend.INSUFFICIENT
 
 
-def test_verify_forecasts_no_forecasts_on_disk():
+def test_verify_forecasts_no_forecasts_on_disk(tmp_path, monkeypatch):
     """No saved forecasts should give empty verifications."""
+    monkeypatch.setattr(
+        "app.strategy.verify._ACCURACY_PATH", tmp_path / "accuracy.json"
+    )
+    monkeypatch.setattr(
+        "app.strategy.forecast._FORECASTS_DIR", tmp_path / "forecasts"
+    )
     signals = [
         {
             "leveraged_ticker": "TQQQ",

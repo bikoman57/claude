@@ -39,8 +39,35 @@ def test_ticker_to_sector_energy():
     assert get_ticker_sector("CVX") == "energy"
 
 
+def test_ticker_to_sector_small_cap():
+    assert get_ticker_sector("ROKU") == "small_cap"
+    assert get_ticker_sector("ETSY") == "small_cap"
+
+
 def test_ticker_to_sector_unknown():
     assert get_ticker_sector("ZZZZZ") is None
+
+
+def test_ticker_map_derived_from_holdings():
+    """TICKER_SECTOR_MAP is built from SEC INDEX_HOLDINGS."""
+    from app.congress.sectors import TICKER_SECTOR_MAP
+    from app.sec.holdings import INDEX_HOLDINGS
+
+    # Every stock in SOXX should map to semiconductors
+    for h in INDEX_HOLDINGS["SOXX"]:
+        assert TICKER_SECTOR_MAP[h.ticker] == "semiconductors"
+
+    # Every stock in XLE should map to energy
+    for h in INDEX_HOLDINGS["XLE"]:
+        assert TICKER_SECTOR_MAP[h.ticker] == "energy"
+
+
+def test_ticker_map_priority_specific_index_wins():
+    """More-specific index wins over broad for multi-index stocks."""
+    # NVDA is in both QQQ and SOXX; SOXX (semiconductors) should win
+    assert get_ticker_sector("NVDA") == "semiconductors"
+    # AVGO is in QQQ, SOXX, XLK; SOXX should win
+    assert get_ticker_sector("AVGO") == "semiconductors"
 
 
 def _recent_date(days_ago: int = 5) -> str:
@@ -169,6 +196,25 @@ def test_member_weight_applied():
     tech_f = next(s for s in sectors_f if s.sector == "tech")
 
     assert tech_a.weighted_score > tech_f.weighted_score
+
+
+def test_sector_aggregation_top_tickers():
+    """Aggregation tracks which tickers were traded per sector."""
+    trades = [
+        _make_trade(member="A", ticker="AAPL", amount_low=50000, amount_high=100000),
+        _make_trade(member="A", ticker="MSFT", amount_low=50000, amount_high=100000),
+        _make_trade(member="A", ticker="AAPL", amount_low=50000, amount_high=100000),
+    ]
+    ratings = [_make_rating(name="A", tier=MemberTier.A)]
+    sectors = aggregate_sectors(trades, ratings)
+    tech = next(s for s in sectors if s.sector == "tech")
+
+    assert len(tech.top_tickers) == 2
+    # AAPL has 2 trades, MSFT has 1
+    assert tech.top_tickers[0].ticker == "AAPL"
+    assert tech.top_tickers[0].trade_count == 2
+    assert tech.top_tickers[1].ticker == "MSFT"
+    assert tech.top_tickers[1].trade_count == 1
 
 
 def test_compute_overall_sentiment_bullish():

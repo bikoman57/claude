@@ -108,14 +108,15 @@ def test_congress_sentiment_neutral():
 
 
 def test_compute_confidence_high():
-    # 10-factor system: HIGH requires 8+
-    factors = [_fav(f"f{i}") for i in range(8)] + [
+    # 12-factor system: HIGH requires 9+
+    factors = [_fav(f"f{i}") for i in range(9)] + [
         _neutral("n1"),
         _neutral("n2"),
+        _neutral("n3"),
     ]
     score = compute_confidence(factors)
     assert score.level == ConfidenceLevel.HIGH
-    assert score.favorable_count == 8
+    assert score.favorable_count == 9
 
 
 def test_compute_confidence_medium():

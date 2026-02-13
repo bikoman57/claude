@@ -4,7 +4,7 @@ description: Generate the unified daily swing trading report using PARALLEL agen
 disable-model-invocation: true
 metadata:
   author: bikoman57
-  version: 1.0.0
+  version: 2.0.0
   category: financial-analysis
   experimental: true
 ---
@@ -42,18 +42,35 @@ for sym, name in [('SPY','S&P 500'),('QQQ','Nasdaq-100'),('IWM','Russell 2000'),
 
 ### Step 2: Create Agent Team
 
-Create an agent team for parallel financial analysis. Spawn **8 teammates** — one per domain:
+Create an agent team for parallel financial analysis. Spawn **13 teammates** across 4 departments:
+
+**Risk Management (Middle Office)**
 
 | Teammate | Agent | Domain |
 |----------|-------|--------|
-| macro | macro-analyst | VIX regime, Fed policy, yield curve, economic indicators |
-| sec | sec-analyst | SEC filings, institutional 13F activity |
-| news | news-analyst | Financial news sentiment, headlines |
-| geopolitical | geopolitical-analyst | Geopolitical events, sector impact |
-| social | social-analyst | Reddit sentiment, official statements |
-| statistics | statistics-analyst | Sector rotation, breadth, correlations |
-| strategy | strategy-analyst | Backtest results, parameter proposals |
-| researcher | strategy-researcher | New strategies, ETF candidates, market edges |
+| risk | risk-manager | Risk limits, exposure, VETO authority |
+| portfolio | risk-portfolio | Portfolio tracking, position sizing |
+
+**Research**
+
+| Teammate | Agent | Domain |
+|----------|-------|--------|
+| macro | research-macro | VIX regime, Fed policy, yield curve, economic indicators |
+| sec | research-sec | SEC filings, institutional 13F activity |
+| statistics | research-statistics | Sector rotation, breadth, correlations |
+| strategy | research-strategy-analyst | Backtest results, parameter proposals |
+| researcher | research-strategy-researcher | New strategies, ETF candidates, market edges |
+| quant | research-quant | Quantitative analysis, regime detection |
+
+**Intelligence**
+
+| Teammate | Agent | Domain |
+|----------|-------|--------|
+| intel-chief | intel-chief | Aggregates intel broadcasts into unified briefing |
+| news | intel-news | Financial news sentiment, headlines |
+| geopolitical | intel-geopolitical | Geopolitical events, sector impact |
+| social | intel-social | Reddit sentiment, official statements |
+| congress | intel-congress | Congressional stock trades, member ratings |
 
 When spawning each teammate, include in their prompt:
 1. The ETF signals from Step 1 (so they have context on what's in SIGNAL/ALERT state)
@@ -64,25 +81,28 @@ When spawning each teammate, include in their prompt:
 [DOMAIN] METRIC: value (FAVORABLE/UNFAVORABLE/NEUTRAL for mean-reversion)
 ```
 
-Use the Sonnet model for all teammates.
+Use the Sonnet model for all teammates (except research-quant which uses opus).
 
 ### Step 3: Wait for All Teammates
 
-Monitor teammate progress. All 8 must complete and broadcast their findings before proceeding. If a teammate stalls or errors, note the missing domain and continue with available data.
+Monitor teammate progress. All 13 must complete and broadcast their findings before proceeding. If a teammate stalls or errors, note the missing domain and continue with available data.
 
 ### Step 4: Synthesize Unified Report
 
-Once all broadcasts are received, use the `chief-analyst` agent logic to:
+Once all broadcasts are received, use the `exec-cio` agent logic to:
 
 1. **Cross-reference** all domain findings — explain tensions between domains
-2. **Compute confidence scores** (9 factors) for each ETF in SIGNAL state:
-   - Drawdown Depth | VIX Regime | Fed Regime | Yield Curve | SEC Sentiment
-   - Geopolitical Risk | Social Sentiment | News Sentiment | Market Statistics
-   - Score: **HIGH** (7+/9 favorable), **MEDIUM** (4-6), **LOW** (0-3)
-3. **Flag contrarian setups**: bearish social + bearish news + deep drawdown = maximum opportunity
-4. **Include learning insights** from `uv run python -m app.history weights` and `uv run python -m app.history summary`
-5. **Include research ideas** from the strategy-researcher — new strategies, ETF candidates, market edges
-6. **Produce the report** in the standard unified format (see Report Format below)
+2. **Check risk-manager for VETOs** — any vetoed signals are reported but marked as BLOCKED
+3. **Include portfolio sizing** from risk-portfolio
+4. **Compute confidence scores** (12 factors) for each ETF in SIGNAL state:
+   - Drawdown Depth | VIX Regime | Fed Regime | Yield Curve | SEC Sentiment | Earnings Risk
+   - Geopolitical Risk | Social Sentiment | News Sentiment | Market Statistics | Congress Sentiment | Portfolio Risk
+   - Score: **HIGH** (9+/12 favorable), **MEDIUM** (5-8), **LOW** (0-4)
+5. **Flag contrarian setups**: bearish social + bearish news + deep drawdown = maximum opportunity
+6. **Include learning insights** from `uv run python -m app.history weights` and `uv run python -m app.history summary`
+7. **Include research ideas** from the research-strategy-researcher — new strategies, ETF candidates, market edges
+8. **Include quantitative insights** from research-quant — regime, recovery stats
+9. **Produce the report** in the standard unified format (see Report Format below)
 
 ### Step 5: Clean Up Team
 
@@ -97,26 +117,24 @@ uv run python -m app.telegram notify --title "Daily Swing Report" "<report summa
 ## Report Format
 
 ```
-══════════════════════════════════════════════════
-       DAILY SWING TRADING REPORT — [DATE]
+======================================================
+       DAILY SWING TRADING REPORT -- [DATE]
        (Generated via PARALLEL AGENT TEAMS)
-══════════════════════════════════════════════════
+======================================================
 
 MARKET OVERVIEW
 Indices: SPY {%} | QQQ {%} | IWM {%}
 VIX: {val} [{regime}] | Fed: {trajectory} | Yields: {curve}
 
-GEOPOLITICAL RISK
-Risk Level: [HIGH/MEDIUM/LOW]
-- [event summary with sector impact]
+RISK DASHBOARD
+Portfolio: ${val} | Invested: {%} | Cash: {%}
+Exposure: {%} leveraged | Positions: {N}/{max}
+Risk status: [WITHIN LIMITS / WARNING / VETO ACTIVE]
 
-SOCIAL & OFFICIAL SENTIMENT
-Reddit: [sentiment] (trending: $TICKER, $TICKER)
-Officials: Fed tone [HAWKISH/DOVISH/NEUTRAL]
-
-NEWS SENTIMENT
-Overall: [sentiment] ([N] articles)
-- [top headline with sector relevance]
+INTELLIGENCE BRIEFING
+Overall: [sentiment] ([confidence] confidence)
+News: [sentiment] | Social: [sentiment] | Geopolitical: [risk] | Congress: [sentiment]
+Conflicts: [any contradictions between sources]
 
 MARKET STATISTICS
 Rotation: [RISK_ON/RISK_OFF] | Put/Call: [val] | VIX Term: [structure]
@@ -126,10 +144,14 @@ SEC FILINGS (last 7 days)
 - [ticker] [form_type] filed [date]: [materiality]
 
 ENTRY SIGNALS
-[1] BUY TQQQ — QQQ down 5.2% from ATH
-    CONFIDENCE: HIGH (7/9 factors)
-    Drawdown: FAV | VIX: FAV | Fed: FAV | Yields: FAV | SEC: NEU
-    Geopolitical: FAV | Social: FAV | News: FAV | Stats: NEU
+[1] BUY TQQQ -- QQQ down 5.2% from ATH
+    CONFIDENCE: HIGH (9/12 factors)
+    Drawdown: FAV | VIX: FAV | Fed: FAV | Yields: FAV | SEC: NEU | Earnings: FAV
+    Geopolitical: FAV | Social: FAV | News: FAV | Stats: NEU | Congress: FAV | Risk: FAV
+    Suggested position: $X (Y% of portfolio)
+
+BLOCKED SIGNALS (risk veto)
+[1] TQQQ -- BLOCKED: tech sector already 50% of portfolio
 
 ACTIVE POSITIONS
 | ETF  | Entry  | Current | P/L   | Target | Days |
@@ -137,8 +159,12 @@ ACTIVE POSITIONS
 STRATEGY INSIGHTS
 - [backtest-based proposals for parameter changes]
 
+QUANTITATIVE INSIGHTS
+- Regime: [BULL/BEAR/RANGE] (confidence: X%)
+- Recovery stats: [key finding]
+
 RESEARCH IDEAS
-- [new strategy proposals from strategy-researcher]
+- [new strategy proposals from research-strategy-researcher]
 - [new ETF candidates with rationale]
 - [market anomalies or edges discovered]
 

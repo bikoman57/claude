@@ -43,8 +43,8 @@ uv run python -m app.sec recent
 ```
 
 ### Step 6: Market Momentum
-Use the `market-analyst` subagent:
-> "Use the market-analyst agent to assess momentum and volatility conditions for [underlying_ticker] to determine if conditions favor a mean-reversion entry on [leveraged_ticker]."
+Use the `trading-market-analyst` subagent:
+> "Use the trading-market-analyst agent to assess momentum and volatility conditions for [underlying_ticker] to determine if conditions favor a mean-reversion entry on [leveraged_ticker]."
 
 ### Step 7: Synthesize with Confidence Score
 

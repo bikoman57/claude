@@ -7,6 +7,15 @@ import json
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+from app.agile.store import (
+    get_current_sprint,
+    list_retros,
+    list_standups,
+    load_retro,
+    load_roadmap,
+    load_standup,
+)
+from app.devops.health import get_all_module_health, get_system_health
 from app.etf.confidence import (
     ConfidenceLevel,
     ConfidenceScore,
@@ -28,31 +37,31 @@ from app.scheduler.runner import SchedulerRun
 _ISRAEL_TZ = ZoneInfo("Asia/Jerusalem")
 
 _CSS = """\
-/* === Fintech Dashboard Design === */
+/* === Dark Fintech Dashboard Design === */
 :root {
-  --bg-primary: #f5f7fa;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #eef1f6;
-  --bg-dark: #1a2332;
-  --border-primary: #dce1e8;
-  --border-light: #e8ecf1;
-  --border-hover: #2563eb;
-  --text-primary: #1a1a1a;
-  --text-secondary: #4a4a4a;
-  --text-muted: #7a7a7a;
-  --accent: #2563eb;
-  --accent-light: #eff6ff;
-  --success: #16a34a;
-  --success-bg: #f0fdf4;
-  --warning: #d97706;
-  --warning-bg: #fffbeb;
-  --danger: #dc2626;
-  --danger-bg: #fef2f2;
-  --info: #2563eb;
-  --info-bg: #eff6ff;
-  --purple: #7c3aed;
-  --purple-bg: #f5f3ff;
-  --neutral: #94a3b8;
+  --bg-primary: #131722;
+  --bg-secondary: #1e2433;
+  --bg-tertiary: #252b3b;
+  --bg-dark: #0b0f18;
+  --border-primary: #2a3346;
+  --border-light: #232b3e;
+  --border-hover: #58a6ff;
+  --text-primary: #e6edf3;
+  --text-secondary: #c9d1d9;
+  --text-muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-light: #1a2744;
+  --success: #3fb950;
+  --success-bg: #0d2818;
+  --warning: #d29922;
+  --warning-bg: #2a1f00;
+  --danger: #f85149;
+  --danger-bg: #2d0a0a;
+  --info: #58a6ff;
+  --info-bg: #0d1f3c;
+  --purple: #bc8cff;
+  --purple-bg: #1f0d3c;
+  --neutral: #484f58;
   --font-serif: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', 'Consolas', monospace;
@@ -96,15 +105,16 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
 .top-bar { background: var(--bg-dark); color: #fff;
   padding: 0 clamp(16px, 3vw, 48px);
   margin: 0 calc(-1 * clamp(16px, 3vw, 48px));
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center;
   position: sticky; top: 0; z-index: 100;
   min-height: 56px; flex-wrap: wrap; }
 .top-bar h1 { color: #fff; font-size: 16px; font-weight: 600;
   letter-spacing: -0.01em; white-space: nowrap; margin-right: 24px; }
+.top-bar-logo { height: 40px; width: auto; vertical-align: middle;
+  margin-right: 12px; border-radius: 4px; }
 
 /* Navigation menu */
-.nav-menu { display: flex; gap: 0; overflow-x: auto;
-  -webkit-overflow-scrolling: touch; margin-left: auto; }
+.nav-menu { display: flex; gap: 0; align-items: center; }
 .nav-menu a { font-family: var(--font-mono); font-size: 11px;
   font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
   color: rgba(255,255,255,0.65); white-space: nowrap;
@@ -116,6 +126,45 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
   border-bottom-color: #fff; }
 .nav-menu .nav-divider { width: 1px; background: rgba(255,255,255,0.2);
   margin: 12px 0; flex-shrink: 0; }
+
+/* Section dropdown */
+.nav-dropdown { position: relative; }
+.nav-dropdown-btn { font-family: var(--font-mono); font-size: 11px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.65); background: none; border: none;
+  padding: 18px 14px; cursor: pointer; white-space: nowrap;
+  display: flex; align-items: center; gap: 6px;
+  transition: color 0.15s; }
+.nav-dropdown-btn:hover, .nav-dropdown-btn:focus { color: #fff; outline: none; }
+.nav-dropdown-btn::after { content: "\\25BC"; font-size: 0.6em;
+  transition: transform 0.15s ease; }
+.nav-dropdown.open .nav-dropdown-btn::after { transform: rotate(180deg); }
+.nav-dropdown-btn:hover, .nav-dropdown.open .nav-dropdown-btn { color: #fff; }
+.nav-dropdown-menu { display: none; position: absolute; top: 100%;
+  right: 0; background: var(--bg-dark); border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px; padding: 6px 0; min-width: 180px; z-index: 200;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.nav-dropdown.open .nav-dropdown-menu { display: block; }
+.nav-dropdown-menu a { display: block; padding: 10px 18px;
+  border-bottom: none; font-family: var(--font-mono); font-size: 11px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.65); text-decoration: none;
+  transition: background 0.1s, color 0.1s; }
+.nav-dropdown-menu a:hover, .nav-dropdown-menu a:focus {
+  background: rgba(255,255,255,0.08); color: #fff;
+  border-bottom: none; text-decoration: none; }
+
+/* Report date picker */
+.nav-date-picker { font-family: var(--font-mono); font-size: 11px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.65); background: transparent;
+  border: 1px solid rgba(255,255,255,0.25); border-radius: 4px;
+  padding: 6px 10px; margin: 0 8px; cursor: pointer;
+  appearance: auto; }
+.nav-date-picker:hover, .nav-date-picker:focus {
+  color: #fff; border-color: rgba(255,255,255,0.5);
+  outline: none; }
+.nav-date-picker option { background: var(--bg-dark); color: #fff; }
 
 /* Header / datebar */
 .header { display: flex; align-items: center; justify-content: space-between;
@@ -195,8 +244,8 @@ th { font-family: var(--font-mono); text-align: left; padding: 12px 14px;
   text-transform: uppercase; letter-spacing: 0.08em;
   background: var(--bg-tertiary); border-bottom: 2px solid var(--border-primary); }
 td { padding: 12px 14px; border-bottom: 1px solid var(--border-light); }
-tbody tr:nth-child(even) { background: #fafbfc; }
-tbody tr:hover { background: #f0f4f8; }
+tbody tr:nth-child(even) { background: #1a2030; }
+tbody tr:hover { background: #252d40; }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
 th.num { text-align: right; }
 .pct-up { color: var(--success); }
@@ -213,7 +262,7 @@ th.num { text-align: right; }
 .signal-card::before { content: ''; position: absolute; left: 0; top: 0;
   width: 100%; height: 3px; background: var(--border-light); }
 .signal-card-signal::before { background: var(--success); }
-.signal-card-signal { background: var(--success-bg); }
+.signal-card-signal { border-color: var(--success); }
 .signal-card-signal .signal-ticker { font-size: 1.35em; }
 .signal-card-alert::before { background: var(--warning); }
 .signal-card-active::before { background: var(--info); }
@@ -320,6 +369,23 @@ details[open] summary { margin-bottom: 8px; }
   color: var(--text-muted); margin-top: 4px;
   display: flex; gap: 12px; flex-wrap: wrap; }
 
+/* Congress member cards */
+.congress-grid { display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px; margin-top: 12px; }
+.congress-member { background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  padding: 14px 18px; border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.congress-member-name { font-family: var(--font-serif); font-size: 14px;
+  font-weight: 700; color: var(--text-primary); }
+.congress-member-meta { font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-muted); margin-top: 4px; }
+.tier-a { border-left: 3px solid var(--success); }
+.tier-b { border-left: 3px solid var(--info); }
+.tier-c { border-left: 3px solid var(--neutral); }
+.tier-d, .tier-f { border-left: 3px solid var(--danger); }
+
 /* Standfirst highlight */
 .highlight { background: var(--accent-light);
   padding: 1px 4px; border-radius: 2px; }
@@ -392,25 +458,101 @@ a:hover { text-decoration: underline; }
 .ok { color: var(--success); }
 .fail { color: var(--danger); }
 
-/* Index page */
-.report-list { display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 12px; margin-top: 16px; }
-.report-card { background: var(--bg-secondary); border: 1px solid var(--border-light);
-  padding: 16px; text-align: center; position: relative;
-  transition: border-color 0.15s ease; border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-.report-card:hover { border-color: var(--accent); }
-.report-card a { font-family: var(--font-serif); font-size: 1.1em;
-  font-weight: 600; }
-.report-card a::after { content: ''; position: absolute;
-  inset: 0; z-index: 1; }
-.badge-latest { background: var(--accent); color: #fff; font-size: 0.7em;
-  font-family: var(--font-mono); padding: 2px 8px; margin-left: 8px;
-  text-transform: uppercase; letter-spacing: 0.06em; border-radius: 3px; }
+/* === Index Page — Compact Dashboard === */
+.idx-ticker-bar { display: flex; gap: 0; align-items: stretch;
+  background: var(--bg-dark); border-bottom: 1px solid var(--border-primary);
+  margin: 0 calc(-1 * clamp(16px, 3vw, 48px));
+  padding: 0 clamp(16px, 3vw, 48px); overflow-x: auto; }
+.idx-ticker { display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 8px 16px; min-width: 80px;
+  border-right: 1px solid var(--border-primary);
+  font-family: var(--font-mono); font-size: 11px; line-height: 1.3; }
+.idx-ticker:last-child { border-right: none; }
+.idx-ticker .tk-sym { font-weight: 700; color: var(--text-primary);
+  font-size: 12px; }
+.idx-ticker .tk-sector { color: var(--text-muted); font-size: 9px;
+  text-transform: uppercase; letter-spacing: 0.06em; }
+.idx-layout { display: grid; grid-template-columns: 1fr 280px;
+  gap: 0; margin-top: 0; min-height: 60vh; }
+.idx-main { border-right: 1px solid var(--border-primary);
+  padding-right: 24px; }
+.idx-sidebar { padding-left: 20px; }
+
+/* Featured latest report */
+.idx-featured { padding: 20px 0 16px; border-bottom: 1px solid var(--border-primary); }
+.idx-featured-kicker { font-family: var(--font-mono); font-size: 10px;
+  font-weight: 700; color: var(--accent); text-transform: uppercase;
+  letter-spacing: 0.12em; margin-bottom: 6px; }
+.idx-featured h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px;
+  padding-bottom: 0; border-bottom: none; display: block; line-height: 1.3; }
+.idx-featured h2 a { color: var(--text-primary); }
+.idx-featured h2 a:hover { color: var(--accent); }
+.idx-featured-meta { font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-muted); margin-bottom: 8px; }
+.idx-featured-tabs { display: flex; gap: 0; flex-wrap: wrap; margin-top: 10px; }
+.idx-tab { font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em; padding: 5px 12px;
+  color: var(--text-muted); border: 1px solid var(--border-primary);
+  border-right: none; background: var(--bg-secondary);
+  transition: color 0.1s, background 0.1s; }
+.idx-tab:last-child { border-right: 1px solid var(--border-primary); }
+.idx-tab:first-child { border-radius: 4px 0 0 4px; }
+.idx-tab:last-child { border-radius: 0 4px 4px 0; }
+.idx-tab:hover { color: var(--text-primary); background: var(--bg-tertiary);
+  text-decoration: none; }
+
+/* Report row items */
+.idx-report-row { display: flex; align-items: center; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--border-light); }
+.idx-report-row:last-child { border-bottom: none; }
+.idx-report-date { font-family: var(--font-serif); font-size: 15px;
+  font-weight: 600; white-space: nowrap; }
+.idx-report-date a { color: var(--text-primary); }
+.idx-report-date a:hover { color: var(--accent); }
+.idx-report-pages { display: flex; gap: 6px; flex-wrap: wrap; }
+.idx-page-link { font-family: var(--font-mono); font-size: 9px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 2px 7px; background: var(--bg-tertiary); color: var(--text-muted);
+  border-radius: 3px; transition: color 0.1s, background 0.1s; }
+.idx-page-link:hover { color: var(--text-primary); background: var(--bg-secondary);
+  text-decoration: none; }
+
+/* Sidebar sections */
+.idx-sb-section { padding: 14px 0; border-bottom: 1px solid var(--border-primary); }
+.idx-sb-section:last-child { border-bottom: none; }
+.idx-sb-title { font-family: var(--font-mono); font-size: 11px;
+  font-weight: 700; color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: 0.1em; margin-bottom: 10px; }
+
+/* Sidebar archive list */
+.idx-archive-item { display: flex; justify-content: space-between;
+  align-items: center; padding: 7px 0;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 13px; }
+.idx-archive-item:last-child { border-bottom: none; }
+.idx-archive-item a { color: var(--text-secondary); font-weight: 500; }
+.idx-archive-item a:hover { color: var(--accent); }
+.badge-latest { background: var(--accent); color: #fff; font-size: 9px;
+  font-family: var(--font-mono); padding: 1px 6px;
+  text-transform: uppercase; letter-spacing: 0.06em; border-radius: 2px; }
+
+/* Sidebar ETF watchlist */
+.idx-etf-row { display: flex; justify-content: space-between;
+  align-items: center; padding: 5px 0;
+  border-bottom: 1px solid var(--border-light); font-size: 12px; }
+.idx-etf-row:last-child { border-bottom: none; }
+.idx-etf-sym { font-family: var(--font-mono); font-weight: 700;
+  color: var(--text-primary); font-size: 12px; }
+.idx-etf-name { color: var(--text-muted); font-size: 11px; }
+
+/* Section header on index page */
+.idx-section-head { font-family: var(--font-mono); font-size: 11px;
+  font-weight: 700; color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: 0.1em; padding: 14px 0 8px;
+  border-bottom: 1px solid var(--border-primary); margin-bottom: 0; }
 
 /* Focus-visible */
-a:focus-visible, summary:focus-visible, .report-card:focus-within {
+a:focus-visible, summary:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -422,6 +564,9 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
   .kpi-strip { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
   table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .index-tiles { grid-template-columns: repeat(3, 1fr); }
+  .idx-layout { grid-template-columns: 1fr; }
+  .idx-main { border-right: none; padding-right: 0; }
+  .idx-sidebar { padding-left: 0; border-top: 1px solid var(--border-primary); }
 }
 
 /* Mobile */
@@ -450,10 +595,10 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 @media print {
   body { background: #fff; color: #000; max-width: 100%;
     font-size: 11pt; }
-  .top-bar { background: #000; }
+  .top-bar { background: #000; color: #fff; }
   .card, .signal-card, .kpi-card, .exec-summary, .report-card {
     background: #fff; border-color: #ccc; box-shadow: none;
-    break-inside: avoid; }
+    break-inside: avoid; color: #000; }
   .skip-nav, .top-bar { display: none; }
   details[open] > summary { display: none; }
   details > *:not(summary) { display: block !important; }
@@ -464,7 +609,144 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
   a { color: #000; text-decoration: underline; }
   .footer { page-break-before: auto; }
   .report-card:hover { transform: none; }
+  h1, h2, .kpi-value, .signal-ticker { color: #000; }
 }
+
+/* === Company Page Styles === */
+
+/* Kanban board */
+.kanban-board { display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 12px; margin-top: 12px; }
+@media (max-width: 900px) { .kanban-board { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .kanban-board { grid-template-columns: 1fr; } }
+.kanban-column { background: var(--bg-secondary); border-radius: 8px;
+  padding: 12px; border: 1px solid var(--border-primary); min-height: 120px; }
+.kanban-column h3 { font-size: 13px; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 10px;
+  padding-bottom: 6px; border-bottom: 2px solid var(--border-primary); }
+.kanban-card { background: var(--bg-tertiary); border-radius: 6px;
+  padding: 10px 12px; margin-bottom: 8px; border-left: 3px solid var(--accent);
+  font-size: 13px; line-height: 1.4; }
+.kanban-card .task-id { font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-muted); }
+.kanban-card .task-title { color: var(--text-primary); margin: 4px 0; }
+.kanban-card .task-dept { font-size: 11px; color: var(--text-muted); }
+.kanban-card.priority-critical { border-left-color: var(--danger); }
+.kanban-card.priority-high { border-left-color: var(--warning); }
+.kanban-card.priority-medium { border-left-color: var(--accent); }
+.kanban-card.priority-low { border-left-color: var(--text-muted); }
+
+/* Progress bars for OKRs and budgets */
+.progress-bar { height: 8px; border-radius: 4px; background: var(--bg-tertiary);
+  overflow: hidden; margin-top: 6px; }
+.progress-fill { height: 100%; border-radius: 4px; min-width: 2px; }
+.progress-fill.green { background: var(--success); }
+.progress-fill.yellow { background: var(--warning); }
+.progress-fill.red { background: var(--danger); }
+
+/* OKR cards */
+.okr-card { background: var(--bg-secondary); border-radius: 8px;
+  padding: 16px; margin-bottom: 12px; border: 1px solid var(--border-primary); }
+.okr-card h3 { font-size: 15px; color: var(--text-primary); margin-bottom: 8px; }
+.okr-card .okr-id { font-family: var(--font-mono); font-size: 12px;
+  color: var(--accent); margin-right: 8px; }
+.okr-card .kr-list { list-style: none; padding: 0; margin: 8px 0 0 0; }
+.okr-card .kr-list li { font-size: 13px; color: var(--text-secondary);
+  padding: 3px 0; padding-left: 20px; position: relative; }
+.okr-card .kr-list li::before { content: "\\2022"; position: absolute;
+  left: 6px; color: var(--text-muted); }
+.okr-pct { font-family: var(--font-mono); font-size: 13px;
+  color: var(--text-muted); float: right; }
+
+/* Health grid */
+.health-grid { display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px; margin-top: 12px; }
+.health-card { background: var(--bg-secondary); border-radius: 8px;
+  padding: 14px; border: 1px solid var(--border-primary); }
+.health-card .module-name { font-family: var(--font-mono); font-size: 13px;
+  color: var(--text-primary); margin-bottom: 6px; }
+.health-card .health-stat { font-size: 12px; color: var(--text-muted);
+  display: flex; justify-content: space-between; padding: 2px 0; }
+.health-card .health-stat .val { color: var(--text-secondary);
+  font-family: var(--font-mono); }
+.health-card.trend-improving { border-left: 3px solid var(--success); }
+.health-card.trend-stable { border-left: 3px solid var(--text-muted); }
+.health-card.trend-degrading { border-left: 3px solid var(--danger); }
+
+/* Grade badge */
+.grade-badge { display: inline-block; font-size: 28px; font-weight: 700;
+  font-family: var(--font-mono); width: 48px; height: 48px; line-height: 48px;
+  text-align: center; border-radius: 8px; }
+.grade-A { background: var(--success-bg); color: var(--success); }
+.grade-B { background: var(--info-bg); color: var(--info); }
+.grade-C { background: var(--warning-bg); color: var(--warning); }
+.grade-D, .grade-F { background: var(--danger-bg); color: var(--danger); }
+
+/* Ceremony sections */
+.ceremony-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 900px) { .ceremony-grid { grid-template-columns: 1fr; } }
+.ceremony-col { background: var(--bg-secondary); border-radius: 8px;
+  padding: 14px; border: 1px solid var(--border-primary); }
+.ceremony-col h3 { font-size: 14px; margin-bottom: 10px; padding-bottom: 6px;
+  border-bottom: 2px solid var(--border-primary); }
+.ceremony-col.went-well h3 { color: var(--success); border-color: var(--success); }
+.ceremony-col.to-improve h3 { color: var(--warning); border-color: var(--warning); }
+.ceremony-col.action-items h3 { color: var(--accent); border-color: var(--accent); }
+.ceremony-item { font-size: 13px; color: var(--text-secondary);
+  padding: 6px 0; border-bottom: 1px solid var(--border-light); }
+
+/* Budget bars */
+.budget-row { display: flex; align-items: center; gap: 12px;
+  padding: 8px 0; border-bottom: 1px solid var(--border-light); }
+.budget-row .dept-name { width: 120px; font-size: 13px; color: var(--text-primary); }
+.budget-row .budget-bar-wrap { flex: 1; }
+.budget-row .budget-nums { width: 140px; font-family: var(--font-mono);
+  font-size: 12px; color: var(--text-muted); text-align: right; }
+
+/* Sprint goals */
+.sprint-goals { list-style: none; padding: 0; margin: 8px 0; }
+.sprint-goals li { font-size: 13px; color: var(--text-secondary);
+  padding: 4px 0 4px 22px; position: relative; }
+.sprint-goals li::before { content: "\\1F3AF"; position: absolute; left: 0; }
+
+/* Standup accordion */
+.standup-detail { margin-bottom: 8px; }
+.standup-detail summary { cursor: pointer; font-size: 14px; color: var(--text-primary);
+  padding: 8px 12px; background: var(--bg-secondary); border-radius: 6px;
+  border: 1px solid var(--border-primary); }
+.standup-entries { padding: 12px; }
+.standup-entry { background: var(--bg-tertiary); border-radius: 6px;
+  padding: 10px; margin-bottom: 8px; font-size: 13px; }
+.standup-entry .dept { font-weight: 600; color: var(--accent); margin-bottom: 4px; }
+.standup-entry .field { color: var(--text-muted); }
+.standup-entry .field span { color: var(--text-secondary); }
+"""
+
+_DROPDOWN_JS = """\
+<script>
+document.querySelectorAll('.nav-dropdown-btn').forEach(function(btn){
+  btn.addEventListener('click',function(e){
+    e.stopPropagation();
+    var dd=btn.parentElement;
+    var open=dd.classList.toggle('open');
+    btn.setAttribute('aria-expanded',open);
+  });
+});
+document.addEventListener('click',function(){
+  document.querySelectorAll('.nav-dropdown.open').forEach(function(dd){
+    dd.classList.remove('open');
+    dd.querySelector('.nav-dropdown-btn').setAttribute('aria-expanded','false');
+  });
+});
+document.querySelectorAll('.nav-dropdown-menu a').forEach(function(a){
+  a.addEventListener('click',function(){
+    var dd=a.closest('.nav-dropdown');
+    if(dd){dd.classList.remove('open');
+      dd.querySelector('.nav-dropdown-btn').setAttribute('aria-expanded','false');}
+  });
+});
+</script>
 """
 
 _BADGE_MAP: dict[str, str] = {
@@ -496,6 +778,11 @@ _BADGE_MAP: dict[str, str] = {
     "ALERT": "badge-yellow",
     "WATCH": "badge-gray",
     "TARGET": "badge-green",
+    "A-TIER": "badge-green",
+    "B-TIER": "badge-blue",
+    "C-TIER": "badge-gray",
+    "D-TIER": "badge-yellow",
+    "F-TIER": "badge-red",
 }
 
 # Confidence uses separate color mapping: HIGH=good, LOW=bad for trades
@@ -530,6 +817,37 @@ _GAUGE_FILL_MAP: dict[str, str] = {
     "badge-blue": "gauge-fill-gray",
 }
 
+# Strategy type labels and descriptions
+_STRATEGY_LABELS: dict[str, str] = {
+    "ath_mean_reversion": "ATH Mean-Reversion",
+    "rsi_oversold": "RSI Oversold",
+    "bollinger_lower": "Bollinger Lower Band",
+    "ma_dip": "Moving Average Dip",
+}
+
+_STRATEGY_DESCRIPTIONS: dict[str, str] = {
+    "ath_mean_reversion": (
+        "Buy leveraged ETF when its underlying index drops a threshold % "
+        "from all-time high, exit at profit target. Captures mean-reversion "
+        "after broad market drawdowns."
+    ),
+    "rsi_oversold": (
+        "Buy when 14-day RSI falls below oversold threshold (typically 30), "
+        "exit when RSI recovers above overbought level or profit target hit. "
+        "Targets short-term momentum reversals."
+    ),
+    "bollinger_lower": (
+        "Buy when price touches or breaks below the lower Bollinger Band "
+        "(20-day SMA minus 2 standard deviations), exit at the middle band "
+        "or profit target. Identifies statistical extremes in price action."
+    ),
+    "ma_dip": (
+        "Buy when price dips a threshold % below its 50-day moving average, "
+        "exit when price recovers to or above the MA. Captures pullbacks "
+        "within an established trend."
+    ),
+}
+
 # Google Material Symbols icon names
 _MATERIAL_ICONS: dict[str, str] = {
     "signal": "radar",
@@ -541,6 +859,7 @@ _MATERIAL_ICONS: dict[str, str] = {
     "rate": "account_balance",
     "yield": "show_chart",
     "rates": "currency_exchange",
+    "congress": "account_balance",
 }
 
 
@@ -589,6 +908,14 @@ def _confidence_badge(level: str) -> str:
     """Return a badge for confidence level (HIGH=green, LOW=red)."""
     cls = _CONFIDENCE_BADGE_MAP.get(level.upper(), "badge-gray")
     return f'<span class="badge {cls}">{html.escape(level)}</span>'
+
+
+def _strategy_badge(strategy_key: str, short_label: str = "") -> str:
+    """Return a strategy type badge with tooltip description."""
+    label = short_label or _STRATEGY_LABELS.get(strategy_key, strategy_key)
+    desc = _STRATEGY_DESCRIPTIONS.get(strategy_key, "")
+    title = f' title="{html.escape(desc)}"' if desc else ""
+    return f'<span class="badge badge-gray"{title}>{html.escape(label)}</span>'
 
 
 def _kpi_bar_class(level: str) -> str:
@@ -675,14 +1002,14 @@ def _html_page(title: str, body: str, *, description: str = "") -> str:
         '<html lang="en" dir="ltr">\n<head>\n'
         '<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-        '<meta name="theme-color" content="#1a2332">\n'
+        '<meta name="theme-color" content="#0b0f18">\n'
         f"{desc_tag}"
         f"<title>{html.escape(title)}</title>\n"
         f"{fonts}"
         f"<style>{_CSS}</style>\n"
         "</head>\n<body>\n"
         '<a href="#main-content" class="skip-nav">Skip to main content</a>\n'
-        f"{body}\n</body>\n</html>\n"
+        f"{body}\n{_DROPDOWN_JS}\n</body>\n</html>\n"
     )
 
 
@@ -1464,7 +1791,7 @@ def _section_strategy(outputs: dict[str, str]) -> str:
     data = _parse_output(outputs["strategy.proposals"])
     if not isinstance(data, list) or not data:
         return ""
-    # Strategy type short labels
+    # Strategy type short labels for table cells
     strategy_short: dict[str, str] = {
         "ath_mean_reversion": "ATH",
         "rsi_oversold": "RSI",
@@ -1486,7 +1813,7 @@ def _section_strategy(outputs: dict[str, str]) -> str:
         ret_str = _fmt_pct(ret, signed=True) if isinstance(ret, (int, float)) else "N/A"
         ret_cls = _pct_class(ret)
 
-        # Strategy type badge
+        # Strategy type badge with tooltip
         stype = str(p.get("strategy_type", "ath_mean_reversion"))
         stype_label = strategy_short.get(stype, stype)
 
@@ -1512,7 +1839,7 @@ def _section_strategy(outputs: dict[str, str]) -> str:
 
         rows.append(
             f"<tr><td><strong>{ticker}</strong></td>"
-            f'<td><span class="badge badge-gray">{html.escape(stype_label)}</span></td>'
+            f"<td>{_strategy_badge(stype, stype_label)}</td>"
             f"<td>{reason}</td>"
             f'<td class="num">{html.escape(sharpe_str)}</td>'
             f'<td class="num">{html.escape(wr_str)}</td>'
@@ -1715,6 +2042,141 @@ def _section_geopolitical(outputs: dict[str, str]) -> str:
     )
 
 
+# --- Congress trading section ---
+
+
+def _section_congress(outputs: dict[str, str]) -> str:
+    """Render Congressional stock trading activity section."""
+    data = _parse_output(outputs.get("congress.summary", ""))
+    if not isinstance(data, dict):
+        return ""
+
+    parts: list[str] = []
+
+    # Overall sentiment + trade counts
+    sentiment = str(data.get("overall_sentiment", "NEUTRAL"))
+    trades_30d = data.get("trades_last_30d", 0)
+    trades_90d = data.get("total_trades_90d", 0)
+    net_usd = data.get("net_buying_usd", 0)
+
+    net_str = ""
+    if isinstance(net_usd, (int, float)):
+        sign = "+" if net_usd >= 0 else ""
+        net_str = f" &mdash; Net: {sign}${abs(net_usd):,.0f}"
+
+    parts.append(
+        f"<p>Overall: {_badge(sentiment)}{net_str}</p>"
+        f'<p class="text-muted" style="font-size:12px">'
+        f"{trades_30d} trades (30d) &bull; {trades_90d} trades (90d)</p>"
+    )
+
+    # Sector breakdown table
+    sectors = data.get("sectors", [])
+    if isinstance(sectors, list) and sectors:
+        rows: list[str] = []
+        for sec in sectors:
+            if not isinstance(sec, dict):
+                continue
+            name = html.escape(str(sec.get("sector", "")))
+            lev = html.escape(str(sec.get("leveraged", "")))
+            sec_sent = str(sec.get("sentiment", "NEUTRAL"))
+            sec_net = sec.get("net_usd", 0)
+            sec_trades = sec.get("trades", 0)
+            if isinstance(sec_net, (int, float)) and sec_net > 0:
+                net_cls = "pct-up"
+            elif isinstance(sec_net, (int, float)) and sec_net < 0:
+                net_cls = "pct-down"
+            else:
+                net_cls = ""
+            net_display = ""
+            if isinstance(sec_net, (int, float)):
+                sign = "+" if sec_net >= 0 else ""
+                net_display = f"{sign}${abs(sec_net):,.0f}"
+            # Top tickers traded in this sector
+            tickers_html = ""
+            top_tickers = sec.get("top_tickers", [])
+            if isinstance(top_tickers, list) and top_tickers:
+                chips: list[str] = []
+                for tk in top_tickers[:5]:
+                    if not isinstance(tk, dict):
+                        continue
+                    t = html.escape(str(tk.get("ticker", "")))
+                    tc = tk.get("trades", 0)
+                    tn = tk.get("net_usd", 0)
+                    cls = (
+                        "pct-up"
+                        if isinstance(tn, (int, float)) and tn > 0
+                        else (
+                            "pct-down"
+                            if isinstance(tn, (int, float)) and tn < 0
+                            else ""
+                        )
+                    )
+                    chips.append(
+                        f'<span class="sector-badge {cls}">{t} ({tc})</span>',
+                    )
+                if chips:
+                    tickers_html = (
+                        '<tr><td colspan="5" style='
+                        '"padding:4px 14px 10px">'
+                        f"{''.join(chips)}</td></tr>"
+                    )
+
+            rows.append(
+                f"<tr><td>{name}</td>"
+                f"<td>{lev}</td>"
+                f"<td>{_badge(sec_sent)}</td>"
+                f'<td class="num {net_cls}">{net_display}</td>'
+                f'<td class="num">{sec_trades}</td></tr>'
+                f"{tickers_html}"
+            )
+        if rows:
+            parts.append(
+                '<div style="overflow-x:auto; margin-top:12px">'
+                "<table>"
+                "<thead><tr>"
+                "<th>Sector</th><th>ETF</th><th>Sentiment</th>"
+                '<th class="num">Net Flow</th><th class="num">Trades</th>'
+                "</tr></thead>"
+                f"<tbody>{''.join(rows)}</tbody>"
+                "</table></div>"
+            )
+
+    # Top members
+    members = data.get("top_members", [])
+    if isinstance(members, list) and members:
+        parts.append('<div class="congress-grid">')
+        for mem in members[:8]:
+            if not isinstance(mem, dict):
+                continue
+            name = html.escape(str(mem.get("name", "")))
+            tier = str(mem.get("tier", "C"))
+            win_rate = mem.get("win_rate", 0)
+            m_trades = mem.get("trades", 0)
+            chamber = html.escape(str(mem.get("chamber", "")))
+            t = tier.lower()
+            tier_cls = f"tier-{t}" if t in "abcdf" else "tier-c"
+            wr_str = f"{win_rate:.0%}" if isinstance(win_rate, float) else str(win_rate)
+            parts.append(
+                f'<div class="congress-member {tier_cls}">'
+                f'<div class="congress-member-name">{name}</div>'
+                f'<div class="congress-member-meta">'
+                f"{_badge(tier + '-TIER')} {chamber} &bull; "
+                f"Win: {wr_str} &bull; {m_trades} trades"
+                "</div></div>"
+            )
+        parts.append("</div>")
+
+    if not parts:
+        return ""
+    return (
+        '<section id="congress">\n'
+        f"<h2>{_section_icon('congress')}Congressional Trading</h2>\n"
+        '<div class="card">\n' + "\n".join(parts) + "\n</div>\n"
+        "</section>\n"
+    )
+
+
 # --- Module status ---
 
 
@@ -1772,30 +2234,32 @@ def _section_strategy_research(outputs: dict[str, str]) -> str:
     if not tickers:
         return ""
 
-    strategy_labels = {
-        "ath_mean_reversion": "ATH Mean-Reversion",
-        "rsi_oversold": "RSI Oversold",
-        "bollinger_lower": "Bollinger Lower",
-        "ma_dip": "MA Dip",
-    }
-
     parts: list[str] = [
         '<p class="kicker">Strategy Research</p>',
         "<p>The multi-strategy optimizer explored "
         f"<strong>{len(tickers)} ETF(s)</strong> across "
         f"<strong>{len(strategies) or 4} strategy types</strong> "
-        "(ATH drawdown, RSI oversold, Bollinger band, MA dip) "
         "with multiple parameter combinations each. "
         "Results are ranked by risk-adjusted returns (Sharpe ratio).</p>",
     ]
 
     if strategies:
-        strat_badges = " ".join(
-            f'<span class="badge badge-gray">'
-            f"{html.escape(strategy_labels.get(s, s))}</span>"
-            for s in sorted(strategies)
+        strat_items: list[str] = []
+        for s in sorted(strategies):
+            label = _STRATEGY_LABELS.get(s, s)
+            desc = _STRATEGY_DESCRIPTIONS.get(s, "")
+            escaped_label = html.escape(label)
+            escaped_desc = html.escape(desc)
+            strat_items.append(
+                f'<div style="padding:8px 0;'
+                f'border-bottom:1px solid var(--border-light)">'
+                f'<span class="badge badge-gray">{escaped_label}</span>'
+                f' <span style="font-size:13px;color:var(--text-secondary)">'
+                f"&mdash; {escaped_desc}</span></div>",
+            )
+        parts.append(
+            '<div class="mt-12">' + "\n".join(strat_items) + "</div>",
         )
-        parts.append(f'<p class="mt-8">Strategies tested: {strat_badges}</p>')
 
     etf_badges = " ".join(
         f'<span class="sector-badge">{html.escape(t)}</span>' for t in tickers[:8]
@@ -1810,18 +2274,24 @@ def _section_strategy_research(outputs: dict[str, str]) -> str:
     )
 
 
-def _page_header_bar(date: str, active_page: str) -> str:
-    """Render a unified navy top bar with title and navigation links.
+def _page_header_bar(
+    date: str,
+    active_page: str,
+    report_dates: list[str] | None = None,
+) -> str:
+    """Render a unified navy top bar with title, navigation, and date picker.
 
     Args:
         date: Report date string (YYYY-MM-DD) for building page hrefs.
-        active_page: One of "dashboard", "trade-logs", "forecasts", "index".
+        active_page: One of "dashboard", "trade-logs", "forecasts".
+        report_dates: Available report dates (newest first) for the picker.
     """
     pages = [
-        (f"{date}.html", "Dashboard", "dashboard"),
+        (f"{date}.html", "Market Report", "dashboard"),
         (f"trade-logs-{date}.html", "Trade Logs", "trade-logs"),
         (f"forecasts-{date}.html", "Forecasts", "forecasts"),
-        ("../index.html", "All Reports", "index"),
+        (f"strategies-{date}.html", "Strategies", "strategies"),
+        (f"company-{date}.html", "Company", "company"),
     ]
     page_items = []
     for href, label, key in pages:
@@ -1830,7 +2300,7 @@ def _page_header_bar(date: str, active_page: str) -> str:
 
     parts = "".join(page_items)
 
-    # Section anchors only on dashboard page
+    # Section anchors as dropdown on dashboard page
     if active_page == "dashboard":
         section_links = [
             ("#signals", "Signals"),
@@ -1838,18 +2308,48 @@ def _page_header_bar(date: str, active_page: str) -> str:
             ("#market", "Market"),
             ("#risks", "Risks"),
             ("#geopolitical", "Geopolitical"),
+            ("#congress", "Congress"),
             ("#strategy", "Strategy"),
             ("#research", "Research"),
             ("#modules", "Modules"),
         ]
-        sections = "".join(
+        section_items = "".join(
             f'<a href="{href}">{label}</a>' for href, label in section_links
         )
-        parts += '<span class="nav-divider"></span>' + sections
+        parts += (
+            '<span class="nav-divider"></span>'
+            '<div class="nav-dropdown">'
+            '<button class="nav-dropdown-btn" '
+            'aria-haspopup="true" aria-expanded="false">'
+            "Sections</button>"
+            f'<div class="nav-dropdown-menu">{section_items}</div>'
+            "</div>"
+        )
+
+    # Date picker dropdown
+    date_picker = ""
+    if report_dates and len(report_dates) > 1:
+        options = []
+        for d in report_dates:
+            escaped = html.escape(d)
+            selected = " selected" if d == date else ""
+            options.append(
+                f'<option value="{escaped}"{selected}>{escaped}</option>',
+            )
+        opts_html = "".join(options)
+        date_picker = (
+            '<select class="nav-date-picker" '
+            'aria-label="Select report date" '
+            'onchange="window.location.href='
+            "this.value+'.html'\">"
+            f"{opts_html}</select>\n"
+        )
 
     return (
         '<div class="top-bar">\n'
-        "<h1>Swing Trading Report</h1>\n"
+        '<h1><img src="../logo.png" alt="Be Him" class="top-bar-logo">'
+        "Swing Trading Report</h1>\n"
+        f"{date_picker}"
         f'<nav class="nav-menu" aria-label="Report navigation">{parts}</nav>\n'
         "</div>\n"
     )
@@ -1859,6 +2359,7 @@ def build_html_report(
     run: SchedulerRun,
     *,
     date: str = "",
+    report_dates: list[str] | None = None,
 ) -> str:
     """Build a complete narrative HTML dashboard from a scheduler run."""
     report_date = date or datetime.now(tz=_ISRAEL_TZ).strftime("%Y-%m-%d")
@@ -1881,11 +2382,12 @@ def build_html_report(
     conditions = _section_market_conditions(outputs)
     market_risks = _section_market_risks(outputs)
     geopolitical = _section_geopolitical(outputs)
+    congress = _section_congress(outputs)
     strategy = _section_strategy(outputs)
     research = _section_strategy_research(outputs)
     modules = _section_module_status(run)
 
-    top_bar = _page_header_bar(report_date, "dashboard")
+    top_bar = _page_header_bar(report_date, "dashboard", report_dates)
 
     header = (
         '<header class="header">\n'
@@ -1926,6 +2428,7 @@ def build_html_report(
         mid,
         market_risks,
         geopolitical,
+        congress,
         strategy,
         research,
         modules,
@@ -1933,40 +2436,168 @@ def build_html_report(
         footer,
     ]
     return _html_page(
-        title=f"Dashboard {report_date}",
+        title=f"Market Report {report_date}",
         body="\n".join(p for p in body_parts if p),
-        description=f"Daily leveraged ETF swing trading dashboard for {report_date}",
+        description=f"Daily leveraged ETF swing trading report for {report_date}",
     )
 
 
-def build_index_html(report_dates: list[str]) -> str:
-    """Build the index.html landing page with card-based report list."""
-    cards: list[str] = []
+_ETF_WATCHLIST: list[tuple[str, str]] = [
+    ("TQQQ", "Tech 3x"),
+    ("TECL", "Tech 3x"),
+    ("SOXL", "Semi 3x"),
+    ("FAS", "Fin 3x"),
+    ("UCO", "Oil 2x"),
+    ("LABU", "Bio 3x"),
+    ("UPRO", "S&P 3x"),
+    ("TNA", "SmCap 3x"),
+]
+
+_SUB_PAGES: list[tuple[str, str, str]] = [
+    # (prefix, label, icon — used as tab text)
+    ("", "Report", "report"),
+    ("trade-logs-", "Trades", "trades"),
+    ("forecasts-", "Forecasts", "fcst"),
+    ("strategies-", "Strategies", "strat"),
+    ("company-", "Company", "co"),
+]
+
+
+def build_index_html(
+    report_dates: list[str],
+    *,
+    sub_pages: dict[str, list[str]] | None = None,
+) -> str:
+    """Build the index.html landing page — compact Yahoo Finance-style layout.
+
+    *sub_pages* maps each date to a list of available prefixes
+    (e.g. ``{"2026-02-13": ["", "trade-logs-", "forecasts-"]}``)
+    so we can link to only the pages that actually exist.
+    If not provided, only the main report link is shown.
+    """
+    sub_pages = sub_pages or {}
+
+    # --- ticker bar ---
+    ticker_cells: list[str] = []
+    for sym, sector in _ETF_WATCHLIST:
+        ticker_cells.append(
+            f'<div class="idx-ticker">'
+            f'<span class="tk-sym">{sym}</span>'
+            f'<span class="tk-sector">{sector}</span></div>',
+        )
+    ticker_bar = '<div class="idx-ticker-bar">\n' + "\n".join(ticker_cells) + "\n</div>"
+
+    # --- helper: build tab links for a date ---
+    def _tabs(d: str, prefix_path: str = "reports/") -> str:
+        available = sub_pages.get(d, [""])
+        parts: list[str] = []
+        for pfx, label, _icon in _SUB_PAGES:
+            if pfx in available:
+                href = f'{prefix_path}{pfx}{html.escape(d)}.html'
+                parts.append(f'<a href="{href}" class="idx-tab">{label}</a>')
+        if not parts:
+            return ""
+        return '<div class="idx-featured-tabs">' + "".join(parts) + "</div>"
+
+    # --- main column: featured latest + older reports ---
+    featured_html = ""
+    older_rows: list[str] = []
+
+    if not report_dates:
+        featured_html = (
+            '<div class="idx-featured">\n'
+            '<div class="idx-featured-kicker">No Reports Yet</div>\n'
+            "<h2>0 report(s) available</h2>\n"
+            '<div class="idx-featured-meta">'
+            "Run a pre-market or post-market analysis to generate your first report."
+            "</div>\n</div>\n"
+        )
+    elif report_dates:
+        latest = report_dates[0]
+        escaped = html.escape(latest)
+        featured_html = (
+            '<div class="idx-featured">\n'
+            '<div class="idx-featured-kicker">Latest Report</div>\n'
+            f'<h2><a href="reports/{escaped}.html">'
+            f"Market Report &mdash; {escaped}</a></h2>\n"
+            f'<div class="idx-featured-meta">{escaped} '
+            f'&middot; {len(report_dates)} report(s) available</div>\n'
+            f"{_tabs(latest)}\n"
+            "</div>\n"
+        )
+
+        for d in report_dates[1:]:
+            ed = html.escape(d)
+            page_links: list[str] = []
+            available = sub_pages.get(d, [""])
+            for pfx, label, _icon in _SUB_PAGES:
+                if pfx in available:
+                    href = f'reports/{pfx}{ed}.html'
+                    page_links.append(
+                        f'<a href="{href}" class="idx-page-link">{label}</a>',
+                    )
+            pages_html = (
+                '<div class="idx-report-pages">' + "".join(page_links) + "</div>"
+                if page_links
+                else ""
+            )
+            older_rows.append(
+                f'<div class="idx-report-row">'
+                f'<span class="idx-report-date">'
+                f'<a href="reports/{ed}.html">{ed}</a></span>'
+                f"{pages_html}</div>",
+            )
+
+    older_html = ""
+    if older_rows:
+        older_html = (
+            '<div class="idx-section-head">Previous Reports</div>\n'
+            + "\n".join(older_rows)
+        )
+
+    main_col = f'<div class="idx-main">\n{featured_html}{older_html}\n</div>'
+
+    # --- sidebar: archive quick links + ETF watchlist ---
+    archive_items: list[str] = []
     for i, d in enumerate(report_dates):
-        escaped = html.escape(d)
-        latest = (
-            '<span class="badge-latest">LATEST</span>'
-            if i == 0 and report_dates
-            else ""
+        ed = html.escape(d)
+        badge = ' <span class="badge-latest">LATEST</span>' if i == 0 else ""
+        archive_items.append(
+            f'<div class="idx-archive-item">'
+            f'<a href="reports/{ed}.html">{ed}</a>{badge}</div>',
         )
-        cards.append(
-            f'<div class="report-card">'
-            f'<a href="reports/{escaped}.html">'
-            f"{escaped}</a>{latest}</div>",
-        )
-
-    list_html = (
-        '<div class="report-list">\n' + "\n".join(cards) + "\n</div>" if cards else ""
+    archive_section = (
+        '<div class="idx-sb-section">\n'
+        '<div class="idx-sb-title">Report Archive</div>\n'
+        + "\n".join(archive_items)
+        + "\n</div>"
     )
+
+    etf_rows: list[str] = []
+    for sym, sector in _ETF_WATCHLIST:
+        etf_rows.append(
+            f'<div class="idx-etf-row">'
+            f'<span class="idx-etf-sym">{sym}</span>'
+            f'<span class="idx-etf-name">{sector}</span></div>',
+        )
+    etf_section = (
+        '<div class="idx-sb-section">\n'
+        '<div class="idx-sb-title">ETF Watchlist</div>\n'
+        + "\n".join(etf_rows)
+        + "\n</div>"
+    )
+
+    sidebar = f'<div class="idx-sidebar">\n{archive_section}\n{etf_section}\n</div>'
 
     body = (
         '<div class="top-bar">\n'
-        "<h1>Swing Trading Report</h1>\n"
+        '<h1><img src="logo.png" alt="Be Him" class="top-bar-logo">'
+        "Swing Trading Report</h1>\n"
         "</div>\n"
-        '<header class="header">\n'
-        f"<span>{len(report_dates)} report(s)</span>\n"
-        "</header>\n"
-        f'<main id="main-content">\n{list_html}\n</main>\n'
+        f"{ticker_bar}\n"
+        f'<main id="main-content">\n'
+        f'<div class="idx-layout">\n{main_col}\n{sidebar}\n</div>\n'
+        f"</main>\n"
         '<footer class="footer">\n'
         '<span>Powered by <a href="https://github.com/bikoman57/claude">'
         "fin-agents</a></span>\n</footer>"
@@ -2142,6 +2773,7 @@ def build_trade_logs_html(
     outputs: dict[str, str],
     *,
     date: str = "",
+    report_dates: list[str] | None = None,
 ) -> str:
     """Build trade logs page with Chart.js equity curve."""
     report_date = date or datetime.now(tz=_ISRAEL_TZ).strftime("%Y-%m-%d")
@@ -2285,6 +2917,7 @@ def build_trade_logs_html(
         "    plugins: {\n"
         "      title: { display: true,"
         " text: 'Equity Curve — $10,000 Starting Capital',"
+        " color: '#e6edf3',"
         " font: { size: 16, family: 'Inter' } },\n"
         "      tooltip: {\n"
         "        callbacks: {\n"
@@ -2296,18 +2929,22 @@ def build_trade_logs_html(
         "      }\n"
         "    },\n"
         "    scales: {\n"
-        "      x: { title: { display: true, text: 'Trade #' },"
-        " ticks: { maxTicksLimit: 20 } },\n"
-        "      y: { title: { display: true, text: 'Portfolio Value ($)' },"
-        " ticks: { callback: function(v) {"
-        " return '$' + v.toLocaleString(); } } }\n"
+        "      x: { title: { display: true, text: 'Trade #',"
+        " color: '#8b949e' },"
+        " ticks: { maxTicksLimit: 20, color: '#8b949e' },"
+        " grid: { color: '#2a3346' } },\n"
+        "      y: { title: { display: true, text: 'Portfolio Value ($)',"
+        " color: '#8b949e' },"
+        " ticks: { color: '#8b949e', callback: function(v) {"
+        " return '$' + v.toLocaleString(); } },"
+        " grid: { color: '#2a3346' } }\n"
         "    }\n"
         "  }\n"
         "});\n"
         "</script>\n"
     )
 
-    top_bar = _page_header_bar(report_date, "trade-logs")
+    top_bar = _page_header_bar(report_date, "trade-logs", report_dates)
 
     header = (
         '<header class="header">\n'
@@ -2348,9 +2985,14 @@ def build_trade_logs_html(
         "</div>\n</div>\n</section>\n"
     )
 
+    trade_count = len(all_rows)
     trade_table = (
         "<section>\n"
-        "<h2>Individual Trade Log</h2>\n"
+        "<details>\n"
+        "<summary>"
+        '<h2 style="display:inline">Individual Trade Log</h2> '
+        f'<span class="badge badge-gray">{trade_count} trades</span>'
+        "</summary>\n"
         '<div class="card">\n'
         '<table class="mt-12">\n<thead><tr>'
         '<th scope="col">ETF</th>'
@@ -2366,7 +3008,8 @@ def build_trade_logs_html(
         '<th scope="col">W/L</th>'
         "</tr></thead>\n<tbody>\n"
         + "\n".join(all_rows)
-        + "\n</tbody></table>\n</div>\n</section>\n"
+        + "\n</tbody></table>\n</div>\n"
+        "</details>\n</section>\n"
     )
 
     footer = (
@@ -2381,8 +3024,8 @@ def build_trade_logs_html(
         top_bar,
         header,
         '<main id="main-content">\n',
-        summary_table,
         chart_section,
+        summary_table,
         trade_table,
         "</main>\n",
         footer,
@@ -2409,6 +3052,7 @@ def build_forecasts_html(
     outputs: dict[str, str],
     *,
     date: str = "",
+    report_dates: list[str] | None = None,
 ) -> str:
     """Build the forecasts page with entry probability table and accuracy KPIs."""
     report_date = date or datetime.now(tz=_ISRAEL_TZ).strftime("%Y-%m-%d")
@@ -2527,12 +3171,11 @@ def build_forecasts_html(
             f'<td class="num {_pct_class(exp_ret)}">'
             f"{_fmt_pct(exp_ret, signed=True)}</td>"
             f'<td class="num">{hold_days}d</td>'
-            f'<td><span class="badge badge-gray">'
-            f"{html.escape(stype_label)}</span></td>"
+            f"<td>{_strategy_badge(strategy, stype_label)}</td>"
             f"</tr>",
         )
 
-    top_bar = _page_header_bar(report_date, "forecasts")
+    top_bar = _page_header_bar(report_date, "forecasts", report_dates)
 
     header = (
         '<header class="header">\n'
@@ -2588,3 +3231,783 @@ def build_forecasts_html(
         body="\n".join(p for p in body_parts if p),
         description=f"ETF entry probability forecasts for {report_date}",
     )
+
+
+# ---------------------------------------------------------------------------
+# Company page — sprint board, roadmap, ceremonies, budget, pipeline health
+# ---------------------------------------------------------------------------
+
+_KANBAN_COLS = ["TODO", "IN_PROGRESS", "DONE", "BLOCKED"]
+_KANBAN_LABELS = {
+    "TODO": "To Do",
+    "IN_PROGRESS": "In Progress",
+    "DONE": "Done",
+    "BLOCKED": "Blocked",
+}
+
+
+def _section_sprint_board() -> str:
+    """Render current sprint as a kanban board."""
+    sprint = get_current_sprint()
+    if sprint is None:
+        return (
+            "<section>\n<h2>Sprint Board</h2>\n"
+            '<div class="card"><p class="text-muted">'
+            "No active sprint &mdash; run "
+            "<code>uv run python -m app.agile init</code></p></div>\n"
+            "</section>\n"
+        )
+
+    status_badge = _badge(
+        "TARGET"
+        if sprint.status == "ACTIVE"
+        else "WATCH"
+        if sprint.status == "PLANNED"
+        else "ALERT",
+    )
+    goals_html = ""
+    if sprint.goals:
+        items = "".join(f"<li>{html.escape(g)}</li>" for g in sprint.goals)
+        goals_html = f'<ul class="sprint-goals">{items}</ul>'
+
+    # Group tasks by status
+    by_status: dict[str, list[str]] = {c: [] for c in _KANBAN_COLS}
+    for task in sprint.tasks:
+        col = task.status.value if task.status.value in by_status else "TODO"
+        prio_val = task.priority.value if hasattr(task.priority, "value") else "medium"
+        prio = prio_val.lower()
+        card = (
+            f'<div class="kanban-card priority-{html.escape(prio)}">'
+            f'<span class="task-id">{html.escape(task.id)}</span>'
+            f'<div class="task-title">{html.escape(task.title)}</div>'
+            f'<span class="task-dept">{html.escape(task.assignee_department)}</span>'
+            "</div>"
+        )
+        by_status[col].append(card)
+
+    cols_html = ""
+    for col_key in _KANBAN_COLS:
+        label = _KANBAN_LABELS.get(col_key, col_key)
+        cards = "".join(by_status[col_key]) or (
+            '<p style="font-size:12px;color:var(--text-muted)">No tasks</p>'
+        )
+        cols_html += (
+            f'<div class="kanban-column"><h3>{html.escape(label)}</h3>{cards}</div>\n'
+        )
+
+    task_done = sum(1 for t in sprint.tasks if t.status.value == "DONE")
+    task_total = len(sprint.tasks)
+
+    return (
+        "<section>\n"
+        "<h2>Sprint Board</h2>\n"
+        '<div class="card">\n'
+        f"<p><strong>Sprint {sprint.number}</strong> "
+        f"({html.escape(sprint.start_date)} &rarr; "
+        f"{html.escape(sprint.end_date)}) "
+        f"{status_badge} &bull; "
+        f"{task_done}/{task_total} tasks done</p>\n"
+        f"{goals_html}"
+        f'<div class="kanban-board">{cols_html}</div>\n'
+        "</div>\n</section>\n"
+    )
+
+
+def _section_roadmap() -> str:
+    """Render company roadmap with OKR progress bars."""
+    roadmap = load_roadmap()
+    if not roadmap.okrs:
+        return (
+            "<section>\n<h2>Roadmap</h2>\n"
+            '<div class="card"><p class="text-muted">'
+            "No roadmap defined</p></div>\n</section>\n"
+        )
+
+    cards: list[str] = []
+    for okr in roadmap.okrs:
+        pct = okr.progress_pct
+        bar_cls = "green" if pct >= 66 else "yellow" if pct >= 33 else "red"
+        kr_items = "".join(f"<li>{html.escape(kr)}</li>" for kr in okr.key_results)
+        cards.append(
+            f'<div class="okr-card">'
+            f"<h3>"
+            f'<span class="okr-id">{html.escape(okr.id)}</span>'
+            f"{html.escape(okr.objective)}"
+            f'<span class="okr-pct">{pct:.0f}%</span>'
+            f"</h3>"
+            f'<div class="progress-bar">'
+            f'<div class="progress-fill {bar_cls}" '
+            f'style="width:{max(pct, 2):.0f}%"></div></div>'
+            f'<ul class="kr-list">{kr_items}</ul>'
+            f"</div>",
+        )
+
+    return "<section>\n<h2>Roadmap &amp; OKRs</h2>\n" + "".join(cards) + "</section>\n"
+
+
+def _section_ceremonies() -> str:
+    """Render recent standups and latest retrospective."""
+    parts: list[str] = []
+
+    # Recent standups
+    standup_dates = list_standups()
+    recent_dates = standup_dates[-3:] if standup_dates else []
+    standup_html = ""
+    for d in reversed(recent_dates):
+        record = load_standup(d)
+        if record is None:
+            continue
+        entries_html = ""
+        for e in record.entries:
+            entries_html += (
+                f'<div class="standup-entry">'
+                f'<div class="dept">{html.escape(e.department)}'
+                f" ({html.escape(e.agent)})</div>"
+                f'<div class="field">Yesterday: '
+                f"<span>{html.escape(e.yesterday)}</span></div>"
+                f'<div class="field">Today: '
+                f"<span>{html.escape(e.today)}</span></div>"
+                f'<div class="field">Blockers: '
+                f"<span>{html.escape(e.blockers or 'None')}</span></div>"
+                f"</div>"
+            )
+        standup_html += (
+            f'<details class="standup-detail">'
+            f"<summary>Standup &mdash; {html.escape(d)}"
+            f" ({html.escape(record.session)})</summary>"
+            f'<div class="standup-entries">{entries_html}</div>'
+            f"</details>"
+        )
+
+    if standup_html:
+        parts.append(
+            "<h3>Recent Standups</h3>\n" + standup_html,
+        )
+
+    # Latest retrospective
+    retro_nums = list_retros()
+    if retro_nums:
+        retro = load_retro(retro_nums[-1])
+        if retro is not None:
+            ww = (
+                "".join(
+                    f'<div class="ceremony-item">{html.escape(i.text)}</div>'
+                    for i in retro.went_well
+                )
+                or '<p class="text-muted">None recorded</p>'
+            )
+            ti = (
+                "".join(
+                    f'<div class="ceremony-item">{html.escape(i.text)}</div>'
+                    for i in retro.to_improve
+                )
+                or '<p class="text-muted">None recorded</p>'
+            )
+            ai = (
+                "".join(
+                    f'<div class="ceremony-item">{html.escape(i.text)}</div>'
+                    for i in retro.action_items
+                )
+                or '<p class="text-muted">None recorded</p>'
+            )
+            parts.append(
+                f"<h3>Sprint {retro.sprint_number} Retrospective</h3>\n"
+                f'<div class="ceremony-grid">'
+                f'<div class="ceremony-col went-well">'
+                f"<h3>Went Well</h3>{ww}</div>"
+                f'<div class="ceremony-col to-improve">'
+                f"<h3>To Improve</h3>{ti}</div>"
+                f'<div class="ceremony-col action-items">'
+                f"<h3>Action Items</h3>{ai}</div>"
+                f"</div>",
+            )
+
+    if not parts:
+        return (
+            "<section>\n<h2>Ceremonies</h2>\n"
+            '<div class="card"><p class="text-muted">'
+            "No ceremonies recorded yet</p></div>\n</section>\n"
+        )
+
+    return (
+        "<section>\n<h2>Ceremonies</h2>\n"
+        '<div class="card">\n' + "\n".join(parts) + "\n</div>\n</section>\n"
+    )
+
+
+def _section_token_budget() -> str:
+    """Render department token budget vs spend bars."""
+    try:
+        from app.finops.budget import load_budgets
+        from app.finops.tracker import summarize_period
+    except ImportError:
+        return ""
+
+    config = load_budgets()
+    if not config.budgets:
+        return (
+            "<section>\n<h2>Token Budget</h2>\n"
+            '<div class="card"><p class="text-muted">'
+            "No budget configured &mdash; run "
+            "<code>uv run python -m app.finops init</code></p></div>\n"
+            "</section>\n"
+        )
+
+    # Get current week spend
+    from datetime import UTC, datetime, timedelta
+
+    now = datetime.now(tz=UTC)
+    week_start = (now - timedelta(days=now.weekday())).strftime("%Y-%m-%d")
+    week_end = now.strftime("%Y-%m-%d")
+    summary = summarize_period(week_start, week_end)
+    dept_spend = summary.by_department
+
+    rows_html = ""
+    for b in config.budgets:
+        spent = dept_spend.get(b.department, 0.0)
+        pct = (spent / b.weekly_budget_usd * 100) if b.weekly_budget_usd > 0 else 0
+        bar_cls = "green" if pct < 75 else "yellow" if pct < 90 else "red"
+        fill_w = min(pct, 100)
+        prio_badge = _badge(
+            "ALERT"
+            if b.priority == "critical"
+            else "WATCH"
+            if b.priority == "normal"
+            else "TARGET",
+        )
+        rows_html += (
+            f'<div class="budget-row">'
+            f'<span class="dept-name">'
+            f"{html.escape(b.department.title())} {prio_badge}</span>"
+            f'<span class="budget-bar-wrap">'
+            f'<div class="progress-bar">'
+            f'<div class="progress-fill {bar_cls}" '
+            f'style="width:{fill_w:.0f}%"></div></div></span>'
+            f'<span class="budget-nums">'
+            f"${spent:.2f} / ${b.weekly_budget_usd:.2f}"
+            f" ({pct:.0f}%)</span>"
+            f"</div>"
+        )
+
+    total_spent = sum(dept_spend.values())
+    total_budget = config.total_weekly_usd
+    total_pct = (total_spent / total_budget * 100) if total_budget > 0 else 0
+
+    return (
+        "<section>\n<h2>Token Budget (Weekly)</h2>\n"
+        '<div class="card">\n'
+        f"{rows_html}"
+        f'<div class="budget-row" style="border-top:2px solid '
+        f'var(--border-primary);margin-top:8px;padding-top:10px">'
+        f'<span class="dept-name"><strong>Total</strong></span>'
+        f'<span class="budget-bar-wrap"></span>'
+        f'<span class="budget-nums"><strong>'
+        f"${total_spent:.2f} / ${total_budget:.2f}"
+        f" ({total_pct:.0f}%)</strong></span>"
+        f"</div>"
+        "\n</div>\n</section>\n"
+    )
+
+
+def _section_pipeline_health() -> str:
+    """Render pipeline health with grade badge and module grid."""
+    health = get_system_health()
+    modules = get_all_module_health()
+
+    if health.module_count == 0 and not modules:
+        return (
+            "<section>\n<h2>Pipeline Health</h2>\n"
+            '<div class="card"><p class="text-muted">'
+            "No pipeline data recorded yet</p></div>\n</section>\n"
+        )
+
+    grade_cls = f"grade-{health.grade}"
+    trend_arrows = {"improving": "&uarr;", "stable": "&rarr;", "degrading": "&darr;"}
+
+    module_cards = ""
+    for m in modules:
+        trend_arrow = trend_arrows.get(m.trend, "&rarr;")
+        trend_cls = f"trend-{m.trend}"
+        sr_cls = (
+            "green"
+            if m.success_rate_7d >= 0.9
+            else ("yellow" if m.success_rate_7d >= 0.7 else "red")
+        )
+        module_cards += (
+            f'<div class="health-card {trend_cls}">'
+            f'<div class="module-name">{html.escape(m.name)}</div>'
+            f'<div class="health-stat">'
+            f"<span>Success (7d)</span>"
+            f'<span class="val {sr_cls}">'
+            f"{m.success_rate_7d:.0%}</span></div>"
+            f'<div class="health-stat">'
+            f"<span>Avg Duration</span>"
+            f'<span class="val">{m.avg_duration_seconds:.1f}s</span></div>'
+            f'<div class="health-stat">'
+            f"<span>Trend</span>"
+            f'<span class="val">{trend_arrow} '
+            f"{html.escape(m.trend)}</span></div>"
+            f"</div>"
+        )
+
+    return (
+        "<section>\n<h2>Pipeline Health</h2>\n"
+        '<div class="card">\n'
+        f'<div style="display:flex;align-items:center;gap:16px;'
+        f'margin-bottom:16px">'
+        f'<span class="grade-badge {grade_cls}">'
+        f"{html.escape(health.grade)}</span>"
+        f"<div>"
+        f'<div style="font-size:18px;color:var(--text-primary)">'
+        f"System Health: {health.score:.0%}</div>"
+        f'<div style="font-size:13px;color:var(--text-muted)">'
+        f"{health.module_count} modules tracked</div>"
+        f"</div></div>"
+        f'<div class="health-grid">{module_cards}</div>'
+        "\n</div>\n</section>\n"
+    )
+
+
+def build_company_html(
+    *,
+    date: str = "",
+    report_dates: list[str] | None = None,
+) -> str:
+    """Build company operations page with sprint, roadmap, and ops data."""
+    report_date = date or datetime.now(tz=_ISRAEL_TZ).strftime("%Y-%m-%d")
+    report_time = datetime.now(tz=_ISRAEL_TZ).strftime("%H:%M IST")
+
+    sprint_board = _section_sprint_board()
+    roadmap = _section_roadmap()
+    ceremonies = _section_ceremonies()
+    token_budget = _section_token_budget()
+    pipeline = _section_pipeline_health()
+
+    top_bar = _page_header_bar(report_date, "company", report_dates)
+
+    header = (
+        '<header class="header">\n'
+        f"<span>{html.escape(report_date)} &bull; "
+        f"{html.escape(report_time)}</span>\n"
+        "</header>\n"
+    )
+
+    footer = (
+        '<footer class="footer">\n'
+        f"<span>Generated {html.escape(report_date)} "
+        f"{html.escape(report_time)} &mdash; "
+        "company operations dashboard.</span>\n"
+        "</footer>\n"
+    )
+
+    body_parts = [
+        top_bar,
+        header,
+        '<main id="main-content">\n',
+        sprint_board,
+        roadmap,
+        ceremonies,
+        token_budget,
+        pipeline,
+        "</main>\n",
+        footer,
+    ]
+
+    return _html_page(
+        title=f"Company {report_date}",
+        body="\n".join(p for p in body_parts if p),
+        description=f"Company operations dashboard for {report_date}",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Strategies page — strategy type comparison and rankings
+# ---------------------------------------------------------------------------
+
+
+def _parse_backtest_data(
+    outputs: dict[str, str],
+) -> list[dict[str, object]]:
+    """Parse strategy.backtest-all output into a list of ETF dicts."""
+    data = _parse_output(outputs.get("strategy.backtest-all", ""))
+    if not isinstance(data, list):
+        return []
+    return [e for e in data if isinstance(e, dict)]
+
+
+_STRAT_LABELS: dict[str, str] = {
+    "ath_mean_reversion": "ATH Mean-Reversion",
+    "rsi_oversold": "RSI Oversold",
+    "bollinger_lower": "Bollinger Band",
+    "ma_dip": "MA Dip",
+}
+
+
+def _section_strategy_comparison(
+    data: list[dict[str, object]],
+) -> str:
+    """Aggregate performance by strategy type across all ETFs."""
+    if not data:
+        return ""
+
+    # Aggregate by strategy type
+    by_type: dict[str, list[dict[str, object]]] = {}
+    for etf in data:
+        stype = str(etf.get("strategy_type", "ath_mean_reversion"))
+        by_type.setdefault(stype, []).append(etf)
+
+    _row_type = tuple[str, str, float, float, float, int, str, str]
+    rows: list[_row_type] = []
+    best_sharpe = -999.0
+    best_type = ""
+
+    for stype, etfs in sorted(by_type.items()):
+        label = _STRAT_LABELS.get(stype, stype)
+        sharpes: list[float] = [
+            float(v)
+            for e in etfs
+            if isinstance((v := e.get("sharpe_ratio")), (int, float))
+        ]
+        win_rates: list[float] = [
+            float(v) for e in etfs if isinstance((v := e.get("win_rate")), (int, float))
+        ]
+        returns: list[float] = [
+            float(v)
+            for e in etfs
+            if isinstance((v := e.get("total_return")), (int, float))
+        ]
+        trades = sum(
+            int(tc)
+            for e in etfs
+            if isinstance((tc := e.get("trade_count", 0)), (int, float))
+        )
+
+        avg_sharpe = sum(sharpes) / len(sharpes) if sharpes else 0.0
+        avg_wr = sum(win_rates) / len(win_rates) if win_rates else 0.0
+        avg_ret = sum(returns) / len(returns) if returns else 0.0
+
+        if avg_sharpe > best_sharpe:
+            best_sharpe = avg_sharpe
+            best_type = stype
+
+        # Find best ETF for this strategy
+        def _sharpe_key(e: dict[str, object]) -> float:
+            s = e.get("sharpe_ratio", 0)
+            return float(s) if isinstance(s, (int, float)) else 0.0
+
+        best_etf = max(etfs, key=_sharpe_key)
+        best_ticker = str(best_etf.get("leveraged_ticker", "?"))
+
+        ret_cls = _pct_class(avg_ret)
+        rows.append(
+            (stype, label, avg_sharpe, avg_wr, avg_ret, trades, best_ticker, ret_cls),
+        )
+
+    table_rows = ""
+    for row in rows:
+        r_stype, r_label, r_sharpe, r_wr, r_ret, r_trades, r_tk, r_cls = row
+        best_mark = (
+            ' <span class="badge badge-ok">BEST</span>' if r_stype == best_type else ""
+        )
+        table_rows += (
+            f"<tr><td><strong>{html.escape(r_label)}</strong>"
+            f"{best_mark}</td>"
+            f'<td class="num">{r_sharpe:.3f}</td>'
+            f'<td class="num">{_fmt_pct(r_wr)}</td>'
+            f'<td class="num {r_cls}">'
+            f"{_fmt_pct(r_ret, signed=True)}</td>"
+            f'<td class="num">{r_trades}</td>'
+            f"<td>{html.escape(r_tk)}</td></tr>\n"
+        )
+
+    return (
+        "<section>\n"
+        "<h2>Strategy Type Comparison</h2>\n"
+        '<div class="card">\n'
+        "<p>Performance metrics averaged across all ETFs "
+        "for each strategy type.</p>\n"
+        '<table class="mt-12">\n<thead><tr>'
+        '<th scope="col">Strategy</th>'
+        '<th scope="col" class="num">Avg Sharpe</th>'
+        '<th scope="col" class="num">Avg Win Rate</th>'
+        '<th scope="col" class="num">Avg Return</th>'
+        '<th scope="col" class="num">Total Trades</th>'
+        '<th scope="col">Best ETF</th>'
+        "</tr></thead>\n<tbody>\n"
+        + table_rows
+        + "</tbody></table>\n</div>\n</section>\n"
+    )
+
+
+def _section_strategy_rankings(
+    data: list[dict[str, object]],
+) -> str:
+    """Rank ETFs by their best strategy performance."""
+    if not data:
+        return ""
+
+    # Find best strategy per ETF (by Sharpe)
+    by_etf: dict[str, dict[str, object]] = {}
+    for etf in data:
+        ticker = str(etf.get("leveraged_ticker", "?"))
+        sharpe = etf.get("sharpe_ratio", 0)
+        if not isinstance(sharpe, (int, float)):
+            sharpe = 0
+        existing = by_etf.get(ticker)
+        if existing is None:
+            by_etf[ticker] = etf
+        else:
+            ex_sharpe = existing.get("sharpe_ratio", 0)
+            if not isinstance(ex_sharpe, (int, float)):
+                ex_sharpe = 0
+            if sharpe > ex_sharpe:
+                by_etf[ticker] = etf
+
+    # Sort by Sharpe descending
+    def _rank_key(e: dict[str, object]) -> float:
+        s = e.get("sharpe_ratio", 0)
+        return float(s) if isinstance(s, (int, float)) else 0.0
+
+    ranked = sorted(by_etf.values(), key=_rank_key, reverse=True)
+
+    rows: list[str] = []
+    strat_short = {
+        "ath_mean_reversion": "ATH",
+        "rsi_oversold": "RSI",
+        "bollinger_lower": "Bollinger",
+        "ma_dip": "MA Dip",
+    }
+    for i, etf in enumerate(ranked):
+        ticker = html.escape(str(etf.get("leveraged_ticker", "?")))
+        underlying = html.escape(str(etf.get("underlying_ticker", "?")))
+        stype = str(etf.get("strategy_type", "ath_mean_reversion"))
+        stype_label = strat_short.get(stype, stype)
+        sharpe = etf.get("sharpe_ratio", 0)
+        sharpe_str = f"{sharpe:.3f}" if isinstance(sharpe, (int, float)) else "N/A"
+        wr = etf.get("win_rate")
+        wr_str = _fmt_pct(wr) if isinstance(wr, (int, float)) else "N/A"
+        ret = etf.get("total_return", 0)
+        ret_str = _fmt_pct(ret, signed=True) if isinstance(ret, (int, float)) else "N/A"
+        ret_cls = _pct_class(ret)
+        max_dd = etf.get("max_drawdown", 0)
+        dd_str = _fmt_pct(max_dd) if isinstance(max_dd, (int, float)) else "N/A"
+        rank_str = f"#{i + 1}"
+
+        rows.append(
+            f"<tr><td>{rank_str}</td>"
+            f"<td><strong>{ticker}</strong></td>"
+            f"<td>{html.escape(underlying)}</td>"
+            f"<td>{_strategy_badge(stype, stype_label)}</td>"
+            f'<td class="num">{html.escape(sharpe_str)}</td>'
+            f'<td class="num">{html.escape(wr_str)}</td>'
+            f'<td class="num {ret_cls}">{html.escape(ret_str)}</td>'
+            f'<td class="num">{html.escape(dd_str)}</td></tr>\n',
+        )
+
+    return (
+        "<section>\n"
+        "<h2>ETF Rankings (Best Strategy)</h2>\n"
+        '<div class="card">\n'
+        "<p>Each ETF ranked by its best-performing strategy "
+        "(highest Sharpe ratio).</p>\n"
+        '<table class="mt-12">\n<thead><tr>'
+        '<th scope="col">Rank</th>'
+        '<th scope="col">ETF</th>'
+        '<th scope="col">Underlying</th>'
+        '<th scope="col">Strategy</th>'
+        '<th scope="col" class="num">Sharpe</th>'
+        '<th scope="col" class="num">Win Rate</th>'
+        '<th scope="col" class="num">Return</th>'
+        '<th scope="col" class="num">Max DD</th>'
+        "</tr></thead>\n<tbody>\n"
+        + "".join(rows)
+        + "</tbody></table>\n</div>\n</section>\n"
+    )
+
+
+def _section_strategy_equity_curves(
+    data: list[dict[str, object]],
+) -> tuple[str, str]:
+    """Build Chart.js equity curve section for best strategy per ETF.
+
+    Returns (section_html, chart_js_script).
+    """
+    if not data:
+        return "", ""
+
+    # Select best strategy per ETF by Sharpe
+    by_etf: dict[str, dict[str, object]] = {}
+    for etf in data:
+        ticker = str(etf.get("leveraged_ticker", "?"))
+        sharpe = etf.get("sharpe_ratio", 0)
+        if not isinstance(sharpe, (int, float)):
+            sharpe = 0
+        existing = by_etf.get(ticker)
+        if existing is None:
+            by_etf[ticker] = etf
+        else:
+            ex_sharpe = existing.get("sharpe_ratio", 0)
+            if not isinstance(ex_sharpe, (int, float)):
+                ex_sharpe = 0
+            if sharpe > ex_sharpe:
+                by_etf[ticker] = etf
+
+    strat_short = {
+        "ath_mean_reversion": "ATH",
+        "rsi_oversold": "RSI",
+        "bollinger_lower": "Bollinger",
+        "ma_dip": "MA Dip",
+    }
+    chart_datasets: list[str] = []
+    max_labels = 0
+
+    for idx, (ticker, etf) in enumerate(sorted(by_etf.items())):
+        equity = etf.get("equity_curve", [])
+        if not isinstance(equity, list) or not equity:
+            continue
+        stype = str(etf.get("strategy_type", "ath_mean_reversion"))
+        stype_label = strat_short.get(stype, stype)
+        color = _CHART_COLORS[idx % len(_CHART_COLORS)]
+        chart_label = f"{ticker} ({stype_label})"
+        equity_json = json.dumps(equity)
+
+        chart_datasets.append(
+            "{"
+            f'label:"{html.escape(chart_label)}",'
+            f"data:{equity_json},"
+            f'borderColor:"{color}",'
+            f'backgroundColor:"{color}22",'
+            "borderWidth:2,"
+            "pointRadius:3,"
+            "pointHoverRadius:5,"
+            "tension:0.1,"
+            "fill:false"
+            "}",
+        )
+        if len(equity) > max_labels:
+            max_labels = len(equity)
+
+    if not chart_datasets:
+        return "", ""
+
+    labels_json = json.dumps(list(range(max_labels)))
+
+    chart_js = (
+        "<script>\n"
+        "const sctx = document.getElementById('stratEquityChart')"
+        ".getContext('2d');\n"
+        "new Chart(sctx, {\n"
+        "  type: 'line',\n"
+        "  data: {\n"
+        f"    labels: {labels_json},\n"
+        "    datasets: [\n      " + ",\n      ".join(chart_datasets) + "\n    ]\n"
+        "  },\n"
+        "  options: {\n"
+        "    responsive: true,\n"
+        "    maintainAspectRatio: false,\n"
+        "    interaction: { mode: 'index', intersect: false },\n"
+        "    plugins: {\n"
+        "      title: { display: true,"
+        " text: 'Best Strategy Equity Curve per ETF',"
+        " color: '#e6edf3',"
+        " font: { size: 16, family: 'Inter' } },\n"
+        "      tooltip: {\n"
+        "        callbacks: {\n"
+        "          label: function(ctx) {\n"
+        "            return ctx.dataset.label + ': $' +"
+        " ctx.parsed.y.toLocaleString();\n"
+        "          }\n"
+        "        }\n"
+        "      }\n"
+        "    },\n"
+        "    scales: {\n"
+        "      x: { title: { display: true, text: 'Trade #',"
+        " color: '#8b949e' },"
+        " ticks: { maxTicksLimit: 20, color: '#8b949e' },"
+        " grid: { color: '#2a3346' } },\n"
+        "      y: { title: { display: true, text: 'Portfolio Value ($)',"
+        " color: '#8b949e' },"
+        " ticks: { color: '#8b949e', callback: function(v) {"
+        " return '$' + v.toLocaleString(); } },"
+        " grid: { color: '#2a3346' } }\n"
+        "    }\n"
+        "  }\n"
+        "});\n"
+        "</script>\n"
+    )
+
+    section = (
+        "<section>\n"
+        "<h2>Equity Curves</h2>\n"
+        '<div class="card">\n'
+        '<div style="position:relative;height:450px">\n'
+        '<canvas id="stratEquityChart"></canvas>\n'
+        "</div>\n</div>\n</section>\n"
+    )
+
+    return section, chart_js
+
+
+def build_strategies_html(
+    outputs: dict[str, str],
+    *,
+    date: str = "",
+    report_dates: list[str] | None = None,
+) -> str:
+    """Build strategies performance page with comparison and rankings."""
+    report_date = date or datetime.now(tz=_ISRAEL_TZ).strftime("%Y-%m-%d")
+    report_time = datetime.now(tz=_ISRAEL_TZ).strftime("%H:%M IST")
+
+    data = _parse_backtest_data(outputs)
+    if not data:
+        return ""
+
+    comparison = _section_strategy_comparison(data)
+    chart_section, chart_js = _section_strategy_equity_curves(data)
+    rankings = _section_strategy_rankings(data)
+
+    top_bar = _page_header_bar(report_date, "strategies", report_dates)
+
+    header = (
+        '<header class="header">\n'
+        f"<span>{html.escape(report_date)} &bull; "
+        f"{html.escape(report_time)}</span>\n"
+        "</header>\n"
+    )
+
+    footer = (
+        '<footer class="footer">\n'
+        f"<span>Generated {html.escape(report_date)} "
+        f"{html.escape(report_time)} &mdash; "
+        "backtested performance, not live results.</span>\n"
+        "</footer>\n"
+    )
+
+    body_parts = [
+        top_bar,
+        header,
+        '<main id="main-content">\n',
+        comparison,
+        chart_section,
+        rankings,
+        "</main>\n",
+        footer,
+    ]
+
+    chart_cdn = (
+        '<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist'
+        '/chart.umd.min.js"></script>\n'
+    )
+
+    result = _html_page(
+        title=f"Strategies {report_date}",
+        body="\n".join(p for p in body_parts if p),
+        description=f"Strategy performance comparison for {report_date}",
+    )
+
+    if chart_js:
+        result = result.replace("</head>", f"{chart_cdn}</head>", 1).replace(
+            "</body>", f"{chart_js}</body>", 1
+        )
+
+    return result

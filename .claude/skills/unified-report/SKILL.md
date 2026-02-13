@@ -34,6 +34,9 @@ uv run python -m app.statistics dashboard
 uv run python -m app.strategy proposals
 uv run python -m app.history weights
 uv run python -m app.history summary
+uv run python -m app.risk dashboard
+uv run python -m app.portfolio dashboard
+uv run python -m app.quant summary
 ```
 
 ### Step 2: Broad Market Context
@@ -50,11 +53,12 @@ for sym, name in [('SPY','S&P 500'),('QQQ','Nasdaq-100'),('IWM','Russell 2000'),
 "
 ```
 
-### Step 3: Synthesize with Chief Analyst
+### Step 3: Synthesize with CIO
 
-Use the `chief-analyst` agent to:
-- Cross-reference all data sources (ETF + macro + SEC + geopolitical + social + news + statistics + strategy)
-- Compute confidence scores (9 factors) for each entry signal
+Use the `exec-cio` agent to:
+- Cross-reference all data sources (ETF + macro + SEC + geopolitical + social + news + statistics + strategy + risk + portfolio + quant)
+- Compute confidence scores (12 factors) for each entry signal
+- Apply risk-manager veto logic for portfolio limit breaches
 - Identify tensions between domains (e.g., bad macro but deep drawdown, high geopolitical risk but bearish sentiment)
 - Produce the unified report in the format below
 

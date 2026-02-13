@@ -3,8 +3,11 @@
     Register Windows Scheduled Tasks for pre-market and post-market runs.
 .DESCRIPTION
     Creates two scheduled tasks under \FinAgents\:
-      - FinAgents-PreMarket:  Weekdays at 7:00 AM (local time)
-      - FinAgents-PostMarket: Weekdays at 4:30 PM (local time)
+      - FinAgents-PreMarket:  Weekdays at 2:00 PM Israel time (= 7:00 AM ET)
+      - FinAgents-PostMarket: Weekdays at 11:30 PM Israel time (= 4:30 PM ET)
+    Times are Israel local time targeting US Eastern market hours.
+    NOTE: DST transitions (US/Israel shift on different dates) can cause
+    ~1 hour drift a few weeks per year. Adjust if needed.
     Must be run as Administrator.
 .PARAMETER Remove
     Remove existing tasks instead of creating them.
@@ -26,20 +29,24 @@ if (-not $Remove -and -not (Test-Path $ScriptPath)) {
 }
 
 # --- Task definitions ---
+# Times are Israel local time, targeting US Eastern market hours.
+# Winter (both standard): IST=UTC+2, EST=UTC-5 → +7h offset
+# Summer (both DST):      IDT=UTC+3, EDT=UTC-4 → +7h offset
+# Transition weeks may drift ±1h when US/Israel DST dates differ.
 $tasks = @(
     @{
         Name        = "FinAgents-PreMarket"
         Session     = "pre-market"
-        Hour        = 7
+        Hour        = 14
         Minute      = 0
-        Description = "Pre-market financial analysis: data pipeline + Claude AI agent analysis + Telegram"
+        Description = "Pre-market financial analysis (2:00 PM Israel = 7:00 AM ET)"
     },
     @{
         Name        = "FinAgents-PostMarket"
         Session     = "post-market"
-        Hour        = 16
+        Hour        = 23
         Minute      = 30
-        Description = "Post-market financial analysis: data pipeline + Claude AI agent analysis + Telegram"
+        Description = "Post-market financial analysis (11:30 PM Israel = 4:30 PM ET)"
     }
 )
 

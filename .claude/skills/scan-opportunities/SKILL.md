@@ -27,8 +27,8 @@ uv run python -m app.sec recent
 ```
 
 ### Step 3: Deep Dive on Signals
-For any ETF in SIGNAL or ALERT state, use the `swing-screener` subagent:
-> "Use the swing-screener agent to analyze entry signals from the latest scan. Focus on ETFs showing SIGNAL or ALERT states. Include confidence scores."
+For any ETF in SIGNAL or ALERT state, use the `trading-swing-screener` subagent:
+> "Use the trading-swing-screener agent to analyze entry signals from the latest scan. Focus on ETFs showing SIGNAL or ALERT states. Include confidence scores."
 
 ### Step 4: Check Active Positions
 ```bash

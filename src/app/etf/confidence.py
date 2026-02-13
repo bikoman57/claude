@@ -294,17 +294,35 @@ def assess_congress_sentiment(sentiment: str) -> FactorResult:
     )
 
 
+def assess_portfolio_risk(within_limits: bool, veto_reason: str = "") -> FactorResult:
+    """Assess portfolio risk status.
+
+    FAVORABLE if within all limits, UNFAVORABLE if entry would be vetoed.
+    """
+    if within_limits:
+        return FactorResult(
+            "portfolio_risk",
+            FactorAssessment.FAVORABLE,
+            "Portfolio within risk limits",
+        )
+    return FactorResult(
+        "portfolio_risk",
+        FactorAssessment.UNFAVORABLE,
+        f"Risk limit breach: {veto_reason}" if veto_reason else "Risk limit breach",
+    )
+
+
 def compute_confidence(
     factors: list[FactorResult],
 ) -> ConfidenceScore:
     """Compute overall confidence from factor assessments.
 
-    HIGH: 8+/10 favorable, MEDIUM: 5-7, LOW: 0-4.
+    HIGH: 9+/12 favorable, MEDIUM: 5-8, LOW: 0-4.
     """
     favorable = sum(1 for f in factors if f.assessment == FactorAssessment.FAVORABLE)
     total = len(factors)
 
-    if favorable >= 8:
+    if favorable >= 9:
         level = ConfidenceLevel.HIGH
     elif favorable >= 5:
         level = ConfidenceLevel.MEDIUM

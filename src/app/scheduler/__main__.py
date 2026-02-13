@@ -7,6 +7,7 @@ Usage:
     python -m app.scheduler pre-market   Full pre-market scheduled run
     python -m app.scheduler post-market  Full post-market scheduled run
     python -m app.scheduler status       Show last run status
+    python -m app.scheduler ceremonies   Show today's ceremony schedule
 """
 
 from __future__ import annotations
@@ -15,6 +16,7 @@ import asyncio
 import json
 import sys
 from dataclasses import asdict
+from datetime import UTC, datetime
 
 from app.scheduler.publisher import git_publish, write_report
 from app.scheduler.report import build_report_text, send_daily_report
@@ -119,6 +121,39 @@ def _cmd_post_market() -> int:
     return 0 if result.claude_success else 1
 
 
+def _cmd_ceremonies() -> int:
+    """Show today's ceremony schedule."""
+    today = datetime.now(tz=UTC).date()
+    day_name = today.strftime("%A")
+    is_monday = today.weekday() == 0
+    is_friday = today.weekday() == 4
+
+    print(f"=== Ceremony Schedule for {today.isoformat()} ({day_name}) ===")  # noqa: T201
+    print()  # noqa: T201
+    print("Pre-Market (7:00 AM ET):")  # noqa: T201
+    if is_monday:
+        print("  [0a] Sprint Planning — create/advance sprint, assign tasks")  # noqa: T201
+    print("  [0]  Daily Standup — department status, blockers")  # noqa: T201
+    print("  [1]  Data Pipeline — run all modules")  # noqa: T201
+    print("  [2]  Publish HTML Report")  # noqa: T201
+    print("  [3]  Claude Analysis")  # noqa: T201
+    print("  [4]  Telegram Summary")  # noqa: T201
+    print("  [5]  Record token usage + pipeline health")  # noqa: T201
+    print()  # noqa: T201
+    print("Post-Market (4:30 PM ET):")  # noqa: T201
+    print("  [1]  Data Pipeline — run all modules")  # noqa: T201
+    print("  [2]  Publish HTML Report")  # noqa: T201
+    print("  [3]  Claude Analysis")  # noqa: T201
+    print("  [4]  Telegram Summary")  # noqa: T201
+    print("  [5]  Record token usage + pipeline health")  # noqa: T201
+    print("  [6]  Postmortem detection")  # noqa: T201
+    if is_friday:
+        print("  [7]  Sprint Review — accomplishments vs goals")  # noqa: T201
+        print("  [8]  Sprint Retrospective — went well / improve / action items")  # noqa: T201
+        print("  [9]  Auto-advance sprint")  # noqa: T201
+    return 0
+
+
 def _print_setup_hint() -> None:
     print(  # noqa: T201
         "\nTo set up scheduled tasks, run as Administrator:"
@@ -151,6 +186,8 @@ def main() -> int:
             return _cmd_post_market()
         case "status":
             return _cmd_status()
+        case "ceremonies":
+            return _cmd_ceremonies()
         case _:
             print(f"Unknown command: {cmd}")  # noqa: T201
             print(__doc__)  # noqa: T201

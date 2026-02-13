@@ -125,6 +125,14 @@ def cmd_summary() -> int:
                 "sentiment": s.sentiment,
                 "net_usd": s.net_buying_usd,
                 "trades": s.trade_count,
+                "top_tickers": [
+                    {
+                        "ticker": td.ticker,
+                        "trades": td.trade_count,
+                        "net_usd": td.net_usd,
+                    }
+                    for td in s.top_tickers
+                ],
             }
             for s in sectors
         ],
