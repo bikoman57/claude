@@ -431,25 +431,150 @@ a:hover { text-decoration: underline; }
 .ok { color: var(--success); }
 .fail { color: var(--danger); }
 
-/* Index page */
-.report-list { display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 12px; margin-top: 16px; }
-.report-card { background: var(--bg-secondary); border: 1px solid var(--border-light);
-  padding: 16px; text-align: center; position: relative;
-  transition: border-color 0.15s ease; border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-.report-card:hover { border-color: var(--accent); }
-.report-card a { font-family: var(--font-serif); font-size: 1.1em;
-  font-weight: 600; }
-.report-card a::after { content: ''; position: absolute;
-  inset: 0; z-index: 1; }
-.badge-latest { background: var(--accent); color: #fff; font-size: 0.7em;
-  font-family: var(--font-mono); padding: 2px 8px; margin-left: 8px;
-  text-transform: uppercase; letter-spacing: 0.06em; border-radius: 3px; }
+/* === Report Page — Compact Financial Layout === */
+.rpt-compact .exec-summary { margin-bottom: 12px; padding-bottom: 10px; }
+.rpt-compact .exec-summary .headline { font-size: 20px; line-height: 1.25; }
+.rpt-compact .exec-summary .detail { font-size: 13px; line-height: 1.5; }
+.rpt-compact .kpi-strip { gap: 8px; margin-bottom: 0;
+  padding-bottom: 12px; border-bottom: 1px solid var(--border-primary); }
+.rpt-compact .kpi-card { padding: 10px 12px; border-radius: 6px; }
+.rpt-compact .kpi-value { font-size: 20px; }
+.rpt-compact .kpi-icon .material-symbols-outlined { font-size: 18px; }
+.rpt-compact .kpi-sub { font-size: 11px; margin-top: 2px; }
+.rpt-compact .kpi-label { font-size: 9px; }
+.rpt-compact .kpi-icon { margin-bottom: 4px; }
+.rpt-layout { display: grid; grid-template-columns: 1fr 320px; gap: 0;
+  margin-top: 12px; }
+.rpt-main { border-right: 1px solid var(--border-primary); padding-right: 16px; }
+.rpt-sidebar { padding-left: 16px; }
+.rpt-compact section { padding: 12px 0;
+  border-bottom: 1px solid var(--border-primary); }
+.rpt-compact section:last-child { border-bottom: none; }
+.rpt-compact h2 { font-size: 15px; margin-bottom: 8px; padding-bottom: 4px;
+  border-bottom-width: 1px; }
+.rpt-compact .card { padding: 0; margin-bottom: 0; border: none; border-radius: 0;
+  box-shadow: none; background: transparent; }
+.rpt-compact .signal-grid { gap: 8px; margin-bottom: 8px; }
+.rpt-compact .signal-card { padding: 10px 12px; border-radius: 6px; }
+.rpt-compact .signal-header { margin-bottom: 4px; }
+.rpt-compact .grid-2col { gap: 0; grid-template-columns: 1fr; }
+.rpt-sidebar .index-tiles { gap: 6px; margin-bottom: 8px; }
+.rpt-sidebar .index-tile { padding: 8px; border-radius: 4px; }
+.rpt-sidebar .index-price { font-size: 16px; }
+.rpt-sidebar .index-chg { font-size: 11px; }
+.rpt-sidebar .commodity-tiles { gap: 6px; }
+.rpt-sidebar .commodity-tile { padding: 8px; }
+.rpt-sidebar .commodity-price { font-size: 16px; }
+.rpt-sidebar .commodity-chg { font-size: 11px; }
+.rpt-sidebar .rates-grid { gap: 4px; }
+.rpt-sidebar .rate-tile { padding: 6px; }
+.rpt-sidebar .rate-value { font-size: 14px; }
+.rpt-sidebar .headline-list li { padding: 6px 0; font-size: 13px; }
+.rpt-sidebar .geo-event { padding: 6px 0; }
+.rpt-sidebar .geo-title { font-size: 13px; }
+.rpt-sidebar .congress-grid { grid-template-columns: 1fr; gap: 8px; }
+.rpt-sidebar .congress-member { padding: 8px 12px; }
+.rpt-compact table th { padding: 6px 8px; font-size: 9px; }
+.rpt-compact table td { padding: 6px 8px; font-size: 12px; }
+.rpt-compact .strategy-entry-exit { padding: 4px 8px; font-size: 11px; }
+.rpt-compact .module-pill { font-size: 9px; padding: 2px 8px; }
+.rpt-compact .footer { margin-top: 16px; padding: 12px 0; }
+
+/* === Index Page — Compact Dashboard === */
+.idx-ticker-bar { display: flex; gap: 0; align-items: stretch;
+  background: var(--bg-dark); border-bottom: 1px solid var(--border-primary);
+  margin: 0 calc(-1 * clamp(16px, 3vw, 48px));
+  padding: 0 clamp(16px, 3vw, 48px); overflow-x: auto; }
+.idx-ticker { display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 8px 16px; min-width: 80px;
+  border-right: 1px solid var(--border-primary);
+  font-family: var(--font-mono); font-size: 11px; line-height: 1.3; }
+.idx-ticker:last-child { border-right: none; }
+.idx-ticker .tk-sym { font-weight: 700; color: var(--text-primary);
+  font-size: 12px; }
+.idx-ticker .tk-sector { color: var(--text-muted); font-size: 9px;
+  text-transform: uppercase; letter-spacing: 0.06em; }
+.idx-layout { display: grid; grid-template-columns: 1fr 280px;
+  gap: 0; margin-top: 0; min-height: 60vh; }
+.idx-main { border-right: 1px solid var(--border-primary);
+  padding-right: 24px; }
+.idx-sidebar { padding-left: 20px; }
+
+/* Featured latest report */
+.idx-featured { padding: 20px 0 16px; border-bottom: 1px solid var(--border-primary); }
+.idx-featured-kicker { font-family: var(--font-mono); font-size: 10px;
+  font-weight: 700; color: var(--accent); text-transform: uppercase;
+  letter-spacing: 0.12em; margin-bottom: 6px; }
+.idx-featured h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px;
+  padding-bottom: 0; border-bottom: none; display: block; line-height: 1.3; }
+.idx-featured h2 a { color: var(--text-primary); }
+.idx-featured h2 a:hover { color: var(--accent); }
+.idx-featured-meta { font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-muted); margin-bottom: 8px; }
+.idx-featured-tabs { display: flex; gap: 0; flex-wrap: wrap; margin-top: 10px; }
+.idx-tab { font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em; padding: 5px 12px;
+  color: var(--text-muted); border: 1px solid var(--border-primary);
+  border-right: none; background: var(--bg-secondary);
+  transition: color 0.1s, background 0.1s; }
+.idx-tab:last-child { border-right: 1px solid var(--border-primary); }
+.idx-tab:first-child { border-radius: 4px 0 0 4px; }
+.idx-tab:last-child { border-radius: 0 4px 4px 0; }
+.idx-tab:hover { color: var(--text-primary); background: var(--bg-tertiary);
+  text-decoration: none; }
+
+/* Report row items */
+.idx-report-row { display: flex; align-items: center; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--border-light); }
+.idx-report-row:last-child { border-bottom: none; }
+.idx-report-date { font-family: var(--font-serif); font-size: 15px;
+  font-weight: 600; white-space: nowrap; }
+.idx-report-date a { color: var(--text-primary); }
+.idx-report-date a:hover { color: var(--accent); }
+.idx-report-pages { display: flex; gap: 6px; flex-wrap: wrap; }
+.idx-page-link { font-family: var(--font-mono); font-size: 9px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 2px 7px; background: var(--bg-tertiary); color: var(--text-muted);
+  border-radius: 3px; transition: color 0.1s, background 0.1s; }
+.idx-page-link:hover { color: var(--text-primary); background: var(--bg-secondary);
+  text-decoration: none; }
+
+/* Sidebar sections */
+.idx-sb-section { padding: 14px 0; border-bottom: 1px solid var(--border-primary); }
+.idx-sb-section:last-child { border-bottom: none; }
+.idx-sb-title { font-family: var(--font-mono); font-size: 11px;
+  font-weight: 700; color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: 0.1em; margin-bottom: 10px; }
+
+/* Sidebar archive list */
+.idx-archive-item { display: flex; justify-content: space-between;
+  align-items: center; padding: 7px 0;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 13px; }
+.idx-archive-item:last-child { border-bottom: none; }
+.idx-archive-item a { color: var(--text-secondary); font-weight: 500; }
+.idx-archive-item a:hover { color: var(--accent); }
+.badge-latest { background: var(--accent); color: #fff; font-size: 9px;
+  font-family: var(--font-mono); padding: 1px 6px;
+  text-transform: uppercase; letter-spacing: 0.06em; border-radius: 2px; }
+
+/* Sidebar ETF watchlist */
+.idx-etf-row { display: flex; justify-content: space-between;
+  align-items: center; padding: 5px 0;
+  border-bottom: 1px solid var(--border-light); font-size: 12px; }
+.idx-etf-row:last-child { border-bottom: none; }
+.idx-etf-sym { font-family: var(--font-mono); font-weight: 700;
+  color: var(--text-primary); font-size: 12px; }
+.idx-etf-name { color: var(--text-muted); font-size: 11px; }
+
+/* Section header on index page */
+.idx-section-head { font-family: var(--font-mono); font-size: 11px;
+  font-weight: 700; color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: 0.1em; padding: 14px 0 8px;
+  border-bottom: 1px solid var(--border-primary); margin-bottom: 0; }
 
 /* Focus-visible */
-a:focus-visible, summary:focus-visible, .report-card:focus-within {
+a:focus-visible, summary:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -461,6 +586,13 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
   .kpi-strip { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
   table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .index-tiles { grid-template-columns: repeat(3, 1fr); }
+  .idx-layout { grid-template-columns: 1fr; }
+  .idx-main { border-right: none; padding-right: 0; }
+  .idx-sidebar { padding-left: 0; border-top: 1px solid var(--border-primary); }
+  .rpt-layout { grid-template-columns: 1fr; }
+  .rpt-main { border-right: none; padding-right: 0; }
+  .rpt-sidebar { padding-left: 0; border-top: 1px solid var(--border-primary);
+    padding-top: 12px; }
 }
 
 /* Mobile */
@@ -626,7 +758,7 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 </div>
 
 <header class="header">
-<span>2026-02-13 &bull; 07:15 IST</span>
+<span>2026-02-13 &bull; 16:13 IST</span>
 </header>
 
 <main id="main-content">
@@ -651,7 +783,7 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 <h2>Ceremonies</h2>
 <div class="card">
 <h3>Recent Standups</h3>
-<details class="standup-detail"><summary>Standup &mdash; 2026-02-13 (pre-market)</summary><div class="standup-entries"><div class="standup-entry"><div class="dept">trading (trading-swing-screener)</div><div class="field">Yesterday: <span>2/2 modules OK</span></div><div class="field">Today: <span>Scan for entry/exit signals, monitor drawdowns</span></div><div class="field">Blockers: <span>None</span></div></div><div class="standup-entry"><div class="dept">research (research-macro)</div><div class="field">Yesterday: <span>4/4 modules OK</span></div><div class="field">Today: <span>Analyze macro conditions, strategy proposals</span></div><div class="field">Blockers: <span>None</span></div></div><div class="standup-entry"><div class="dept">intelligence (intel-chief)</div><div class="field">Yesterday: <span>4/4 modules OK</span></div><div class="field">Today: <span>Aggregate sentiment across all sources</span></div><div class="field">Blockers: <span>None</span></div></div><div class="standup-entry"><div class="dept">risk (risk-manager)</div><div class="field">Yesterday: <span>No relevant modules ran</span></div><div class="field">Today: <span>Monitor portfolio limits, evaluate veto triggers</span></div><div class="field">Blockers: <span>None</span></div></div><div class="standup-entry"><div class="dept">operations (exec-coo)</div><div class="field">Yesterday: <span>Pipeline: 19/19 OK, 0 failed</span></div><div class="field">Today: <span>Monitor system health, data freshness</span></div><div class="field">Blockers: <span>None</span></div></div></div></details><details class="standup-detail"><summary>Standup &mdash; 2026-02-12 (post-market)</summary><div class="standup-entries"><div class="standup-entry"><div class="dept">trading (trading-swing-screener)</div><div class="field">Yesterday: <span>No relevant modules ran</span></div><div class="field">Today: <span>Scan for entry/exit signals, monitor drawdowns</span></div><div class="field">Blockers: <span>None</span></div></div><div class="standup-entry"><div class="dept">research (research-macro)</div><div class="field">Yesterday: <span>No relevant modules ran</span></div><div class="field">Today: <span>Analyze macro conditions, strategy proposals</span></div><div class="field">Blockers: <span>None</span></div></div><div class="standup-entry"><div class="dept">intelligence (intel-chief)</div><div class="field">Yesterday: <span>No relevant modules ran</span></div><div class="field">Today: <span>Aggregate sentiment across all sources</span></div><div class="field">Blockers: <span>None</span></div></div><div class="standup-entry"><div class="dept">risk (risk-manager)</div><div class="field">Yesterday: <span>No relevant modules ran</span></div><div class="field">Today: <span>Monitor portfolio limits, evaluate veto triggers</span></div><div class="field">Blockers: <span>None</span></div></div><div class="standup-entry"><div class="dept">operations (exec-coo)</div><div class="field">Yesterday: <span>Pipeline: 15/21 OK, 6 failed</span></div><div class="field">Today: <span>Monitor system health, data freshness</span></div><div class="field">Blockers: <span>Failed modules: failed.0, failed.1, failed.2, failed.3, failed.4, failed.5</span></div></div></div></details>
+<details class="standup-detail"><summary>Standup &mdash; 2026-02-13 (post-market)</summary><div class="standup-entries"><div class="standup-entry"><div class="dept">trading (trading-swing-screener)</div><div class="field">Yesterday: <span>No relevant modules ran</span></div><div class="field">Today: <span>Scan for entry/exit signals, monitor drawdowns</span></div><div class="field">Blockers: <span>None</span></div></div><div class="standup-entry"><div class="dept">research (research-macro)</div><div class="field">Yesterday: <span>No relevant modules ran</span></div><div class="field">Today: <span>Analyze macro conditions, strategy proposals</span></div><div class="field">Blockers: <span>None</span></div></div><div class="standup-entry"><div class="dept">intelligence (intel-chief)</div><div class="field">Yesterday: <span>No relevant modules ran</span></div><div class="field">Today: <span>Aggregate sentiment across all sources</span></div><div class="field">Blockers: <span>None</span></div></div><div class="standup-entry"><div class="dept">risk (risk-manager)</div><div class="field">Yesterday: <span>No relevant modules ran</span></div><div class="field">Today: <span>Monitor portfolio limits, evaluate veto triggers</span></div><div class="field">Blockers: <span>None</span></div></div><div class="standup-entry"><div class="dept">operations (exec-coo)</div><div class="field">Yesterday: <span>Pipeline: 15/21 OK, 6 failed</span></div><div class="field">Today: <span>Monitor system health, data freshness</span></div><div class="field">Blockers: <span>Failed modules: failed.0, failed.1, failed.2, failed.3, failed.4, failed.5</span></div></div></div></details><details class="standup-detail"><summary>Standup &mdash; 2026-02-12 (post-market)</summary><div class="standup-entries"><div class="standup-entry"><div class="dept">trading (trading-swing-screener)</div><div class="field">Yesterday: <span>No relevant modules ran</span></div><div class="field">Today: <span>Scan for entry/exit signals, monitor drawdowns</span></div><div class="field">Blockers: <span>None</span></div></div><div class="standup-entry"><div class="dept">research (research-macro)</div><div class="field">Yesterday: <span>No relevant modules ran</span></div><div class="field">Today: <span>Analyze macro conditions, strategy proposals</span></div><div class="field">Blockers: <span>None</span></div></div><div class="standup-entry"><div class="dept">intelligence (intel-chief)</div><div class="field">Yesterday: <span>No relevant modules ran</span></div><div class="field">Today: <span>Aggregate sentiment across all sources</span></div><div class="field">Blockers: <span>None</span></div></div><div class="standup-entry"><div class="dept">risk (risk-manager)</div><div class="field">Yesterday: <span>No relevant modules ran</span></div><div class="field">Today: <span>Monitor portfolio limits, evaluate veto triggers</span></div><div class="field">Blockers: <span>None</span></div></div><div class="standup-entry"><div class="dept">operations (exec-coo)</div><div class="field">Yesterday: <span>Pipeline: 15/21 OK, 6 failed</span></div><div class="field">Today: <span>Monitor system health, data freshness</span></div><div class="field">Blockers: <span>Failed modules: failed.0, failed.1, failed.2, failed.3, failed.4, failed.5</span></div></div></div></details>
 </div>
 </section>
 
@@ -664,13 +796,15 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 
 <section>
 <h2>Pipeline Health</h2>
-<div class="card"><p class="text-muted">No pipeline data recorded yet</p></div>
+<div class="card">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:16px"><span class="grade-badge grade-A">A</span><div><div style="font-size:18px;color:var(--text-primary)">System Health: 100%</div><div style="font-size:13px;color:var(--text-muted)">22 modules tracked</div></div></div><div class="health-grid"><div class="health-card trend-stable"><div class="module-name">congress.summary</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">etf.active</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">etf.signals</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">geopolitical.summary</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">history.summary</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">history.weights</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">macro.calendar</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">macro.dashboard</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">macro.rates</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">macro.yields</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">news.summary</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">portfolio.dashboard</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">quant.summary</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">risk.dashboard</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">sec.institutional</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">sec.recent</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">social.summary</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">statistics.dashboard</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">strategy.backtest-all</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">strategy.forecast</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">strategy.proposals</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">strategy.verify</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div></div>
+</div>
 </section>
 
 </main>
 
 <footer class="footer">
-<span>Generated 2026-02-13 07:15 IST &mdash; company operations dashboard.</span>
+<span>Generated 2026-02-13 16:13 IST &mdash; company operations dashboard.</span>
 </footer>
 
 <script>

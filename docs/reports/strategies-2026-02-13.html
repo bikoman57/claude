@@ -431,25 +431,150 @@ a:hover { text-decoration: underline; }
 .ok { color: var(--success); }
 .fail { color: var(--danger); }
 
-/* Index page */
-.report-list { display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 12px; margin-top: 16px; }
-.report-card { background: var(--bg-secondary); border: 1px solid var(--border-light);
-  padding: 16px; text-align: center; position: relative;
-  transition: border-color 0.15s ease; border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-.report-card:hover { border-color: var(--accent); }
-.report-card a { font-family: var(--font-serif); font-size: 1.1em;
-  font-weight: 600; }
-.report-card a::after { content: ''; position: absolute;
-  inset: 0; z-index: 1; }
-.badge-latest { background: var(--accent); color: #fff; font-size: 0.7em;
-  font-family: var(--font-mono); padding: 2px 8px; margin-left: 8px;
-  text-transform: uppercase; letter-spacing: 0.06em; border-radius: 3px; }
+/* === Report Page — Compact Financial Layout === */
+.rpt-compact .exec-summary { margin-bottom: 12px; padding-bottom: 10px; }
+.rpt-compact .exec-summary .headline { font-size: 20px; line-height: 1.25; }
+.rpt-compact .exec-summary .detail { font-size: 13px; line-height: 1.5; }
+.rpt-compact .kpi-strip { gap: 8px; margin-bottom: 0;
+  padding-bottom: 12px; border-bottom: 1px solid var(--border-primary); }
+.rpt-compact .kpi-card { padding: 10px 12px; border-radius: 6px; }
+.rpt-compact .kpi-value { font-size: 20px; }
+.rpt-compact .kpi-icon .material-symbols-outlined { font-size: 18px; }
+.rpt-compact .kpi-sub { font-size: 11px; margin-top: 2px; }
+.rpt-compact .kpi-label { font-size: 9px; }
+.rpt-compact .kpi-icon { margin-bottom: 4px; }
+.rpt-layout { display: grid; grid-template-columns: 1fr 320px; gap: 0;
+  margin-top: 12px; }
+.rpt-main { border-right: 1px solid var(--border-primary); padding-right: 16px; }
+.rpt-sidebar { padding-left: 16px; }
+.rpt-compact section { padding: 12px 0;
+  border-bottom: 1px solid var(--border-primary); }
+.rpt-compact section:last-child { border-bottom: none; }
+.rpt-compact h2 { font-size: 15px; margin-bottom: 8px; padding-bottom: 4px;
+  border-bottom-width: 1px; }
+.rpt-compact .card { padding: 0; margin-bottom: 0; border: none; border-radius: 0;
+  box-shadow: none; background: transparent; }
+.rpt-compact .signal-grid { gap: 8px; margin-bottom: 8px; }
+.rpt-compact .signal-card { padding: 10px 12px; border-radius: 6px; }
+.rpt-compact .signal-header { margin-bottom: 4px; }
+.rpt-compact .grid-2col { gap: 0; grid-template-columns: 1fr; }
+.rpt-sidebar .index-tiles { gap: 6px; margin-bottom: 8px; }
+.rpt-sidebar .index-tile { padding: 8px; border-radius: 4px; }
+.rpt-sidebar .index-price { font-size: 16px; }
+.rpt-sidebar .index-chg { font-size: 11px; }
+.rpt-sidebar .commodity-tiles { gap: 6px; }
+.rpt-sidebar .commodity-tile { padding: 8px; }
+.rpt-sidebar .commodity-price { font-size: 16px; }
+.rpt-sidebar .commodity-chg { font-size: 11px; }
+.rpt-sidebar .rates-grid { gap: 4px; }
+.rpt-sidebar .rate-tile { padding: 6px; }
+.rpt-sidebar .rate-value { font-size: 14px; }
+.rpt-sidebar .headline-list li { padding: 6px 0; font-size: 13px; }
+.rpt-sidebar .geo-event { padding: 6px 0; }
+.rpt-sidebar .geo-title { font-size: 13px; }
+.rpt-sidebar .congress-grid { grid-template-columns: 1fr; gap: 8px; }
+.rpt-sidebar .congress-member { padding: 8px 12px; }
+.rpt-compact table th { padding: 6px 8px; font-size: 9px; }
+.rpt-compact table td { padding: 6px 8px; font-size: 12px; }
+.rpt-compact .strategy-entry-exit { padding: 4px 8px; font-size: 11px; }
+.rpt-compact .module-pill { font-size: 9px; padding: 2px 8px; }
+.rpt-compact .footer { margin-top: 16px; padding: 12px 0; }
+
+/* === Index Page — Compact Dashboard === */
+.idx-ticker-bar { display: flex; gap: 0; align-items: stretch;
+  background: var(--bg-dark); border-bottom: 1px solid var(--border-primary);
+  margin: 0 calc(-1 * clamp(16px, 3vw, 48px));
+  padding: 0 clamp(16px, 3vw, 48px); overflow-x: auto; }
+.idx-ticker { display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 8px 16px; min-width: 80px;
+  border-right: 1px solid var(--border-primary);
+  font-family: var(--font-mono); font-size: 11px; line-height: 1.3; }
+.idx-ticker:last-child { border-right: none; }
+.idx-ticker .tk-sym { font-weight: 700; color: var(--text-primary);
+  font-size: 12px; }
+.idx-ticker .tk-sector { color: var(--text-muted); font-size: 9px;
+  text-transform: uppercase; letter-spacing: 0.06em; }
+.idx-layout { display: grid; grid-template-columns: 1fr 280px;
+  gap: 0; margin-top: 0; min-height: 60vh; }
+.idx-main { border-right: 1px solid var(--border-primary);
+  padding-right: 24px; }
+.idx-sidebar { padding-left: 20px; }
+
+/* Featured latest report */
+.idx-featured { padding: 20px 0 16px; border-bottom: 1px solid var(--border-primary); }
+.idx-featured-kicker { font-family: var(--font-mono); font-size: 10px;
+  font-weight: 700; color: var(--accent); text-transform: uppercase;
+  letter-spacing: 0.12em; margin-bottom: 6px; }
+.idx-featured h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px;
+  padding-bottom: 0; border-bottom: none; display: block; line-height: 1.3; }
+.idx-featured h2 a { color: var(--text-primary); }
+.idx-featured h2 a:hover { color: var(--accent); }
+.idx-featured-meta { font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-muted); margin-bottom: 8px; }
+.idx-featured-tabs { display: flex; gap: 0; flex-wrap: wrap; margin-top: 10px; }
+.idx-tab { font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em; padding: 5px 12px;
+  color: var(--text-muted); border: 1px solid var(--border-primary);
+  border-right: none; background: var(--bg-secondary);
+  transition: color 0.1s, background 0.1s; }
+.idx-tab:last-child { border-right: 1px solid var(--border-primary); }
+.idx-tab:first-child { border-radius: 4px 0 0 4px; }
+.idx-tab:last-child { border-radius: 0 4px 4px 0; }
+.idx-tab:hover { color: var(--text-primary); background: var(--bg-tertiary);
+  text-decoration: none; }
+
+/* Report row items */
+.idx-report-row { display: flex; align-items: center; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--border-light); }
+.idx-report-row:last-child { border-bottom: none; }
+.idx-report-date { font-family: var(--font-serif); font-size: 15px;
+  font-weight: 600; white-space: nowrap; }
+.idx-report-date a { color: var(--text-primary); }
+.idx-report-date a:hover { color: var(--accent); }
+.idx-report-pages { display: flex; gap: 6px; flex-wrap: wrap; }
+.idx-page-link { font-family: var(--font-mono); font-size: 9px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 2px 7px; background: var(--bg-tertiary); color: var(--text-muted);
+  border-radius: 3px; transition: color 0.1s, background 0.1s; }
+.idx-page-link:hover { color: var(--text-primary); background: var(--bg-secondary);
+  text-decoration: none; }
+
+/* Sidebar sections */
+.idx-sb-section { padding: 14px 0; border-bottom: 1px solid var(--border-primary); }
+.idx-sb-section:last-child { border-bottom: none; }
+.idx-sb-title { font-family: var(--font-mono); font-size: 11px;
+  font-weight: 700; color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: 0.1em; margin-bottom: 10px; }
+
+/* Sidebar archive list */
+.idx-archive-item { display: flex; justify-content: space-between;
+  align-items: center; padding: 7px 0;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 13px; }
+.idx-archive-item:last-child { border-bottom: none; }
+.idx-archive-item a { color: var(--text-secondary); font-weight: 500; }
+.idx-archive-item a:hover { color: var(--accent); }
+.badge-latest { background: var(--accent); color: #fff; font-size: 9px;
+  font-family: var(--font-mono); padding: 1px 6px;
+  text-transform: uppercase; letter-spacing: 0.06em; border-radius: 2px; }
+
+/* Sidebar ETF watchlist */
+.idx-etf-row { display: flex; justify-content: space-between;
+  align-items: center; padding: 5px 0;
+  border-bottom: 1px solid var(--border-light); font-size: 12px; }
+.idx-etf-row:last-child { border-bottom: none; }
+.idx-etf-sym { font-family: var(--font-mono); font-weight: 700;
+  color: var(--text-primary); font-size: 12px; }
+.idx-etf-name { color: var(--text-muted); font-size: 11px; }
+
+/* Section header on index page */
+.idx-section-head { font-family: var(--font-mono); font-size: 11px;
+  font-weight: 700; color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: 0.1em; padding: 14px 0 8px;
+  border-bottom: 1px solid var(--border-primary); margin-bottom: 0; }
 
 /* Focus-visible */
-a:focus-visible, summary:focus-visible, .report-card:focus-within {
+a:focus-visible, summary:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -461,6 +586,13 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
   .kpi-strip { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
   table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .index-tiles { grid-template-columns: repeat(3, 1fr); }
+  .idx-layout { grid-template-columns: 1fr; }
+  .idx-main { border-right: none; padding-right: 0; }
+  .idx-sidebar { padding-left: 0; border-top: 1px solid var(--border-primary); }
+  .rpt-layout { grid-template-columns: 1fr; }
+  .rpt-main { border-right: none; padding-right: 0; }
+  .rpt-sidebar { padding-left: 0; border-top: 1px solid var(--border-primary);
+    padding-top: 12px; }
 }
 
 /* Mobile */
@@ -627,7 +759,7 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 </div>
 
 <header class="header">
-<span>2026-02-13 &bull; 07:15 IST</span>
+<span>2026-02-13 &bull; 16:13 IST</span>
 </header>
 
 <main id="main-content">
@@ -678,7 +810,7 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 </main>
 
 <footer class="footer">
-<span>Generated 2026-02-13 07:15 IST &mdash; backtested performance, not live results.</span>
+<span>Generated 2026-02-13 16:13 IST &mdash; backtested performance, not live results.</span>
 </footer>
 
 <script>
@@ -712,14 +844,14 @@ new Chart(sctx, {
   data: {
     labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
     datasets: [
-      {label:"FAS (ATH)",data:[10000.0, 11064.1, 12183.87, 14689.56],borderColor:"#2563eb",backgroundColor:"#2563eb22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"LABU (MA Dip)",data:[10000.0, 11211.58, 12837.35, 14686.83, 12461.8, 14076.68, 15726.99, 11691.77, 9672.33, 11083.63, 12195.76, 10160.36, 11673.61],borderColor:"#0a7c42",backgroundColor:"#0a7c4222",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"SOXL (ATH)",data:[10000.0, 11004.7, 12645.57, 10539.45, 12808.28, 14491.05, 16498.8, 18155.63, 20215.91, 17015.84, 12059.34, 18778.18, 23596.07, 19736.62, 22763.23, 26510.7],borderColor:"#1565c0",backgroundColor:"#1565c022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"TECL (MA Dip)",data:[10000.0, 11045.3, 8614.06, 9479.8, 10458.04, 11552.04, 12869.33, 10555.52, 11623.73, 8898.93, 12044.81, 13256.92, 15619.65, 17622.12, 19598.11, 21824.4],borderColor:"#b86e00",backgroundColor:"#b86e0022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"TNA (Bollinger)",data:[10000.0, 11082.59, 12738.56, 14287.33, 12047.8, 10122.95, 12704.36, 14812.88, 16378.06, 18143.07],borderColor:"#6a1b9a",backgroundColor:"#6a1b9a22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"FAS (ATH)",data:[10000.0, 11064.09, 12183.87, 14689.56],borderColor:"#2563eb",backgroundColor:"#2563eb22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"LABU (MA Dip)",data:[10000.0, 11211.58, 12837.35, 14686.84, 12461.81, 14076.68, 15726.99, 11691.77, 9672.34, 11083.64, 12195.76, 10160.37, 11673.61],borderColor:"#0a7c42",backgroundColor:"#0a7c4222",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"SOXL (ATH)",data:[10000.0, 11004.69, 12645.57, 10539.44, 12808.27, 14491.04, 16498.78, 18155.6, 20215.89, 17015.82, 12059.34, 18778.17, 23596.06, 19736.61, 22763.22, 26510.7],borderColor:"#1565c0",backgroundColor:"#1565c022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"TECL (MA Dip)",data:[10000.0, 11045.29, 8614.06, 9479.8, 10458.04, 11552.05, 12869.33, 10555.52, 11623.74, 8898.93, 12044.81, 13256.92, 15619.65, 17622.12, 19598.11, 21824.4],borderColor:"#b86e00",backgroundColor:"#b86e0022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"TNA (Bollinger)",data:[10000.0, 11082.59, 12738.56, 14287.33, 12047.8, 10122.95, 12704.35, 14812.87, 16378.05, 18143.06],borderColor:"#6a1b9a",backgroundColor:"#6a1b9a22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
       {label:"TQQQ (RSI)",data:[10000.0, 11184.29, 14623.96],borderColor:"#00838f",backgroundColor:"#00838f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
       {label:"UCO (ATH)",data:[10000.0, 11010.72, 12637.81, 13974.03, 15505.76, 12410.78, 13696.23, 15182.17, 16984.09, 19096.02],borderColor:"#c62828",backgroundColor:"#c6282822",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"UPRO (RSI)",data:[10000.0, 11073.19, 13922.58],borderColor:"#37474f",backgroundColor:"#37474f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false}
+      {label:"UPRO (RSI)",data:[10000.0, 11073.19, 13922.57],borderColor:"#37474f",backgroundColor:"#37474f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false}
     ]
   },
   options: {

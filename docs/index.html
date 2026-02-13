@@ -431,6 +431,55 @@ a:hover { text-decoration: underline; }
 .ok { color: var(--success); }
 .fail { color: var(--danger); }
 
+/* === Report Page — Compact Financial Layout === */
+.rpt-compact .exec-summary { margin-bottom: 12px; padding-bottom: 10px; }
+.rpt-compact .exec-summary .headline { font-size: 20px; line-height: 1.25; }
+.rpt-compact .exec-summary .detail { font-size: 13px; line-height: 1.5; }
+.rpt-compact .kpi-strip { gap: 8px; margin-bottom: 0;
+  padding-bottom: 12px; border-bottom: 1px solid var(--border-primary); }
+.rpt-compact .kpi-card { padding: 10px 12px; border-radius: 6px; }
+.rpt-compact .kpi-value { font-size: 20px; }
+.rpt-compact .kpi-icon .material-symbols-outlined { font-size: 18px; }
+.rpt-compact .kpi-sub { font-size: 11px; margin-top: 2px; }
+.rpt-compact .kpi-label { font-size: 9px; }
+.rpt-compact .kpi-icon { margin-bottom: 4px; }
+.rpt-layout { display: grid; grid-template-columns: 1fr 320px; gap: 0;
+  margin-top: 12px; }
+.rpt-main { border-right: 1px solid var(--border-primary); padding-right: 16px; }
+.rpt-sidebar { padding-left: 16px; }
+.rpt-compact section { padding: 12px 0;
+  border-bottom: 1px solid var(--border-primary); }
+.rpt-compact section:last-child { border-bottom: none; }
+.rpt-compact h2 { font-size: 15px; margin-bottom: 8px; padding-bottom: 4px;
+  border-bottom-width: 1px; }
+.rpt-compact .card { padding: 0; margin-bottom: 0; border: none; border-radius: 0;
+  box-shadow: none; background: transparent; }
+.rpt-compact .signal-grid { gap: 8px; margin-bottom: 8px; }
+.rpt-compact .signal-card { padding: 10px 12px; border-radius: 6px; }
+.rpt-compact .signal-header { margin-bottom: 4px; }
+.rpt-compact .grid-2col { gap: 0; grid-template-columns: 1fr; }
+.rpt-sidebar .index-tiles { gap: 6px; margin-bottom: 8px; }
+.rpt-sidebar .index-tile { padding: 8px; border-radius: 4px; }
+.rpt-sidebar .index-price { font-size: 16px; }
+.rpt-sidebar .index-chg { font-size: 11px; }
+.rpt-sidebar .commodity-tiles { gap: 6px; }
+.rpt-sidebar .commodity-tile { padding: 8px; }
+.rpt-sidebar .commodity-price { font-size: 16px; }
+.rpt-sidebar .commodity-chg { font-size: 11px; }
+.rpt-sidebar .rates-grid { gap: 4px; }
+.rpt-sidebar .rate-tile { padding: 6px; }
+.rpt-sidebar .rate-value { font-size: 14px; }
+.rpt-sidebar .headline-list li { padding: 6px 0; font-size: 13px; }
+.rpt-sidebar .geo-event { padding: 6px 0; }
+.rpt-sidebar .geo-title { font-size: 13px; }
+.rpt-sidebar .congress-grid { grid-template-columns: 1fr; gap: 8px; }
+.rpt-sidebar .congress-member { padding: 8px 12px; }
+.rpt-compact table th { padding: 6px 8px; font-size: 9px; }
+.rpt-compact table td { padding: 6px 8px; font-size: 12px; }
+.rpt-compact .strategy-entry-exit { padding: 4px 8px; font-size: 11px; }
+.rpt-compact .module-pill { font-size: 9px; padding: 2px 8px; }
+.rpt-compact .footer { margin-top: 16px; padding: 12px 0; }
+
 /* === Index Page — Compact Dashboard === */
 .idx-ticker-bar { display: flex; gap: 0; align-items: stretch;
   background: var(--bg-dark); border-bottom: 1px solid var(--border-primary);
@@ -540,6 +589,10 @@ a:focus-visible, summary:focus-visible {
   .idx-layout { grid-template-columns: 1fr; }
   .idx-main { border-right: none; padding-right: 0; }
   .idx-sidebar { padding-left: 0; border-top: 1px solid var(--border-primary); }
+  .rpt-layout { grid-template-columns: 1fr; }
+  .rpt-main { border-right: none; padding-right: 0; }
+  .rpt-sidebar { padding-left: 0; border-top: 1px solid var(--border-primary);
+    padding-top: 12px; }
 }
 
 /* Mobile */
