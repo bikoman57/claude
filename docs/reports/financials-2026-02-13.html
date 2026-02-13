@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0b0f18">
-<meta name="description" content="Strategy performance comparison for 2026-02-13">
-<title>Strategies 2026-02-13</title>
+<meta name="description" content="Portfolio financial performance for 2026-02-13">
+<title>Financials 2026-02-13</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
@@ -781,14 +781,13 @@ a:focus-visible, summary:focus-visible {
 .standup-entry .field { color: var(--text-muted); }
 .standup-entry .field span { color: var(--text-secondary); }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <a href="#main-content" class="skip-nav">Skip to main content</a>
 <div class="top-bar">
 <h1><img src="../logo.png" alt="Be Him" class="top-bar-logo">Swing Trading Report</h1>
 <select class="nav-date-picker" aria-label="Select report date" onchange="window.location.href=this.value+'.html'"><option value="2026-02-13" selected>2026-02-13</option><option value="2026-02-12">2026-02-12</option><option value="2026-02-11">2026-02-11</option></select>
-<nav class="nav-menu" aria-label="Report navigation"><a href="2026-02-13.html">Market Report</a><a href="trade-logs-2026-02-13.html">Trade Logs</a><a href="forecasts-2026-02-13.html">Forecasts</a><a href="strategies-2026-02-13.html" class="nav-active">Strategies</a><a href="financials-2026-02-13.html">Financials</a><a href="company-2026-02-13.html">Company</a><a href="about-2026-02-13.html">About</a></nav>
+<nav class="nav-menu" aria-label="Report navigation"><a href="2026-02-13.html">Market Report</a><a href="trade-logs-2026-02-13.html">Trade Logs</a><a href="forecasts-2026-02-13.html">Forecasts</a><a href="strategies-2026-02-13.html">Strategies</a><a href="financials-2026-02-13.html" class="nav-active">Financials</a><a href="company-2026-02-13.html">Company</a><a href="about-2026-02-13.html">About</a></nav>
 </div>
 
 <header class="header">
@@ -797,53 +796,83 @@ a:focus-visible, summary:focus-visible {
 
 <main id="main-content">
 
-<section>
-<h2>Strategy Type Comparison</h2>
-<div class="card">
-<p>Performance metrics averaged across all ETFs for each strategy type.</p>
-<table class="mt-12">
-<thead><tr><th scope="col">Strategy</th><th scope="col" class="num">Avg Sharpe</th><th scope="col" class="num">Avg Win Rate</th><th scope="col" class="num">Avg Return</th><th scope="col" class="num">Total Trades</th><th scope="col">Best ETF</th></tr></thead>
-<tbody>
-<tr><td><strong>ATH Mean-Reversion</strong></td><td class="num">0.958</td><td class="num">72.0%</td><td class="num pct-up">+46.1%</td><td class="num">62</td><td>FAS</td></tr>
-<tr><td><strong>Bollinger Band</strong></td><td class="num">1.008</td><td class="num">70.4%</td><td class="num pct-up">+48.7%</td><td class="num">79</td><td>FAS</td></tr>
-<tr><td><strong>MA Dip</strong></td><td class="num">0.966</td><td class="num">74.7%</td><td class="num pct-up">+67.9%</td><td class="num">96</td><td>TECL</td></tr>
-<tr><td><strong>RSI Oversold</strong> <span class="badge badge-ok">BEST</span></td><td class="num">1.340</td><td class="num">79.2%</td><td class="num pct-up">+23.4%</td><td class="num">20</td><td>FAS</td></tr>
-</tbody></table>
+<section id="portfolio-kpis">
+<h2>Portfolio Overview</h2>
+<div class="kpi-strip">
+<div class="kpi-card kpi-bar-gray">
+<div class="kpi-label">Portfolio Value</div>
+<div class="kpi-value">$10,000.00</div>
+<div class="kpi-sub"><span class="pct-up">+0.0%</span> total return</div>
+</div>
+<div class="kpi-card kpi-bar-gray">
+<div class="kpi-label">Cash Balance</div>
+<div class="kpi-value">$10,000.00</div>
+<div class="kpi-sub">100% of portfolio</div>
+</div>
+<div class="kpi-card kpi-bar-gray">
+<div class="kpi-label">Realized P&amp;L</div>
+<div class="kpi-value">$+0.00</div>
+<div class="kpi-sub"><span class="pct-up">from 1 snapshots</span></div>
+</div>
+<div class="kpi-card kpi-bar-gray">
+<div class="kpi-label">Operating Costs</div>
+<div class="kpi-value">$0.00</div>
+<div class="kpi-sub">$100/month run rate</div>
+</div>
+<div class="kpi-card kpi-bar-gray">
+<div class="kpi-label">Net Value</div>
+<div class="kpi-value">$10,000.00</div>
+<div class="kpi-sub"><span class="pct-up">+0.0%</span> after costs</div>
+</div>
+<div class="kpi-card kpi-bar-gray">
+<div class="kpi-label">Open Positions</div>
+<div class="kpi-value">0</div>
+<div class="kpi-sub">none</div>
+</div>
 </div>
 </section>
 
 <section>
-<h2>Equity Curves</h2>
+<h2>Equity Curve</h2>
+<div class="card"><p class="text-muted">Need at least 2 snapshots to display equity curve. Run daily to build history.</p></div>
+</section>
+
+<section>
+<h2>Operating Costs</h2>
 <div class="card">
-<div style="position:relative;height:450px">
-<canvas id="stratEquityChart"></canvas>
-</div>
+<table>
+<thead><tr><th>Metric</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>Monthly run rate</td><td class="num">$100/mo</td></tr>
+<tr><td>Annual projected</td><td class="num">$1,200/yr</td></tr>
+<tr><td>Total costs to date</td><td class="num">$0.00</td></tr>
+<tr><td>Cost as % of initial capital</td><td class="num">0.0%</td></tr>
+</tbody>
+</table>
 </div>
 </section>
 
 <section>
-<h2>ETF Rankings (Best Strategy)</h2>
+<h2>Trade History</h2>
+<div class="card"><p class="text-muted">No trades recorded yet. Use <code>uv run python -m app.etf enter TICKER PRICE</code> to record entries.</p></div>
+</section>
+
+<section>
+<h2>Monthly Summary</h2>
 <div class="card">
-<p>Each ETF ranked by its best-performing strategy (highest Sharpe ratio).</p>
-<table class="mt-12">
-<thead><tr><th scope="col">Rank</th><th scope="col">ETF</th><th scope="col">Underlying</th><th scope="col">Strategy</th><th scope="col" class="num">Sharpe</th><th scope="col" class="num">Win Rate</th><th scope="col" class="num">Return</th><th scope="col" class="num">Max DD</th></tr></thead>
+<table>
+<thead><tr><th>Month</th><th>Start</th><th>End</th><th>Change $</th><th>Change %</th><th>Realized P&L</th><th>Costs</th></tr></thead>
 <tbody>
-<tr><td>#1</td><td><strong>FAS</strong></td><td>XLF</td><td><span class="badge badge-gray" title="Buy when 14-day RSI falls below oversold threshold (typically 30), exit when RSI recovers above overbought level or profit target hit. Targets short-term momentum reversals.">RSI</span></td><td class="num">3.520</td><td class="num">100.0%</td><td class="num pct-up">+35.5%</td><td class="num">0.0%</td></tr>
-<tr><td>#2</td><td><strong>TQQQ</strong></td><td>QQQ</td><td><span class="badge badge-gray" title="Buy when 14-day RSI falls below oversold threshold (typically 30), exit when RSI recovers above overbought level or profit target hit. Targets short-term momentum reversals.">RSI</span></td><td class="num">2.665</td><td class="num">100.0%</td><td class="num pct-up">+63.5%</td><td class="num">0.0%</td></tr>
-<tr><td>#3</td><td><strong>UPRO</strong></td><td>SPY</td><td><span class="badge badge-gray" title="Buy when 14-day RSI falls below oversold threshold (typically 30), exit when RSI recovers above overbought level or profit target hit. Targets short-term momentum reversals.">RSI</span></td><td class="num">2.164</td><td class="num">100.0%</td><td class="num pct-up">+39.2%</td><td class="num">0.0%</td></tr>
-<tr><td>#4</td><td><strong>UCO</strong></td><td>USO</td><td><span class="badge badge-gray" title="Buy leveraged ETF when its underlying index drops a threshold % from all-time high, exit at profit target. Captures mean-reversion after broad market drawdowns.">ATH</span></td><td class="num">2.141</td><td class="num">88.9%</td><td class="num pct-up">+91.0%</td><td class="num">20.0%</td></tr>
-<tr><td>#5</td><td><strong>TNA</strong></td><td>IWM</td><td><span class="badge badge-gray" title="Buy when price touches or breaks below the lower Bollinger Band (20-day SMA minus 2 standard deviations), exit at the middle band or profit target. Identifies statistical extremes in price action.">Bollinger</span></td><td class="num">1.548</td><td class="num">77.8%</td><td class="num pct-up">+81.4%</td><td class="num">29.1%</td></tr>
-<tr><td>#6</td><td><strong>SOXL</strong></td><td>SOXX</td><td><span class="badge badge-gray" title="Buy leveraged ETF when its underlying index drops a threshold % from all-time high, exit at profit target. Captures mean-reversion after broad market drawdowns.">ATH</span></td><td class="num">1.376</td><td class="num">73.3%</td><td class="num pct-up">+165.1%</td><td class="num">40.4%</td></tr>
-<tr><td>#7</td><td><strong>TECL</strong></td><td>XLK</td><td><span class="badge badge-gray" title="Buy when price dips a threshold % below its 50-day moving average, exit when price recovers to or above the MA. Captures pullbacks within an established trend.">MA Dip</span></td><td class="num">1.334</td><td class="num">81.2%</td><td class="num pct-up">+121.2%</td><td class="num">30.9%</td></tr>
-<tr><td>#8</td><td><strong>LABU</strong></td><td>XBI</td><td><span class="badge badge-gray" title="Buy when price dips a threshold % below its 50-day moving average, exit when price recovers to or above the MA. Captures pullbacks within an established trend.">MA Dip</span></td><td class="num">0.683</td><td class="num">69.2%</td><td class="num pct-up">+32.9%</td><td class="num">38.5%</td></tr>
-</tbody></table>
+<tr><td>2026-02</td><td class="num">$10,000.00</td><td class="num">$10,000.00</td><td class="num pct-up">$+0.00</td><td class="num pct-up">+0.0%</td><td class="num">$+0.00</td><td class="num">$0.00</td></tr>
+</tbody>
+</table>
 </div>
 </section>
 
 </main>
 
 <footer class="footer">
-<span>Generated 2026-02-13 23:45 IST &mdash; backtested performance, not live results.</span>
+<span>Generated 2026-02-13 23:45 IST &mdash; portfolio financials &amp; performance.</span>
 </footer>
 
 <script>
@@ -870,43 +899,5 @@ document.querySelectorAll('.nav-dropdown-menu a').forEach(function(a){
 });
 </script>
 
-<script>
-const sctx = document.getElementById('stratEquityChart').getContext('2d');
-new Chart(sctx, {
-  type: 'line',
-  data: {
-    labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-    datasets: [
-      {label:"FAS (RSI)",data:[10000.0, 11235.03, 13545.59],borderColor:"#2563eb",backgroundColor:"#2563eb22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"LABU (MA Dip)",data:[10000.0, 11204.09, 12681.72, 14611.17, 16716.21, 14183.73, 16021.75, 17900.1, 13307.3, 11008.82, 12615.12, 13880.92, 11564.29, 13286.63],borderColor:"#0a7c42",backgroundColor:"#0a7c4222",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"SOXL (ATH)",data:[10000.0, 11004.7, 12645.57, 10539.45, 12808.28, 14491.06, 16498.8, 18155.63, 20215.92, 17015.85, 12059.36, 18778.2, 23596.1, 19736.64, 22763.25, 26510.74],borderColor:"#1565c0",backgroundColor:"#1565c022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"TECL (MA Dip)",data:[10000.0, 11112.85, 8666.75, 9537.78, 10522.0, 11622.7, 12948.05, 10620.09, 11694.84, 8953.36, 12118.49, 13338.01, 15715.19, 17729.91, 19717.99, 21957.9, 22123.51],borderColor:"#b86e00",backgroundColor:"#b86e0022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"TNA (Bollinger)",data:[10000.0, 11082.59, 12738.56, 14287.33, 12047.8, 10122.95, 12704.35, 14812.87, 16378.05, 18143.06],borderColor:"#6a1b9a",backgroundColor:"#6a1b9a22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"TQQQ (RSI)",data:[10000.0, 11182.92, 12507.31, 16353.86],borderColor:"#00838f",backgroundColor:"#00838f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"UCO (ATH)",data:[10000.0, 11010.72, 12637.81, 13974.03, 15505.76, 12410.78, 13696.23, 15182.17, 16984.09, 19096.02],borderColor:"#c62828",backgroundColor:"#c6282822",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"UPRO (RSI)",data:[10000.0, 11073.19, 13922.58],borderColor:"#37474f",backgroundColor:"#37474f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false}
-    ]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: { mode: 'index', intersect: false },
-    plugins: {
-      title: { display: true, text: 'Best Strategy Equity Curve per ETF', color: '#e6edf3', font: { size: 16, family: 'Inter' } },
-      tooltip: {
-        callbacks: {
-          label: function(ctx) {
-            return ctx.dataset.label + ': $' + ctx.parsed.y.toLocaleString();
-          }
-        }
-      }
-    },
-    scales: {
-      x: { title: { display: true, text: 'Trade #', color: '#8b949e' }, ticks: { maxTicksLimit: 20, color: '#8b949e' }, grid: { color: '#2a3346' } },
-      y: { title: { display: true, text: 'Portfolio Value ($)', color: '#8b949e' }, ticks: { color: '#8b949e', callback: function(v) { return '$' + v.toLocaleString(); } }, grid: { color: '#2a3346' } }
-    }
-  }
-});
-</script>
 </body>
 </html>

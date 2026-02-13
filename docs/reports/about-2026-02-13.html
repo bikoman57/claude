@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0b0f18">
-<meta name="description" content="Strategy performance comparison for 2026-02-13">
-<title>Strategies 2026-02-13</title>
+<meta name="description" content="System overview, trading strategy, and team structure">
+<title>About 2026-02-13</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
@@ -781,14 +781,13 @@ a:focus-visible, summary:focus-visible {
 .standup-entry .field { color: var(--text-muted); }
 .standup-entry .field span { color: var(--text-secondary); }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <a href="#main-content" class="skip-nav">Skip to main content</a>
 <div class="top-bar">
 <h1><img src="../logo.png" alt="Be Him" class="top-bar-logo">Swing Trading Report</h1>
 <select class="nav-date-picker" aria-label="Select report date" onchange="window.location.href=this.value+'.html'"><option value="2026-02-13" selected>2026-02-13</option><option value="2026-02-12">2026-02-12</option><option value="2026-02-11">2026-02-11</option></select>
-<nav class="nav-menu" aria-label="Report navigation"><a href="2026-02-13.html">Market Report</a><a href="trade-logs-2026-02-13.html">Trade Logs</a><a href="forecasts-2026-02-13.html">Forecasts</a><a href="strategies-2026-02-13.html" class="nav-active">Strategies</a><a href="financials-2026-02-13.html">Financials</a><a href="company-2026-02-13.html">Company</a><a href="about-2026-02-13.html">About</a></nav>
+<nav class="nav-menu" aria-label="Report navigation"><a href="2026-02-13.html">Market Report</a><a href="trade-logs-2026-02-13.html">Trade Logs</a><a href="forecasts-2026-02-13.html">Forecasts</a><a href="strategies-2026-02-13.html">Strategies</a><a href="financials-2026-02-13.html">Financials</a><a href="company-2026-02-13.html">Company</a><a href="about-2026-02-13.html" class="nav-active">About</a></nav>
 </div>
 
 <header class="header">
@@ -797,53 +796,189 @@ a:focus-visible, summary:focus-visible {
 
 <main id="main-content">
 
-<section>
-<h2>Strategy Type Comparison</h2>
+<section id="about-hero">
+<h2>About This System</h2>
 <div class="card">
-<p>Performance metrics averaged across all ETFs for each strategy type.</p>
-<table class="mt-12">
-<thead><tr><th scope="col">Strategy</th><th scope="col" class="num">Avg Sharpe</th><th scope="col" class="num">Avg Win Rate</th><th scope="col" class="num">Avg Return</th><th scope="col" class="num">Total Trades</th><th scope="col">Best ETF</th></tr></thead>
-<tbody>
-<tr><td><strong>ATH Mean-Reversion</strong></td><td class="num">0.958</td><td class="num">72.0%</td><td class="num pct-up">+46.1%</td><td class="num">62</td><td>FAS</td></tr>
-<tr><td><strong>Bollinger Band</strong></td><td class="num">1.008</td><td class="num">70.4%</td><td class="num pct-up">+48.7%</td><td class="num">79</td><td>FAS</td></tr>
-<tr><td><strong>MA Dip</strong></td><td class="num">0.966</td><td class="num">74.7%</td><td class="num pct-up">+67.9%</td><td class="num">96</td><td>TECL</td></tr>
-<tr><td><strong>RSI Oversold</strong> <span class="badge badge-ok">BEST</span></td><td class="num">1.340</td><td class="num">79.2%</td><td class="num pct-up">+23.4%</td><td class="num">20</td><td>FAS</td></tr>
-</tbody></table>
+<p><strong>AI-Powered Leveraged ETF Mean-Reversion Swing Trading System</strong></p>
+<p>This is a fully automated financial analysis platform that monitors underlying index drawdowns from all-time highs, identifies mean-reversion entry opportunities in leveraged ETFs, and takes profit at predetermined targets.</p>
+<p style="margin-top:12px"><strong>Core Strategy:</strong> When an underlying index drops significantly from its ATH, history shows it tends to recover. We buy the leveraged ETF during the dip and sell when it recovers for amplified returns.</p>
+<p style="margin-top:12px"><strong>Initial Capital:</strong> $10,000 &bull; <strong>Operating Cost:</strong> $100/month &bull; <strong>Analysis Frequency:</strong> Twice daily (pre-market &amp; post-market)</p>
 </div>
 </section>
 
-<section>
-<h2>Equity Curves</h2>
+<section id="about-strategy">
+<h2>Trading Strategy</h2>
 <div class="card">
-<div style="position:relative;height:450px">
-<canvas id="stratEquityChart"></canvas>
+<h3>Sector-to-ETF Mapping</h3>
+<table>
+<thead><tr><th>Sector</th><th>Underlying Tickers</th><th>Leveraged ETF</th></tr></thead>
+<tbody>
+<tr><td>Technology</td><td>AAPL, MSFT, GOOGL, META</td><td><strong>TQQQ, TECL</strong></td></tr>
+<tr><td>Semiconductors</td><td>NVDA, AMD, AVGO</td><td><strong>SOXL</strong></td></tr>
+<tr><td>Finance</td><td>JPM, GS, BAC</td><td><strong>FAS</strong></td></tr>
+<tr><td>Energy</td><td>XOM, CVX</td><td><strong>UCO</strong></td></tr>
+<tr><td>Biotech / Healthcare</td><td>LLY, PFE, JNJ</td><td><strong>LABU</strong></td></tr>
+<tr><td>Broad Market / Small Cap</td><td>SPY, IWM</td><td><strong>UPRO, TNA</strong></td></tr>
+</tbody>
+</table>
+</div>
+<div class="card">
+<h3>Signal Lifecycle</h3>
+<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:stretch">
+<div style="flex:1;min-width:140px;text-align:center;padding:12px;border-radius:8px;border:2px solid #64748b;background:#64748b11">
+<div style="font-weight:700;font-size:1.1em;color:#64748b">WATCH</div>
+<div style="font-size:0.85em;margin-top:4px;color:#94a3b8">0-3% below ATH</div>
+<div style="font-size:0.8em;margin-top:6px">Baseline monitoring, no action</div>
+</div>
+<div style="flex:1;min-width:140px;text-align:center;padding:12px;border-radius:8px;border:2px solid #b86e00;background:#b86e0011">
+<div style="font-weight:700;font-size:1.1em;color:#b86e00">ALERT</div>
+<div style="font-size:0.85em;margin-top:4px;color:#94a3b8">3-5% below ATH</div>
+<div style="font-size:0.8em;margin-top:6px">Heightened monitoring, confidence scoring begins</div>
+</div>
+<div style="flex:1;min-width:140px;text-align:center;padding:12px;border-radius:8px;border:2px solid #c62828;background:#c6282811">
+<div style="font-weight:700;font-size:1.1em;color:#c62828">SIGNAL</div>
+<div style="font-size:0.85em;margin-top:4px;color:#94a3b8">5%+ below ATH</div>
+<div style="font-size:0.8em;margin-top:6px">Entry opportunity — CIO synthesizes all domains</div>
+</div>
+<div style="flex:1;min-width:140px;text-align:center;padding:12px;border-radius:8px;border:2px solid #2563eb;background:#2563eb11">
+<div style="font-weight:700;font-size:1.1em;color:#2563eb">ACTIVE</div>
+<div style="font-size:0.85em;margin-top:4px;color:#94a3b8">Position entered</div>
+<div style="font-size:0.8em;margin-top:6px">Tracking P&amp;L, daily updates</div>
+</div>
+<div style="flex:1;min-width:140px;text-align:center;padding:12px;border-radius:8px;border:2px solid #0a7c42;background:#0a7c4211">
+<div style="font-weight:700;font-size:1.1em;color:#0a7c42">TARGET</div>
+<div style="font-size:0.85em;margin-top:4px;color:#94a3b8">Profit target hit</div>
+<div style="font-size:0.8em;margin-top:6px">Exit signal, position closed, outcome recorded</div>
+</div>
+</div>
+</div>
+<div class="card">
+<h3>12-Factor Confidence Scoring</h3>
+<p><span class="badge badge-gray" style="margin:2px">Drawdown Depth</span> <span class="badge badge-gray" style="margin:2px">VIX Regime</span> <span class="badge badge-gray" style="margin:2px">Fed Policy</span> <span class="badge badge-gray" style="margin:2px">Yield Curve</span> <span class="badge badge-gray" style="margin:2px">SEC Filings</span> <span class="badge badge-gray" style="margin:2px">Earnings Risk</span> <span class="badge badge-gray" style="margin:2px">Geopolitical Risk</span> <span class="badge badge-gray" style="margin:2px">Social Sentiment</span> <span class="badge badge-gray" style="margin:2px">News Sentiment</span> <span class="badge badge-gray" style="margin:2px">Market Statistics</span> <span class="badge badge-gray" style="margin:2px">Congress Trades</span> <span class="badge badge-gray" style="margin:2px">Portfolio Risk</span></p>
+<p style="margin-top:8px"><span class="badge badge-green">HIGH</span> 9+ favorable &bull; <span class="badge badge-yellow">MEDIUM</span> 5-8 &bull; <span class="badge badge-red">LOW</span> 0-4</p>
+</div>
+</section>
+
+<section id="about-org">
+<h2>Organization</h2>
+<div class="card">
+<div style="text-align:center;margin-bottom:24px">
+<div style="display:inline-block;padding:12px 24px;background:#1e293b;color:#f8fafc;border-radius:8px;font-weight:700;font-size:1.1em">Board of Directors (You)</div>
+<div style="width:2px;height:20px;background:#475569;margin:0 auto"></div>
+</div>
+<div style="display:flex;justify-content:center;gap:24px;margin-bottom:24px;flex-wrap:wrap">
+<div style="padding:12px 20px;background:#1e3a5f;color:#f8fafc;border-radius:8px;text-align:center;min-width:200px">
+<div style="font-weight:700">CIO</div><div style="font-size:0.85em;color:#94a3b8">exec-cio &bull; opus</div>
+<div style="font-size:0.8em;margin-top:4px">Cross-domain synthesis &amp; unified report</div>
+</div>
+<div style="padding:12px 20px;background:#1e3a5f;color:#f8fafc;border-radius:8px;text-align:center;min-width:200px">
+<div style="font-weight:700">COO</div><div style="font-size:0.85em;color:#94a3b8">exec-coo &bull; haiku</div>
+<div style="font-size:0.8em;margin-top:4px">System health &amp; operations</div>
+</div>
+</div>
+<div style="display:flex;gap:16px;flex-wrap:wrap">
+<div style="flex:1;min-width:250px;border:2px solid #2563eb;border-radius:8px;overflow:hidden">
+<div style="background:#2563eb;color:#f8fafc;padding:8px 12px;font-weight:700">Trading Desk<span style="float:right;font-size:0.8em;opacity:0.8">3 agents</span></div>
+<div style="padding:8px 12px"><div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>trading-drawdown-monitor</strong> &mdash; Drawdown monitoring</div>
+<div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>trading-market-analyst</strong> &mdash; Momentum &amp; volatility</div>
+<div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>trading-swing-screener</strong> &mdash; Entry/exit signals</div>
+</div>
+</div>
+<div style="flex:1;min-width:250px;border:2px solid #7c3aed;border-radius:8px;overflow:hidden">
+<div style="background:#7c3aed;color:#f8fafc;padding:8px 12px;font-weight:700">Research<span style="float:right;font-size:0.8em;opacity:0.8">6 agents</span></div>
+<div style="padding:8px 12px"><div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>research-macro</strong> &mdash; Macro data (VIX, Fed, yields)</div>
+<div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>research-sec</strong> &mdash; SEC filings &amp; 13F</div>
+<div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>research-statistics</strong> &mdash; Sector rotation &amp; breadth</div>
+<div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>research-strategy-analyst</strong> &mdash; Backtesting &amp; optimization</div>
+<div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>research-strategy-researcher</strong> &mdash; New strategies (opus)</div>
+<div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>research-quant</strong> &mdash; Statistical analysis (opus)</div>
+</div>
+</div>
+<div style="flex:1;min-width:250px;border:2px solid #0891b2;border-radius:8px;overflow:hidden">
+<div style="background:#0891b2;color:#f8fafc;padding:8px 12px;font-weight:700">Intelligence<span style="float:right;font-size:0.8em;opacity:0.8">5 agents</span></div>
+<div style="padding:8px 12px"><div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>intel-chief</strong> &mdash; Intel aggregation &amp; briefing</div>
+<div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>intel-news</strong> &mdash; Financial news sentiment</div>
+<div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>intel-geopolitical</strong> &mdash; GDELT &amp; geopolitical risk</div>
+<div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>intel-social</strong> &mdash; Reddit &amp; social sentiment</div>
+<div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>intel-congress</strong> &mdash; Congressional stock trades</div>
+</div>
+</div>
+<div style="flex:1;min-width:250px;border:2px solid #dc2626;border-radius:8px;overflow:hidden">
+<div style="background:#dc2626;color:#f8fafc;padding:8px 12px;font-weight:700">Risk Management<span style="float:right;font-size:0.8em;opacity:0.8">2 agents</span></div>
+<div style="padding:8px 12px"><div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>risk-manager</strong> &mdash; Portfolio limits &amp; VETO authority</div>
+<div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>risk-portfolio</strong> &mdash; Position sizing &amp; allocations</div>
+</div>
+</div>
+<div style="flex:1;min-width:250px;border:2px solid #475569;border-radius:8px;overflow:hidden">
+<div style="background:#475569;color:#f8fafc;padding:8px 12px;font-weight:700">Operations<span style="float:right;font-size:0.8em;opacity:0.8">5 agents</span></div>
+<div style="padding:8px 12px"><div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>ops-code-reviewer</strong> &mdash; Code quality (haiku)</div>
+<div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>ops-design-reviewer</strong> &mdash; UI/UX review</div>
+<div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>ops-security-reviewer</strong> &mdash; Security audit (haiku)</div>
+<div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>ops-token-optimizer</strong> &mdash; Token efficiency (haiku)</div>
+<div style="font-size:0.8em;padding:3px 0;border-bottom:1px solid #1e293b"><strong>ops-devops</strong> &mdash; Pipeline health (haiku)</div>
+</div>
+</div>
 </div>
 </div>
 </section>
 
-<section>
-<h2>ETF Rankings (Best Strategy)</h2>
+<section id="about-sources">
+<h2>Data Sources</h2>
 <div class="card">
-<p>Each ETF ranked by its best-performing strategy (highest Sharpe ratio).</p>
-<table class="mt-12">
-<thead><tr><th scope="col">Rank</th><th scope="col">ETF</th><th scope="col">Underlying</th><th scope="col">Strategy</th><th scope="col" class="num">Sharpe</th><th scope="col" class="num">Win Rate</th><th scope="col" class="num">Return</th><th scope="col" class="num">Max DD</th></tr></thead>
+<table>
+<thead><tr><th>Source</th><th>Data</th></tr></thead>
 <tbody>
-<tr><td>#1</td><td><strong>FAS</strong></td><td>XLF</td><td><span class="badge badge-gray" title="Buy when 14-day RSI falls below oversold threshold (typically 30), exit when RSI recovers above overbought level or profit target hit. Targets short-term momentum reversals.">RSI</span></td><td class="num">3.520</td><td class="num">100.0%</td><td class="num pct-up">+35.5%</td><td class="num">0.0%</td></tr>
-<tr><td>#2</td><td><strong>TQQQ</strong></td><td>QQQ</td><td><span class="badge badge-gray" title="Buy when 14-day RSI falls below oversold threshold (typically 30), exit when RSI recovers above overbought level or profit target hit. Targets short-term momentum reversals.">RSI</span></td><td class="num">2.665</td><td class="num">100.0%</td><td class="num pct-up">+63.5%</td><td class="num">0.0%</td></tr>
-<tr><td>#3</td><td><strong>UPRO</strong></td><td>SPY</td><td><span class="badge badge-gray" title="Buy when 14-day RSI falls below oversold threshold (typically 30), exit when RSI recovers above overbought level or profit target hit. Targets short-term momentum reversals.">RSI</span></td><td class="num">2.164</td><td class="num">100.0%</td><td class="num pct-up">+39.2%</td><td class="num">0.0%</td></tr>
-<tr><td>#4</td><td><strong>UCO</strong></td><td>USO</td><td><span class="badge badge-gray" title="Buy leveraged ETF when its underlying index drops a threshold % from all-time high, exit at profit target. Captures mean-reversion after broad market drawdowns.">ATH</span></td><td class="num">2.141</td><td class="num">88.9%</td><td class="num pct-up">+91.0%</td><td class="num">20.0%</td></tr>
-<tr><td>#5</td><td><strong>TNA</strong></td><td>IWM</td><td><span class="badge badge-gray" title="Buy when price touches or breaks below the lower Bollinger Band (20-day SMA minus 2 standard deviations), exit at the middle band or profit target. Identifies statistical extremes in price action.">Bollinger</span></td><td class="num">1.548</td><td class="num">77.8%</td><td class="num pct-up">+81.4%</td><td class="num">29.1%</td></tr>
-<tr><td>#6</td><td><strong>SOXL</strong></td><td>SOXX</td><td><span class="badge badge-gray" title="Buy leveraged ETF when its underlying index drops a threshold % from all-time high, exit at profit target. Captures mean-reversion after broad market drawdowns.">ATH</span></td><td class="num">1.376</td><td class="num">73.3%</td><td class="num pct-up">+165.1%</td><td class="num">40.4%</td></tr>
-<tr><td>#7</td><td><strong>TECL</strong></td><td>XLK</td><td><span class="badge badge-gray" title="Buy when price dips a threshold % below its 50-day moving average, exit when price recovers to or above the MA. Captures pullbacks within an established trend.">MA Dip</span></td><td class="num">1.334</td><td class="num">81.2%</td><td class="num pct-up">+121.2%</td><td class="num">30.9%</td></tr>
-<tr><td>#8</td><td><strong>LABU</strong></td><td>XBI</td><td><span class="badge badge-gray" title="Buy when price dips a threshold % below its 50-day moving average, exit when price recovers to or above the MA. Captures pullbacks within an established trend.">MA Dip</span></td><td class="num">0.683</td><td class="num">69.2%</td><td class="num pct-up">+32.9%</td><td class="num">38.5%</td></tr>
-</tbody></table>
+<tr><td><strong>Yahoo Finance</strong></td><td>Stock prices, ATH, drawdown calculation</td></tr>
+<tr><td><strong>FRED API</strong></td><td>VIX, CPI, GDP, unemployment, Fed funds rate</td></tr>
+<tr><td><strong>SEC EDGAR</strong></td><td>10-K, 10-Q, 8-K filings, institutional 13F</td></tr>
+<tr><td><strong>GDELT</strong></td><td>Global geopolitical events, conflict monitoring</td></tr>
+<tr><td><strong>Congress.gov</strong></td><td>STOCK Act disclosures, member trading</td></tr>
+<tr><td><strong>Reddit</strong></td><td>r/wallstreetbets, r/stocks sentiment</td></tr>
+<tr><td><strong>Financial RSS</strong></td><td>Reuters, CNBC, AP Business news feeds</td></tr>
+<tr><td><strong>Treasury.gov</strong></td><td>Yield curve rates across maturities</td></tr>
+<tr><td><strong>Fed Reserve</strong></td><td>FOMC calendar, rate decisions, dot plot</td></tr>
+<tr><td><strong>Geopolitical RSS</strong></td><td>Trade war, sanctions, territorial events</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section id="about-schedule">
+<h2>Daily Operations</h2>
+<div class="card">
+<div style="display:flex;gap:24px;flex-wrap:wrap">
+<div style="flex:1;min-width:280px">
+<h3 style="color:#2563eb">Pre-Market (7:00 AM ET)</h3>
+<ol>
+<li>Daily standup ceremony</li>
+<li>Data pipeline &mdash; 20+ modules (~2 min)</li>
+<li>HTML report published to GitHub Pages</li>
+<li>CIO synthesizes unified analysis</li>
+<li>Telegram alert with key signals</li>
+<li>Token usage &amp; pipeline health recorded</li>
+</ol>
+<p style="font-size:0.85em;color:#94a3b8">Monday: also runs sprint planning</p>
+</div>
+<div style="flex:1;min-width:280px">
+<h3 style="color:#0a7c42">Post-Market (4:30 PM ET)</h3>
+<ol>
+<li>Data pipeline refresh with EOD data</li>
+<li>HTML report updated</li>
+<li>CIO reviews daily P&amp;L, signal state changes</li>
+<li>Overnight positioning &amp; catalysts</li>
+<li>Telegram summary</li>
+<li>Postmortem detection (Fridays)</li>
+</ol>
+<p style="font-size:0.85em;color:#94a3b8">Friday: also runs sprint retrospective</p>
+</div>
+</div>
 </div>
 </section>
 
 </main>
 
 <footer class="footer">
-<span>Generated 2026-02-13 23:45 IST &mdash; backtested performance, not live results.</span>
+<span>Generated 2026-02-13 23:45 IST &mdash; system overview &amp; methodology.</span>
 </footer>
 
 <script>
@@ -870,43 +1005,5 @@ document.querySelectorAll('.nav-dropdown-menu a').forEach(function(a){
 });
 </script>
 
-<script>
-const sctx = document.getElementById('stratEquityChart').getContext('2d');
-new Chart(sctx, {
-  type: 'line',
-  data: {
-    labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-    datasets: [
-      {label:"FAS (RSI)",data:[10000.0, 11235.03, 13545.59],borderColor:"#2563eb",backgroundColor:"#2563eb22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"LABU (MA Dip)",data:[10000.0, 11204.09, 12681.72, 14611.17, 16716.21, 14183.73, 16021.75, 17900.1, 13307.3, 11008.82, 12615.12, 13880.92, 11564.29, 13286.63],borderColor:"#0a7c42",backgroundColor:"#0a7c4222",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"SOXL (ATH)",data:[10000.0, 11004.7, 12645.57, 10539.45, 12808.28, 14491.06, 16498.8, 18155.63, 20215.92, 17015.85, 12059.36, 18778.2, 23596.1, 19736.64, 22763.25, 26510.74],borderColor:"#1565c0",backgroundColor:"#1565c022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"TECL (MA Dip)",data:[10000.0, 11112.85, 8666.75, 9537.78, 10522.0, 11622.7, 12948.05, 10620.09, 11694.84, 8953.36, 12118.49, 13338.01, 15715.19, 17729.91, 19717.99, 21957.9, 22123.51],borderColor:"#b86e00",backgroundColor:"#b86e0022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"TNA (Bollinger)",data:[10000.0, 11082.59, 12738.56, 14287.33, 12047.8, 10122.95, 12704.35, 14812.87, 16378.05, 18143.06],borderColor:"#6a1b9a",backgroundColor:"#6a1b9a22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"TQQQ (RSI)",data:[10000.0, 11182.92, 12507.31, 16353.86],borderColor:"#00838f",backgroundColor:"#00838f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"UCO (ATH)",data:[10000.0, 11010.72, 12637.81, 13974.03, 15505.76, 12410.78, 13696.23, 15182.17, 16984.09, 19096.02],borderColor:"#c62828",backgroundColor:"#c6282822",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"UPRO (RSI)",data:[10000.0, 11073.19, 13922.58],borderColor:"#37474f",backgroundColor:"#37474f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false}
-    ]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: { mode: 'index', intersect: false },
-    plugins: {
-      title: { display: true, text: 'Best Strategy Equity Curve per ETF', color: '#e6edf3', font: { size: 16, family: 'Inter' } },
-      tooltip: {
-        callbacks: {
-          label: function(ctx) {
-            return ctx.dataset.label + ': $' + ctx.parsed.y.toLocaleString();
-          }
-        }
-      }
-    },
-    scales: {
-      x: { title: { display: true, text: 'Trade #', color: '#8b949e' }, ticks: { maxTicksLimit: 20, color: '#8b949e' }, grid: { color: '#2a3346' } },
-      y: { title: { display: true, text: 'Portfolio Value ($)', color: '#8b949e' }, ticks: { color: '#8b949e', callback: function(v) { return '$' + v.toLocaleString(); } }, grid: { color: '#2a3346' } }
-    }
-  }
-});
-</script>
 </body>
 </html>

@@ -443,10 +443,10 @@ a:hover { text-decoration: underline; }
 .rpt-compact .kpi-sub { font-size: 11px; margin-top: 2px; }
 .rpt-compact .kpi-label { font-size: 9px; }
 .rpt-compact .kpi-icon { margin-bottom: 4px; }
-.rpt-layout { display: grid; grid-template-columns: 1fr 320px; gap: 0;
-  margin-top: 12px; }
-.rpt-main { border-right: 1px solid var(--border-primary); padding-right: 16px; }
-.rpt-sidebar { padding-left: 16px; }
+.rpt-layout { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+  align-items: start; margin-top: 12px; }
+.rpt-main { }
+.rpt-sidebar { }
 .rpt-compact section { padding: 12px 0;
   border-bottom: 1px solid var(--border-primary); }
 .rpt-compact section:last-child { border-bottom: none; }
@@ -455,9 +455,21 @@ a:hover { text-decoration: underline; }
 .rpt-compact .card { padding: 0; margin-bottom: 0; border: none; border-radius: 0;
   box-shadow: none; background: transparent; }
 .rpt-compact .signal-grid { grid-template-columns: 1fr;
-  gap: 8px; margin-bottom: 8px; }
-.rpt-compact .signal-card { padding: 10px 12px; border-radius: 6px; }
-.rpt-compact .signal-header { margin-bottom: 4px; }
+  gap: 6px; margin-bottom: 6px; }
+.rpt-compact .signal-card { padding: 8px 10px; border-radius: 4px; }
+.rpt-compact .signal-header { margin-bottom: 2px; }
+.rpt-widget .signal-grid { gap: 4px; margin-bottom: 4px; }
+.rpt-widget .signal-card { padding: 6px 8px; border-radius: 4px; font-size: 12px; }
+.rpt-widget .signal-card::before { width: 3px; }
+.rpt-widget .signal-ticker { font-size: 13px !important; }
+.rpt-widget .signal-header { margin-bottom: 1px; gap: 4px; }
+.rpt-widget .signal-badge { font-size: 9px; padding: 1px 6px; }
+.rpt-widget .signal-details { font-size: 11px; gap: 2px; }
+.rpt-widget .signal-details .grid-2col { gap: 2px; }
+.rpt-widget .confidence-drilldown { font-size: 10px; padding: 4px 0 0; }
+.rpt-widget .confidence-drilldown summary { font-size: 10px; }
+.rpt-widget details.watch-group { font-size: 11px; }
+.rpt-widget details.watch-group summary { padding: 4px 0; }
 .rpt-compact .grid-2col { gap: 0; grid-template-columns: 1fr; }
 
 /* Sidebar widgets */
@@ -481,23 +493,23 @@ a:hover { text-decoration: underline; }
 .rpt-widget .kpi-label { font-size: 8px; }
 .rpt-widget .kpi-sub { font-size: 10px; margin-top: 2px; }
 .rpt-widget .gauge-track { margin-top: 6px; }
-.rpt-sidebar .index-tiles { gap: 6px; margin-bottom: 8px; }
-.rpt-sidebar .index-tile { padding: 8px; border-radius: 4px; }
-.rpt-sidebar .index-price { font-size: 16px; }
-.rpt-sidebar .index-chg { font-size: 11px; }
-.rpt-sidebar .commodity-tiles { gap: 6px; }
-.rpt-sidebar .commodity-tile { padding: 8px; }
-.rpt-sidebar .commodity-price { font-size: 16px; }
-.rpt-sidebar .commodity-chg { font-size: 11px; }
-.rpt-sidebar .rates-grid { gap: 4px; }
-.rpt-sidebar .rate-tile { padding: 6px; }
-.rpt-sidebar .rate-value { font-size: 14px; }
-.rpt-sidebar .headline-list li { padding: 6px 0; font-size: 13px; }
-.rpt-sidebar .geo-event { padding: 6px 0; }
-.rpt-sidebar .geo-title { font-size: 13px; }
-.rpt-sidebar .sentiment-bar { height: 8px; margin: 6px 0; }
-.rpt-sidebar .sentiment-counts { font-size: 10px; gap: 10px; }
-.rpt-sidebar .sector-badges { margin-top: 6px; }
+.rpt-widget .index-tiles { gap: 6px; margin-bottom: 8px; }
+.rpt-widget .index-tile { padding: 8px; border-radius: 4px; }
+.rpt-widget .index-price { font-size: 16px; }
+.rpt-widget .index-chg { font-size: 11px; }
+.rpt-widget .commodity-tiles { gap: 6px; }
+.rpt-widget .commodity-tile { padding: 8px; }
+.rpt-widget .commodity-price { font-size: 16px; }
+.rpt-widget .commodity-chg { font-size: 11px; }
+.rpt-widget .rates-grid { gap: 4px; }
+.rpt-widget .rate-tile { padding: 6px; }
+.rpt-widget .rate-value { font-size: 14px; }
+.rpt-widget .headline-list li { padding: 6px 0; font-size: 13px; }
+.rpt-widget .geo-event { padding: 6px 0; }
+.rpt-widget .geo-title { font-size: 13px; }
+.rpt-widget .sentiment-bar { height: 8px; margin: 6px 0; }
+.rpt-widget .sentiment-counts { font-size: 10px; gap: 10px; }
+.rpt-widget .sector-badges { margin-top: 6px; }
 .rpt-compact table th { padding: 6px 8px; font-size: 9px; }
 .rpt-compact table td { padding: 6px 8px; font-size: 12px; }
 .rpt-compact .strategy-entry-exit { padding: 4px 8px; font-size: 11px; }
@@ -614,9 +626,6 @@ a:focus-visible, summary:focus-visible {
   .idx-main { border-right: none; padding-right: 0; }
   .idx-sidebar { padding-left: 0; border-top: 1px solid var(--border-primary); }
   .rpt-layout { grid-template-columns: 1fr; }
-  .rpt-main { border-right: none; padding-right: 0; }
-  .rpt-sidebar { padding-left: 0; border-top: 1px solid var(--border-primary);
-    padding-top: 12px; }
 }
 
 /* Mobile */
