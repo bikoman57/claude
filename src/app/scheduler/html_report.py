@@ -499,6 +499,15 @@ a:hover { text-decoration: underline; }
 .rpt-widget section h2 { display: none; }
 .rpt-widget .card { padding: 0; margin: 0; border: none;
   border-radius: 0; box-shadow: none; background: transparent; }
+.rpt-widget .kpi-strip { grid-template-columns: repeat(2, 1fr);
+  gap: 6px; margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+.rpt-widget .kpi-card { padding: 8px 10px; }
+.rpt-widget .kpi-value { font-size: 16px; }
+.rpt-widget .kpi-icon { margin-bottom: 2px; }
+.rpt-widget .kpi-icon .material-symbols-outlined { font-size: 16px; }
+.rpt-widget .kpi-label { font-size: 8px; }
+.rpt-widget .kpi-sub { font-size: 10px; margin-top: 2px; }
+.rpt-widget .gauge-track { margin-top: 6px; }
 .rpt-sidebar .index-tiles { gap: 6px; margin-bottom: 8px; }
 .rpt-sidebar .index-tile { padding: 8px; border-radius: 4px; }
 .rpt-sidebar .index-price { font-size: 16px; }
@@ -2468,6 +2477,13 @@ def build_html_report(
 
     # Build sidebar widgets
     sidebar_html = ""
+    if kpi:
+        sidebar_html += (
+            '<div class="rpt-widget">\n'
+            '<div class="rpt-widget-title">Key Indicators</div>\n'
+            f"{kpi}\n"
+            "</div>\n"
+        )
     if conditions:
         sidebar_html += (
             '<div class="rpt-widget">\n'
@@ -2498,7 +2514,6 @@ def build_html_report(
         '<main id="main-content">\n',
         '<div class="rpt-compact">\n',
         exec_summary,
-        kpi,
         '<div class="rpt-layout">\n<div class="rpt-main">\n',
         signal_cards,
         '</div>\n<div class="rpt-sidebar">\n',
