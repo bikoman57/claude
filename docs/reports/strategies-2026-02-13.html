@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0b0f18">
-<meta name="description" content="Leveraged ETF swing trading dashboard reports">
-<title>Trading Reports</title>
+<meta name="description" content="Strategy performance comparison for 2026-02-13">
+<title>Strategies 2026-02-13</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
@@ -616,25 +616,71 @@ a:focus-visible, summary:focus-visible, .report-card:focus-within {
 .standup-entry .field { color: var(--text-muted); }
 .standup-entry .field span { color: var(--text-secondary); }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <a href="#main-content" class="skip-nav">Skip to main content</a>
 <div class="top-bar">
-<h1><img src="logo.png" alt="Be Him" class="top-bar-logo">Swing Trading Report</h1>
+<h1><img src="../logo.png" alt="Be Him" class="top-bar-logo">Swing Trading Report</h1>
+<select class="nav-date-picker" aria-label="Select report date" onchange="window.location.href=this.value+'.html'"><option value="2026-02-13" selected>2026-02-13</option><option value="2026-02-12">2026-02-12</option><option value="2026-02-11">2026-02-11</option></select>
+<nav class="nav-menu" aria-label="Report navigation"><a href="2026-02-13.html">Market Report</a><a href="trade-logs-2026-02-13.html">Trade Logs</a><a href="forecasts-2026-02-13.html">Forecasts</a><a href="strategies-2026-02-13.html" class="nav-active">Strategies</a><a href="company-2026-02-13.html">Company</a></nav>
 </div>
+
 <header class="header">
-<span>3 report(s)</span>
+<span>2026-02-13 &bull; 07:15 IST</span>
 </header>
+
 <main id="main-content">
-<div class="report-list">
-<div class="report-card"><a href="reports/2026-02-13.html">2026-02-13</a><span class="badge-latest">LATEST</span></div>
-<div class="report-card"><a href="reports/2026-02-12.html">2026-02-12</a></div>
-<div class="report-card"><a href="reports/2026-02-11.html">2026-02-11</a></div>
+
+<section>
+<h2>Strategy Type Comparison</h2>
+<div class="card">
+<p>Performance metrics averaged across all ETFs for each strategy type.</p>
+<table class="mt-12">
+<thead><tr><th scope="col">Strategy</th><th scope="col" class="num">Avg Sharpe</th><th scope="col" class="num">Avg Win Rate</th><th scope="col" class="num">Avg Return</th><th scope="col" class="num">Total Trades</th><th scope="col">Best ETF</th></tr></thead>
+<tbody>
+<tr><td><strong>ATH Mean-Reversion</strong></td><td class="num">1.141</td><td class="num">75.2%</td><td class="num pct-up">+46.1%</td><td class="num">61</td><td>FAS</td></tr>
+<tr><td><strong>Bollinger Band</strong></td><td class="num">1.008</td><td class="num">70.4%</td><td class="num pct-up">+48.6%</td><td class="num">79</td><td>FAS</td></tr>
+<tr><td><strong>MA Dip</strong></td><td class="num">0.953</td><td class="num">75.8%</td><td class="num pct-up">+68.8%</td><td class="num">94</td><td>TECL</td></tr>
+<tr><td><strong>RSI Oversold</strong> <span class="badge badge-ok">BEST</span></td><td class="num">1.251</td><td class="num">79.2%</td><td class="num pct-up">+21.3%</td><td class="num">19</td><td>FAS</td></tr>
+</tbody></table>
 </div>
+</section>
+
+<section>
+<h2>Equity Curves</h2>
+<div class="card">
+<div style="position:relative;height:450px">
+<canvas id="stratEquityChart"></canvas>
+</div>
+</div>
+</section>
+
+<section>
+<h2>ETF Rankings (Best Strategy)</h2>
+<div class="card">
+<p>Each ETF ranked by its best-performing strategy (highest Sharpe ratio).</p>
+<table class="mt-12">
+<thead><tr><th scope="col">Rank</th><th scope="col">ETF</th><th scope="col">Underlying</th><th scope="col">Strategy</th><th scope="col" class="num">Sharpe</th><th scope="col" class="num">Win Rate</th><th scope="col" class="num">Return</th><th scope="col" class="num">Max DD</th></tr></thead>
+<tbody>
+<tr><td>#1</td><td><strong>FAS</strong></td><td>XLF</td><td><span class="badge badge-gray" title="Buy leveraged ETF when its underlying index drops a threshold % from all-time high, exit at profit target. Captures mean-reversion after broad market drawdowns.">ATH</span></td><td class="num">3.661</td><td class="num">100.0%</td><td class="num pct-up">+46.9%</td><td class="num">0.0%</td></tr>
+<tr><td>#2</td><td><strong>UPRO</strong></td><td>SPY</td><td><span class="badge badge-gray" title="Buy when 14-day RSI falls below oversold threshold (typically 30), exit when RSI recovers above overbought level or profit target hit. Targets short-term momentum reversals.">RSI</span></td><td class="num">2.164</td><td class="num">100.0%</td><td class="num pct-up">+39.2%</td><td class="num">0.0%</td></tr>
+<tr><td>#3</td><td><strong>UCO</strong></td><td>USO</td><td><span class="badge badge-gray" title="Buy leveraged ETF when its underlying index drops a threshold % from all-time high, exit at profit target. Captures mean-reversion after broad market drawdowns.">ATH</span></td><td class="num">2.141</td><td class="num">88.9%</td><td class="num pct-up">+91.0%</td><td class="num">20.0%</td></tr>
+<tr><td>#4</td><td><strong>TQQQ</strong></td><td>QQQ</td><td><span class="badge badge-gray" title="Buy when 14-day RSI falls below oversold threshold (typically 30), exit when RSI recovers above overbought level or profit target hit. Targets short-term momentum reversals.">RSI</span></td><td class="num">2.041</td><td class="num">100.0%</td><td class="num pct-up">+46.2%</td><td class="num">0.0%</td></tr>
+<tr><td>#5</td><td><strong>TNA</strong></td><td>IWM</td><td><span class="badge badge-gray" title="Buy when price touches or breaks below the lower Bollinger Band (20-day SMA minus 2 standard deviations), exit at the middle band or profit target. Identifies statistical extremes in price action.">Bollinger</span></td><td class="num">1.548</td><td class="num">77.8%</td><td class="num pct-up">+81.4%</td><td class="num">29.1%</td></tr>
+<tr><td>#6</td><td><strong>SOXL</strong></td><td>SOXX</td><td><span class="badge badge-gray" title="Buy leveraged ETF when its underlying index drops a threshold % from all-time high, exit at profit target. Captures mean-reversion after broad market drawdowns.">ATH</span></td><td class="num">1.376</td><td class="num">73.3%</td><td class="num pct-up">+165.1%</td><td class="num">40.4%</td></tr>
+<tr><td>#7</td><td><strong>TECL</strong></td><td>XLK</td><td><span class="badge badge-gray" title="Buy when price dips a threshold % below its 50-day moving average, exit when price recovers to or above the MA. Captures pullbacks within an established trend.">MA Dip</span></td><td class="num">1.366</td><td class="num">80.0%</td><td class="num pct-up">+118.2%</td><td class="num">30.9%</td></tr>
+<tr><td>#8</td><td><strong>LABU</strong></td><td>XBI</td><td><span class="badge badge-gray" title="Buy when price dips a threshold % below its 50-day moving average, exit when price recovers to or above the MA. Captures pullbacks within an established trend.">MA Dip</span></td><td class="num">0.479</td><td class="num">66.7%</td><td class="num pct-up">+16.7%</td><td class="num">38.5%</td></tr>
+</tbody></table>
+</div>
+</section>
+
 </main>
+
 <footer class="footer">
-<span>Powered by <a href="https://github.com/bikoman57/claude">fin-agents</a></span>
+<span>Generated 2026-02-13 07:15 IST &mdash; backtested performance, not live results.</span>
 </footer>
+
 <script>
 document.querySelectorAll('.nav-dropdown-btn').forEach(function(btn){
   btn.addEventListener('click',function(e){
@@ -659,5 +705,43 @@ document.querySelectorAll('.nav-dropdown-menu a').forEach(function(a){
 });
 </script>
 
+<script>
+const sctx = document.getElementById('stratEquityChart').getContext('2d');
+new Chart(sctx, {
+  type: 'line',
+  data: {
+    labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+    datasets: [
+      {label:"FAS (ATH)",data:[10000.0, 11064.1, 12183.87, 14689.56],borderColor:"#2563eb",backgroundColor:"#2563eb22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"LABU (MA Dip)",data:[10000.0, 11211.58, 12837.35, 14686.83, 12461.8, 14076.68, 15726.99, 11691.77, 9672.33, 11083.63, 12195.76, 10160.36, 11673.61],borderColor:"#0a7c42",backgroundColor:"#0a7c4222",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"SOXL (ATH)",data:[10000.0, 11004.7, 12645.57, 10539.45, 12808.28, 14491.05, 16498.8, 18155.63, 20215.91, 17015.84, 12059.34, 18778.18, 23596.07, 19736.62, 22763.23, 26510.7],borderColor:"#1565c0",backgroundColor:"#1565c022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"TECL (MA Dip)",data:[10000.0, 11045.3, 8614.06, 9479.8, 10458.04, 11552.04, 12869.33, 10555.52, 11623.73, 8898.93, 12044.81, 13256.92, 15619.65, 17622.12, 19598.11, 21824.4],borderColor:"#b86e00",backgroundColor:"#b86e0022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"TNA (Bollinger)",data:[10000.0, 11082.59, 12738.56, 14287.33, 12047.8, 10122.95, 12704.36, 14812.88, 16378.06, 18143.07],borderColor:"#6a1b9a",backgroundColor:"#6a1b9a22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"TQQQ (RSI)",data:[10000.0, 11184.29, 14623.96],borderColor:"#00838f",backgroundColor:"#00838f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"UCO (ATH)",data:[10000.0, 11010.72, 12637.81, 13974.03, 15505.76, 12410.78, 13696.23, 15182.17, 16984.09, 19096.02],borderColor:"#c62828",backgroundColor:"#c6282822",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"UPRO (RSI)",data:[10000.0, 11073.19, 13922.58],borderColor:"#37474f",backgroundColor:"#37474f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false}
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      title: { display: true, text: 'Best Strategy Equity Curve per ETF', color: '#e6edf3', font: { size: 16, family: 'Inter' } },
+      tooltip: {
+        callbacks: {
+          label: function(ctx) {
+            return ctx.dataset.label + ': $' + ctx.parsed.y.toLocaleString();
+          }
+        }
+      }
+    },
+    scales: {
+      x: { title: { display: true, text: 'Trade #', color: '#8b949e' }, ticks: { maxTicksLimit: 20, color: '#8b949e' }, grid: { color: '#2a3346' } },
+      y: { title: { display: true, text: 'Portfolio Value ($)', color: '#8b949e' }, ticks: { color: '#8b949e', callback: function(v) { return '$' + v.toLocaleString(); } }, grid: { color: '#2a3346' } }
+    }
+  }
+});
+</script>
 </body>
 </html>
