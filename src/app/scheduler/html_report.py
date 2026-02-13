@@ -481,10 +481,24 @@ a:hover { text-decoration: underline; }
   border-bottom-width: 1px; }
 .rpt-compact .card { padding: 0; margin-bottom: 0; border: none; border-radius: 0;
   box-shadow: none; background: transparent; }
-.rpt-compact .signal-grid { gap: 8px; margin-bottom: 8px; }
+.rpt-compact .signal-grid { grid-template-columns: 1fr;
+  gap: 8px; margin-bottom: 8px; }
 .rpt-compact .signal-card { padding: 10px 12px; border-radius: 6px; }
 .rpt-compact .signal-header { margin-bottom: 4px; }
 .rpt-compact .grid-2col { gap: 0; grid-template-columns: 1fr; }
+
+/* Sidebar widgets */
+.rpt-widget { background: var(--bg-secondary); border: 1px solid var(--border-light);
+  border-radius: 6px; padding: 12px; margin-bottom: 12px; }
+.rpt-widget:last-child { margin-bottom: 0; }
+.rpt-widget-title { font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;
+  padding-bottom: 8px; border-bottom: 1px solid var(--border-primary);
+  margin-bottom: 8px; }
+.rpt-widget section { padding: 0 !important; border-bottom: none !important; }
+.rpt-widget section h2 { display: none; }
+.rpt-widget .card { padding: 0; margin: 0; border: none;
+  border-radius: 0; box-shadow: none; background: transparent; }
 .rpt-sidebar .index-tiles { gap: 6px; margin-bottom: 8px; }
 .rpt-sidebar .index-tile { padding: 8px; border-radius: 4px; }
 .rpt-sidebar .index-price { font-size: 16px; }
@@ -499,8 +513,9 @@ a:hover { text-decoration: underline; }
 .rpt-sidebar .headline-list li { padding: 6px 0; font-size: 13px; }
 .rpt-sidebar .geo-event { padding: 6px 0; }
 .rpt-sidebar .geo-title { font-size: 13px; }
-.rpt-sidebar .congress-grid { grid-template-columns: 1fr; gap: 8px; }
-.rpt-sidebar .congress-member { padding: 8px 12px; }
+.rpt-sidebar .sentiment-bar { height: 8px; margin: 6px 0; }
+.rpt-sidebar .sentiment-counts { font-size: 10px; gap: 10px; }
+.rpt-sidebar .sector-badges { margin-top: 6px; }
 .rpt-compact table th { padding: 6px 8px; font-size: 9px; }
 .rpt-compact table td { padding: 6px 8px; font-size: 12px; }
 .rpt-compact .strategy-entry-exit { padding: 4px 8px; font-size: 11px; }
@@ -2451,9 +2466,23 @@ def build_html_report(
         "</div>\n</header>\n"
     )
 
-    # Build sidebar content (market data, sentiment, geopolitical)
-    sidebar_parts = [p for p in [conditions, sentiment, geopolitical] if p]
-    sidebar_html = "\n".join(sidebar_parts) if sidebar_parts else ""
+    # Build sidebar widgets
+    sidebar_html = ""
+    if conditions:
+        sidebar_html += (
+            '<div class="rpt-widget">\n'
+            '<div class="rpt-widget-title">Market Overview</div>\n'
+            f"{conditions}\n"
+            "</div>\n"
+        )
+    events_parts = [p for p in [sentiment, geopolitical] if p]
+    if events_parts:
+        sidebar_html += (
+            '<div class="rpt-widget">\n'
+            '<div class="rpt-widget-title">Market-Moving Events</div>\n'
+            + "\n".join(events_parts)
+            + "\n</div>\n"
+        )
 
     footer = (
         '<footer class="footer">\n'
