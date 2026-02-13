@@ -472,6 +472,15 @@ a:hover { text-decoration: underline; }
 .rpt-widget section h2 { display: none; }
 .rpt-widget .card { padding: 0; margin: 0; border: none;
   border-radius: 0; box-shadow: none; background: transparent; }
+.rpt-widget .kpi-strip { grid-template-columns: repeat(2, 1fr);
+  gap: 6px; margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+.rpt-widget .kpi-card { padding: 8px 10px; }
+.rpt-widget .kpi-value { font-size: 16px; }
+.rpt-widget .kpi-icon { margin-bottom: 2px; }
+.rpt-widget .kpi-icon .material-symbols-outlined { font-size: 16px; }
+.rpt-widget .kpi-label { font-size: 8px; }
+.rpt-widget .kpi-sub { font-size: 10px; margin-top: 2px; }
+.rpt-widget .gauge-track { margin-top: 6px; }
 .rpt-sidebar .index-tiles { gap: 6px; margin-bottom: 8px; }
 .rpt-sidebar .index-tile { padding: 8px; border-radius: 4px; }
 .rpt-sidebar .index-price { font-size: 16px; }
@@ -773,7 +782,7 @@ a:focus-visible, summary:focus-visible {
 </div>
 
 <header class="header">
-<span>2026-02-13 &bull; 16:55 IST</span>
+<span>2026-02-13 &bull; 21:48 IST</span>
 <div class="header-status"><span class="ok">22</span>/22 OK &bull; <span class="fail">0</span> failed</div>
 </header>
 
@@ -783,38 +792,8 @@ a:focus-visible, summary:focus-visible {
 
 <div class="exec-summary">
 <div class="kicker">Market Overview</div>
-<p class="headline">Market conditions are mixed for mean-reversion entries. 4 ETF(s) at actionable SIGNAL level with MEDIUM confidence (6/9).</p>
-<p class="detail"><span class="highlight">TECL (-7.8% drawdown)</span> and <span class="highlight">FAS (-7.6% drawdown)</span> and <span class="highlight">LABU (-24.1% drawdown)</span> at actionable levels. Key support: VIX ELEVATED: fear present. Key risk: Shallow: 7.8%.</p>
-</div>
-
-<div class="kpi-strip">
-<div class="kpi-card kpi-bar-red">
-<div class="kpi-icon"><span class="material-symbols-outlined">trending_up</span></div><div class="kpi-label">VIX</div>
-<div class="kpi-value">21.2</div>
-<div class="kpi-sub"><span class="badge badge-red">ELEVATED</span></div>
-<div class="gauge-track" role="progressbar" aria-valuenow="42" aria-valuemin="0" aria-valuemax="100" aria-label="VIX gauge"><div class="gauge-fill gauge-fill-red" style="width:42%"></div></div>
-</div>
-<div class="kpi-card kpi-bar-green">
-<div class="kpi-icon"><span class="material-symbols-outlined">account_balance</span></div><div class="kpi-label">Fed</div>
-<div class="kpi-value">3.64%</div>
-<div class="kpi-sub"><span class="badge badge-green">CUTTING</span></div>
-</div>
-<div class="kpi-card kpi-bar-yellow">
-<div class="kpi-icon"><span class="material-symbols-outlined">show_chart</span></div><div class="kpi-label">Yield Curve</div>
-<div class="kpi-value">+0.47%</div>
-<div class="kpi-sub"><span class="badge badge-yellow">NORMAL</span></div>
-<div class="gauge-track" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" aria-label="Yield Curve gauge"><div class="gauge-fill gauge-fill-yellow" style="width:62%"></div></div>
-</div>
-<div class="kpi-card kpi-bar-green">
-<div class="kpi-icon"><span class="material-symbols-outlined">public</span></div><div class="kpi-label">Geopolitical</div>
-<div class="kpi-value">80</div>
-<div class="kpi-sub"><span class="badge badge-green">LOW</span> 80 events</div>
-</div>
-<div class="kpi-card kpi-bar-red">
-<div class="kpi-icon"><span class="material-symbols-outlined">newspaper</span></div><div class="kpi-label">News</div>
-<div class="kpi-value">363</div>
-<div class="kpi-sub"><span class="badge badge-red">BEARISH</span> 363 articles</div>
-</div>
+<p class="headline">Market conditions are mixed for mean-reversion entries. 4 ETF(s) at actionable SIGNAL level with MEDIUM confidence (5/9).</p>
+<p class="detail"><span class="highlight">TECL (-7.8% drawdown)</span> and <span class="highlight">FAS (-7.6% drawdown)</span> and <span class="highlight">LABU (-24.1% drawdown)</span> at actionable levels. Key support: Fed cutting rates. Key risk: Shallow: 7.8%.</p>
 </div>
 
 <div class="rpt-layout">
@@ -828,101 +807,101 @@ a:focus-visible, summary:focus-visible {
 <div class="signal-card signal-card-signal">
 <div class="signal-header">
 <span><span class="signal-ticker">TECL</span> (XLK) &mdash; <span class="badge badge-green">SIGNAL</span></span>
-<span>Confidence: <span class="badge badge-yellow">MEDIUM</span> (6/9)</span>
+<span>Confidence: <span class="badge badge-yellow">MEDIUM</span> (5/9)</span>
 </div>
 <div class="signal-details">Drawdown: -7.8% &bull; ATH: $151.83 &bull; Current: $140.06 &bull; Target: 10.0%</div>
-<div class="confidence-bar"><span class="conf-dot conf-dot-unfavorable" title="drawdown_depth: Shallow: 7.8%" role="img" aria-label="drawdown_depth: UNFAVORABLE">-</span><span class="conf-dot conf-dot-favorable" title="vix_regime: VIX ELEVATED: fear present" role="img" aria-label="vix_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="fed_regime: Fed cutting rates" role="img" aria-label="fed_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="yield_curve: Normal yield curve" role="img" aria-label="yield_curve: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="earnings_risk: Low earnings event risk" role="img" aria-label="earnings_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="geopolitical_risk: Low geopolitical risk" role="img" aria-label="geopolitical_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="social_sentiment: Social sentiment neutral" role="img" aria-label="social_sentiment: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="news_sentiment: News sentiment bearish (contrarian)" role="img" aria-label="news_sentiment: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="market_statistics: Market risk-on" role="img" aria-label="market_statistics: NEUTRAL">~</span></div>
+<div class="confidence-bar"><span class="conf-dot conf-dot-unfavorable" title="drawdown_depth: Shallow: 7.8%" role="img" aria-label="drawdown_depth: UNFAVORABLE">-</span><span class="conf-dot conf-dot-neutral" title="vix_regime: VIX normal range" role="img" aria-label="vix_regime: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="fed_regime: Fed cutting rates" role="img" aria-label="fed_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="yield_curve: Normal yield curve" role="img" aria-label="yield_curve: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="earnings_risk: Low earnings event risk" role="img" aria-label="earnings_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="geopolitical_risk: Low geopolitical risk" role="img" aria-label="geopolitical_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="social_sentiment: Social sentiment neutral" role="img" aria-label="social_sentiment: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="news_sentiment: News sentiment bearish (contrarian)" role="img" aria-label="news_sentiment: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="market_statistics: Market statistics neutral" role="img" aria-label="market_statistics: NEUTRAL">~</span></div>
 <details>
 <summary>View 9-factor analysis</summary>
 <table class="factor-table"><tbody><tr><td class="factor-name">Drawdown Depth</td><td><span class="badge badge-gray">UNFAVORABLE</span></td><td>Shallow: 7.8%</td></tr>
-<tr><td class="factor-name">Vix Regime</td><td><span class="badge badge-green">FAVORABLE</span></td><td>VIX ELEVATED: fear present</td></tr>
+<tr><td class="factor-name">Vix Regime</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>VIX normal range</td></tr>
 <tr><td class="factor-name">Fed Regime</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Fed cutting rates</td></tr>
 <tr><td class="factor-name">Yield Curve</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Normal yield curve</td></tr>
 <tr><td class="factor-name">Earnings Risk</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Low earnings event risk</td></tr>
 <tr><td class="factor-name">Geopolitical Risk</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Low geopolitical risk</td></tr>
 <tr><td class="factor-name">Social Sentiment</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Social sentiment neutral</td></tr>
 <tr><td class="factor-name">News Sentiment</td><td><span class="badge badge-green">FAVORABLE</span></td><td>News sentiment bearish (contrarian)</td></tr>
-<tr><td class="factor-name">Market Statistics</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Market risk-on</td></tr></tbody></table>
+<tr><td class="factor-name">Market Statistics</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Market statistics neutral</td></tr></tbody></table>
 </details>
 </div>
 <div class="signal-card signal-card-signal">
 <div class="signal-header">
 <span><span class="signal-ticker">FAS</span> (XLF) &mdash; <span class="badge badge-green">SIGNAL</span></span>
-<span>Confidence: <span class="badge badge-yellow">MEDIUM</span> (6/9)</span>
+<span>Confidence: <span class="badge badge-yellow">MEDIUM</span> (5/9)</span>
 </div>
 <div class="signal-details">Drawdown: -7.6% &bull; ATH: $56.40 &bull; Current: $52.11 &bull; Target: 10.0%</div>
-<div class="confidence-bar"><span class="conf-dot conf-dot-unfavorable" title="drawdown_depth: Shallow: 7.6%" role="img" aria-label="drawdown_depth: UNFAVORABLE">-</span><span class="conf-dot conf-dot-favorable" title="vix_regime: VIX ELEVATED: fear present" role="img" aria-label="vix_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="fed_regime: Fed cutting rates" role="img" aria-label="fed_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="yield_curve: Normal yield curve" role="img" aria-label="yield_curve: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="earnings_risk: Low earnings event risk" role="img" aria-label="earnings_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="geopolitical_risk: Low geopolitical risk" role="img" aria-label="geopolitical_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="social_sentiment: Social sentiment neutral" role="img" aria-label="social_sentiment: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="news_sentiment: News sentiment bearish (contrarian)" role="img" aria-label="news_sentiment: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="market_statistics: Market risk-on" role="img" aria-label="market_statistics: NEUTRAL">~</span></div>
+<div class="confidence-bar"><span class="conf-dot conf-dot-unfavorable" title="drawdown_depth: Shallow: 7.6%" role="img" aria-label="drawdown_depth: UNFAVORABLE">-</span><span class="conf-dot conf-dot-neutral" title="vix_regime: VIX normal range" role="img" aria-label="vix_regime: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="fed_regime: Fed cutting rates" role="img" aria-label="fed_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="yield_curve: Normal yield curve" role="img" aria-label="yield_curve: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="earnings_risk: Low earnings event risk" role="img" aria-label="earnings_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="geopolitical_risk: Low geopolitical risk" role="img" aria-label="geopolitical_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="social_sentiment: Social sentiment neutral" role="img" aria-label="social_sentiment: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="news_sentiment: News sentiment bearish (contrarian)" role="img" aria-label="news_sentiment: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="market_statistics: Market statistics neutral" role="img" aria-label="market_statistics: NEUTRAL">~</span></div>
 <details>
 <summary>View 9-factor analysis</summary>
 <table class="factor-table"><tbody><tr><td class="factor-name">Drawdown Depth</td><td><span class="badge badge-gray">UNFAVORABLE</span></td><td>Shallow: 7.6%</td></tr>
-<tr><td class="factor-name">Vix Regime</td><td><span class="badge badge-green">FAVORABLE</span></td><td>VIX ELEVATED: fear present</td></tr>
+<tr><td class="factor-name">Vix Regime</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>VIX normal range</td></tr>
 <tr><td class="factor-name">Fed Regime</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Fed cutting rates</td></tr>
 <tr><td class="factor-name">Yield Curve</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Normal yield curve</td></tr>
 <tr><td class="factor-name">Earnings Risk</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Low earnings event risk</td></tr>
 <tr><td class="factor-name">Geopolitical Risk</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Low geopolitical risk</td></tr>
 <tr><td class="factor-name">Social Sentiment</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Social sentiment neutral</td></tr>
 <tr><td class="factor-name">News Sentiment</td><td><span class="badge badge-green">FAVORABLE</span></td><td>News sentiment bearish (contrarian)</td></tr>
-<tr><td class="factor-name">Market Statistics</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Market risk-on</td></tr></tbody></table>
+<tr><td class="factor-name">Market Statistics</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Market statistics neutral</td></tr></tbody></table>
 </details>
 </div>
 <div class="signal-card signal-card-signal">
 <div class="signal-header">
 <span><span class="signal-ticker">LABU</span> (XBI) &mdash; <span class="badge badge-green">SIGNAL</span></span>
-<span>Confidence: <span class="badge badge-yellow">MEDIUM</span> (7/9)</span>
+<span>Confidence: <span class="badge badge-yellow">MEDIUM</span> (6/9)</span>
 </div>
 <div class="signal-details">Drawdown: -24.1% &bull; ATH: $163.40 &bull; Current: $124.00 &bull; Target: 10.0%</div>
-<div class="confidence-bar"><span class="conf-dot conf-dot-favorable" title="drawdown_depth: Deep drawdown: 24.1%" role="img" aria-label="drawdown_depth: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="vix_regime: VIX ELEVATED: fear present" role="img" aria-label="vix_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="fed_regime: Fed cutting rates" role="img" aria-label="fed_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="yield_curve: Normal yield curve" role="img" aria-label="yield_curve: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="earnings_risk: Low earnings event risk" role="img" aria-label="earnings_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="geopolitical_risk: Low geopolitical risk" role="img" aria-label="geopolitical_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="social_sentiment: Social sentiment neutral" role="img" aria-label="social_sentiment: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="news_sentiment: News sentiment bearish (contrarian)" role="img" aria-label="news_sentiment: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="market_statistics: Market risk-on" role="img" aria-label="market_statistics: NEUTRAL">~</span></div>
+<div class="confidence-bar"><span class="conf-dot conf-dot-favorable" title="drawdown_depth: Deep drawdown: 24.1%" role="img" aria-label="drawdown_depth: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="vix_regime: VIX normal range" role="img" aria-label="vix_regime: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="fed_regime: Fed cutting rates" role="img" aria-label="fed_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="yield_curve: Normal yield curve" role="img" aria-label="yield_curve: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="earnings_risk: Low earnings event risk" role="img" aria-label="earnings_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="geopolitical_risk: Low geopolitical risk" role="img" aria-label="geopolitical_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="social_sentiment: Social sentiment neutral" role="img" aria-label="social_sentiment: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="news_sentiment: News sentiment bearish (contrarian)" role="img" aria-label="news_sentiment: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="market_statistics: Market statistics neutral" role="img" aria-label="market_statistics: NEUTRAL">~</span></div>
 <details>
 <summary>View 9-factor analysis</summary>
 <table class="factor-table"><tbody><tr><td class="factor-name">Drawdown Depth</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Deep drawdown: 24.1%</td></tr>
-<tr><td class="factor-name">Vix Regime</td><td><span class="badge badge-green">FAVORABLE</span></td><td>VIX ELEVATED: fear present</td></tr>
+<tr><td class="factor-name">Vix Regime</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>VIX normal range</td></tr>
 <tr><td class="factor-name">Fed Regime</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Fed cutting rates</td></tr>
 <tr><td class="factor-name">Yield Curve</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Normal yield curve</td></tr>
 <tr><td class="factor-name">Earnings Risk</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Low earnings event risk</td></tr>
 <tr><td class="factor-name">Geopolitical Risk</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Low geopolitical risk</td></tr>
 <tr><td class="factor-name">Social Sentiment</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Social sentiment neutral</td></tr>
 <tr><td class="factor-name">News Sentiment</td><td><span class="badge badge-green">FAVORABLE</span></td><td>News sentiment bearish (contrarian)</td></tr>
-<tr><td class="factor-name">Market Statistics</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Market risk-on</td></tr></tbody></table>
+<tr><td class="factor-name">Market Statistics</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Market statistics neutral</td></tr></tbody></table>
 </details>
 </div>
 <div class="signal-card signal-card-signal">
 <div class="signal-header">
 <span><span class="signal-ticker">UCO</span> (USO) &mdash; <span class="badge badge-green">SIGNAL</span></span>
-<span>Confidence: <span class="badge badge-yellow">MEDIUM</span> (7/9)</span>
+<span>Confidence: <span class="badge badge-yellow">MEDIUM</span> (6/9)</span>
 </div>
 <div class="signal-details">Drawdown: -17.0% &bull; ATH: $91.99 &bull; Current: $76.35 &bull; Target: 10.0%</div>
-<div class="confidence-bar"><span class="conf-dot conf-dot-favorable" title="drawdown_depth: Deep drawdown: 17.0%" role="img" aria-label="drawdown_depth: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="vix_regime: VIX ELEVATED: fear present" role="img" aria-label="vix_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="fed_regime: Fed cutting rates" role="img" aria-label="fed_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="yield_curve: Normal yield curve" role="img" aria-label="yield_curve: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="earnings_risk: Low earnings event risk" role="img" aria-label="earnings_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="geopolitical_risk: Low geopolitical risk" role="img" aria-label="geopolitical_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="social_sentiment: Social sentiment neutral" role="img" aria-label="social_sentiment: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="news_sentiment: News sentiment bearish (contrarian)" role="img" aria-label="news_sentiment: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="market_statistics: Market risk-on" role="img" aria-label="market_statistics: NEUTRAL">~</span></div>
+<div class="confidence-bar"><span class="conf-dot conf-dot-favorable" title="drawdown_depth: Deep drawdown: 17.0%" role="img" aria-label="drawdown_depth: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="vix_regime: VIX normal range" role="img" aria-label="vix_regime: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="fed_regime: Fed cutting rates" role="img" aria-label="fed_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="yield_curve: Normal yield curve" role="img" aria-label="yield_curve: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="earnings_risk: Low earnings event risk" role="img" aria-label="earnings_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="geopolitical_risk: Low geopolitical risk" role="img" aria-label="geopolitical_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="social_sentiment: Social sentiment neutral" role="img" aria-label="social_sentiment: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="news_sentiment: News sentiment bearish (contrarian)" role="img" aria-label="news_sentiment: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="market_statistics: Market statistics neutral" role="img" aria-label="market_statistics: NEUTRAL">~</span></div>
 <details>
 <summary>View 9-factor analysis</summary>
 <table class="factor-table"><tbody><tr><td class="factor-name">Drawdown Depth</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Deep drawdown: 17.0%</td></tr>
-<tr><td class="factor-name">Vix Regime</td><td><span class="badge badge-green">FAVORABLE</span></td><td>VIX ELEVATED: fear present</td></tr>
+<tr><td class="factor-name">Vix Regime</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>VIX normal range</td></tr>
 <tr><td class="factor-name">Fed Regime</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Fed cutting rates</td></tr>
 <tr><td class="factor-name">Yield Curve</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Normal yield curve</td></tr>
 <tr><td class="factor-name">Earnings Risk</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Low earnings event risk</td></tr>
 <tr><td class="factor-name">Geopolitical Risk</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Low geopolitical risk</td></tr>
 <tr><td class="factor-name">Social Sentiment</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Social sentiment neutral</td></tr>
 <tr><td class="factor-name">News Sentiment</td><td><span class="badge badge-green">FAVORABLE</span></td><td>News sentiment bearish (contrarian)</td></tr>
-<tr><td class="factor-name">Market Statistics</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Market risk-on</td></tr></tbody></table>
+<tr><td class="factor-name">Market Statistics</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Market statistics neutral</td></tr></tbody></table>
 </details>
 </div>
 <div class="signal-card signal-card-alert">
 <div class="signal-header">
 <span><span class="signal-ticker">TQQQ</span> (QQQ) &mdash; <span class="badge badge-yellow">ALERT</span></span>
-<span>Confidence: <span class="badge badge-yellow">MEDIUM</span> (6/9)</span>
+<span>Confidence: <span class="badge badge-yellow">MEDIUM</span> (5/9)</span>
 </div>
 <div class="signal-details">Drawdown: -4.9% &bull; ATH: $634.95 &bull; Current: $604.13 &bull; Target: 10.0%</div>
-<div class="confidence-bar"><span class="conf-dot conf-dot-unfavorable" title="drawdown_depth: Shallow: 4.9%" role="img" aria-label="drawdown_depth: UNFAVORABLE">-</span><span class="conf-dot conf-dot-favorable" title="vix_regime: VIX ELEVATED: fear present" role="img" aria-label="vix_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="fed_regime: Fed cutting rates" role="img" aria-label="fed_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="yield_curve: Normal yield curve" role="img" aria-label="yield_curve: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="earnings_risk: Low earnings event risk" role="img" aria-label="earnings_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="geopolitical_risk: Low geopolitical risk" role="img" aria-label="geopolitical_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="social_sentiment: Social sentiment neutral" role="img" aria-label="social_sentiment: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="news_sentiment: News sentiment bearish (contrarian)" role="img" aria-label="news_sentiment: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="market_statistics: Market risk-on" role="img" aria-label="market_statistics: NEUTRAL">~</span></div>
+<div class="confidence-bar"><span class="conf-dot conf-dot-unfavorable" title="drawdown_depth: Shallow: 4.9%" role="img" aria-label="drawdown_depth: UNFAVORABLE">-</span><span class="conf-dot conf-dot-neutral" title="vix_regime: VIX normal range" role="img" aria-label="vix_regime: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="fed_regime: Fed cutting rates" role="img" aria-label="fed_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="yield_curve: Normal yield curve" role="img" aria-label="yield_curve: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="earnings_risk: Low earnings event risk" role="img" aria-label="earnings_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="geopolitical_risk: Low geopolitical risk" role="img" aria-label="geopolitical_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="social_sentiment: Social sentiment neutral" role="img" aria-label="social_sentiment: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="news_sentiment: News sentiment bearish (contrarian)" role="img" aria-label="news_sentiment: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="market_statistics: Market statistics neutral" role="img" aria-label="market_statistics: NEUTRAL">~</span></div>
 <details>
 <summary>View 9-factor analysis</summary>
 <table class="factor-table"><tbody><tr><td class="factor-name">Drawdown Depth</td><td><span class="badge badge-gray">UNFAVORABLE</span></td><td>Shallow: 4.9%</td></tr>
-<tr><td class="factor-name">Vix Regime</td><td><span class="badge badge-green">FAVORABLE</span></td><td>VIX ELEVATED: fear present</td></tr>
+<tr><td class="factor-name">Vix Regime</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>VIX normal range</td></tr>
 <tr><td class="factor-name">Fed Regime</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Fed cutting rates</td></tr>
 <tr><td class="factor-name">Yield Curve</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Normal yield curve</td></tr>
 <tr><td class="factor-name">Earnings Risk</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Low earnings event risk</td></tr>
 <tr><td class="factor-name">Geopolitical Risk</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Low geopolitical risk</td></tr>
 <tr><td class="factor-name">Social Sentiment</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Social sentiment neutral</td></tr>
 <tr><td class="factor-name">News Sentiment</td><td><span class="badge badge-green">FAVORABLE</span></td><td>News sentiment bearish (contrarian)</td></tr>
-<tr><td class="factor-name">Market Statistics</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Market risk-on</td></tr></tbody></table>
+<tr><td class="factor-name">Market Statistics</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Market statistics neutral</td></tr></tbody></table>
 </details>
 </div>
 </div>
@@ -932,61 +911,61 @@ a:focus-visible, summary:focus-visible {
 <div class="signal-card signal-card-watch">
 <div class="signal-header">
 <span><span class="signal-ticker">UPRO</span> (SPY) &mdash; <span class="badge badge-gray">WATCH</span></span>
-<span>Confidence: <span class="badge badge-yellow">MEDIUM</span> (6/9)</span>
+<span>Confidence: <span class="badge badge-yellow">MEDIUM</span> (5/9)</span>
 </div>
 <div class="signal-details">Drawdown: -1.4% &bull; ATH: $695.49 &bull; Current: $685.43 &bull; Target: 10.0%</div>
-<div class="confidence-bar"><span class="conf-dot conf-dot-unfavorable" title="drawdown_depth: Shallow: 1.4%" role="img" aria-label="drawdown_depth: UNFAVORABLE">-</span><span class="conf-dot conf-dot-favorable" title="vix_regime: VIX ELEVATED: fear present" role="img" aria-label="vix_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="fed_regime: Fed cutting rates" role="img" aria-label="fed_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="yield_curve: Normal yield curve" role="img" aria-label="yield_curve: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="earnings_risk: Low earnings event risk" role="img" aria-label="earnings_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="geopolitical_risk: Low geopolitical risk" role="img" aria-label="geopolitical_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="social_sentiment: Social sentiment neutral" role="img" aria-label="social_sentiment: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="news_sentiment: News sentiment bearish (contrarian)" role="img" aria-label="news_sentiment: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="market_statistics: Market risk-on" role="img" aria-label="market_statistics: NEUTRAL">~</span></div>
+<div class="confidence-bar"><span class="conf-dot conf-dot-unfavorable" title="drawdown_depth: Shallow: 1.4%" role="img" aria-label="drawdown_depth: UNFAVORABLE">-</span><span class="conf-dot conf-dot-neutral" title="vix_regime: VIX normal range" role="img" aria-label="vix_regime: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="fed_regime: Fed cutting rates" role="img" aria-label="fed_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="yield_curve: Normal yield curve" role="img" aria-label="yield_curve: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="earnings_risk: Low earnings event risk" role="img" aria-label="earnings_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="geopolitical_risk: Low geopolitical risk" role="img" aria-label="geopolitical_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="social_sentiment: Social sentiment neutral" role="img" aria-label="social_sentiment: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="news_sentiment: News sentiment bearish (contrarian)" role="img" aria-label="news_sentiment: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="market_statistics: Market statistics neutral" role="img" aria-label="market_statistics: NEUTRAL">~</span></div>
 <details>
 <summary>View 9-factor analysis</summary>
 <table class="factor-table"><tbody><tr><td class="factor-name">Drawdown Depth</td><td><span class="badge badge-gray">UNFAVORABLE</span></td><td>Shallow: 1.4%</td></tr>
-<tr><td class="factor-name">Vix Regime</td><td><span class="badge badge-green">FAVORABLE</span></td><td>VIX ELEVATED: fear present</td></tr>
+<tr><td class="factor-name">Vix Regime</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>VIX normal range</td></tr>
 <tr><td class="factor-name">Fed Regime</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Fed cutting rates</td></tr>
 <tr><td class="factor-name">Yield Curve</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Normal yield curve</td></tr>
 <tr><td class="factor-name">Earnings Risk</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Low earnings event risk</td></tr>
 <tr><td class="factor-name">Geopolitical Risk</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Low geopolitical risk</td></tr>
 <tr><td class="factor-name">Social Sentiment</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Social sentiment neutral</td></tr>
 <tr><td class="factor-name">News Sentiment</td><td><span class="badge badge-green">FAVORABLE</span></td><td>News sentiment bearish (contrarian)</td></tr>
-<tr><td class="factor-name">Market Statistics</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Market risk-on</td></tr></tbody></table>
+<tr><td class="factor-name">Market Statistics</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Market statistics neutral</td></tr></tbody></table>
 </details>
 </div>
 <div class="signal-card signal-card-watch">
 <div class="signal-header">
 <span><span class="signal-ticker">SOXL</span> (SOXX) &mdash; <span class="badge badge-gray">WATCH</span></span>
-<span>Confidence: <span class="badge badge-yellow">MEDIUM</span> (6/9)</span>
+<span>Confidence: <span class="badge badge-yellow">MEDIUM</span> (5/9)</span>
 </div>
 <div class="signal-details">Drawdown: -1.9% &bull; ATH: $361.13 &bull; Current: $354.11 &bull; Target: 10.0%</div>
-<div class="confidence-bar"><span class="conf-dot conf-dot-unfavorable" title="drawdown_depth: Shallow: 1.9%" role="img" aria-label="drawdown_depth: UNFAVORABLE">-</span><span class="conf-dot conf-dot-favorable" title="vix_regime: VIX ELEVATED: fear present" role="img" aria-label="vix_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="fed_regime: Fed cutting rates" role="img" aria-label="fed_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="yield_curve: Normal yield curve" role="img" aria-label="yield_curve: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="earnings_risk: Low earnings event risk" role="img" aria-label="earnings_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="geopolitical_risk: Low geopolitical risk" role="img" aria-label="geopolitical_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="social_sentiment: Social sentiment neutral" role="img" aria-label="social_sentiment: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="news_sentiment: News sentiment bearish (contrarian)" role="img" aria-label="news_sentiment: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="market_statistics: Market risk-on" role="img" aria-label="market_statistics: NEUTRAL">~</span></div>
+<div class="confidence-bar"><span class="conf-dot conf-dot-unfavorable" title="drawdown_depth: Shallow: 1.9%" role="img" aria-label="drawdown_depth: UNFAVORABLE">-</span><span class="conf-dot conf-dot-neutral" title="vix_regime: VIX normal range" role="img" aria-label="vix_regime: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="fed_regime: Fed cutting rates" role="img" aria-label="fed_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="yield_curve: Normal yield curve" role="img" aria-label="yield_curve: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="earnings_risk: Low earnings event risk" role="img" aria-label="earnings_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="geopolitical_risk: Low geopolitical risk" role="img" aria-label="geopolitical_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="social_sentiment: Social sentiment neutral" role="img" aria-label="social_sentiment: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="news_sentiment: News sentiment bearish (contrarian)" role="img" aria-label="news_sentiment: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="market_statistics: Market statistics neutral" role="img" aria-label="market_statistics: NEUTRAL">~</span></div>
 <details>
 <summary>View 9-factor analysis</summary>
 <table class="factor-table"><tbody><tr><td class="factor-name">Drawdown Depth</td><td><span class="badge badge-gray">UNFAVORABLE</span></td><td>Shallow: 1.9%</td></tr>
-<tr><td class="factor-name">Vix Regime</td><td><span class="badge badge-green">FAVORABLE</span></td><td>VIX ELEVATED: fear present</td></tr>
+<tr><td class="factor-name">Vix Regime</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>VIX normal range</td></tr>
 <tr><td class="factor-name">Fed Regime</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Fed cutting rates</td></tr>
 <tr><td class="factor-name">Yield Curve</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Normal yield curve</td></tr>
 <tr><td class="factor-name">Earnings Risk</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Low earnings event risk</td></tr>
 <tr><td class="factor-name">Geopolitical Risk</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Low geopolitical risk</td></tr>
 <tr><td class="factor-name">Social Sentiment</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Social sentiment neutral</td></tr>
 <tr><td class="factor-name">News Sentiment</td><td><span class="badge badge-green">FAVORABLE</span></td><td>News sentiment bearish (contrarian)</td></tr>
-<tr><td class="factor-name">Market Statistics</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Market risk-on</td></tr></tbody></table>
+<tr><td class="factor-name">Market Statistics</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Market statistics neutral</td></tr></tbody></table>
 </details>
 </div>
 <div class="signal-card signal-card-watch">
 <div class="signal-header">
 <span><span class="signal-ticker">TNA</span> (IWM) &mdash; <span class="badge badge-gray">WATCH</span></span>
-<span>Confidence: <span class="badge badge-yellow">MEDIUM</span> (6/9)</span>
+<span>Confidence: <span class="badge badge-yellow">MEDIUM</span> (5/9)</span>
 </div>
 <div class="signal-details">Drawdown: -3.3% &bull; ATH: $269.79 &bull; Current: $260.94 &bull; Target: 10.0%</div>
-<div class="confidence-bar"><span class="conf-dot conf-dot-unfavorable" title="drawdown_depth: Shallow: 3.3%" role="img" aria-label="drawdown_depth: UNFAVORABLE">-</span><span class="conf-dot conf-dot-favorable" title="vix_regime: VIX ELEVATED: fear present" role="img" aria-label="vix_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="fed_regime: Fed cutting rates" role="img" aria-label="fed_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="yield_curve: Normal yield curve" role="img" aria-label="yield_curve: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="earnings_risk: Low earnings event risk" role="img" aria-label="earnings_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="geopolitical_risk: Low geopolitical risk" role="img" aria-label="geopolitical_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="social_sentiment: Social sentiment neutral" role="img" aria-label="social_sentiment: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="news_sentiment: News sentiment bearish (contrarian)" role="img" aria-label="news_sentiment: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="market_statistics: Market risk-on" role="img" aria-label="market_statistics: NEUTRAL">~</span></div>
+<div class="confidence-bar"><span class="conf-dot conf-dot-unfavorable" title="drawdown_depth: Shallow: 3.3%" role="img" aria-label="drawdown_depth: UNFAVORABLE">-</span><span class="conf-dot conf-dot-neutral" title="vix_regime: VIX normal range" role="img" aria-label="vix_regime: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="fed_regime: Fed cutting rates" role="img" aria-label="fed_regime: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="yield_curve: Normal yield curve" role="img" aria-label="yield_curve: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="earnings_risk: Low earnings event risk" role="img" aria-label="earnings_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-favorable" title="geopolitical_risk: Low geopolitical risk" role="img" aria-label="geopolitical_risk: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="social_sentiment: Social sentiment neutral" role="img" aria-label="social_sentiment: NEUTRAL">~</span><span class="conf-dot conf-dot-favorable" title="news_sentiment: News sentiment bearish (contrarian)" role="img" aria-label="news_sentiment: FAVORABLE">+</span><span class="conf-dot conf-dot-neutral" title="market_statistics: Market statistics neutral" role="img" aria-label="market_statistics: NEUTRAL">~</span></div>
 <details>
 <summary>View 9-factor analysis</summary>
 <table class="factor-table"><tbody><tr><td class="factor-name">Drawdown Depth</td><td><span class="badge badge-gray">UNFAVORABLE</span></td><td>Shallow: 3.3%</td></tr>
-<tr><td class="factor-name">Vix Regime</td><td><span class="badge badge-green">FAVORABLE</span></td><td>VIX ELEVATED: fear present</td></tr>
+<tr><td class="factor-name">Vix Regime</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>VIX normal range</td></tr>
 <tr><td class="factor-name">Fed Regime</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Fed cutting rates</td></tr>
 <tr><td class="factor-name">Yield Curve</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Normal yield curve</td></tr>
 <tr><td class="factor-name">Earnings Risk</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Low earnings event risk</td></tr>
 <tr><td class="factor-name">Geopolitical Risk</td><td><span class="badge badge-green">FAVORABLE</span></td><td>Low geopolitical risk</td></tr>
 <tr><td class="factor-name">Social Sentiment</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Social sentiment neutral</td></tr>
 <tr><td class="factor-name">News Sentiment</td><td><span class="badge badge-green">FAVORABLE</span></td><td>News sentiment bearish (contrarian)</td></tr>
-<tr><td class="factor-name">Market Statistics</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Market risk-on</td></tr></tbody></table>
+<tr><td class="factor-name">Market Statistics</td><td><span class="badge badge-gray">NEUTRAL</span></td><td>Market statistics neutral</td></tr></tbody></table>
 </details>
 </div>
 </div>
@@ -998,13 +977,46 @@ a:focus-visible, summary:focus-visible {
 <div class="rpt-sidebar">
 
 <div class="rpt-widget">
+<div class="rpt-widget-title">Key Indicators</div>
+<div class="kpi-strip">
+<div class="kpi-card kpi-bar-yellow">
+<div class="kpi-icon"><span class="material-symbols-outlined">trending_up</span></div><div class="kpi-label">VIX</div>
+<div class="kpi-value">19.6</div>
+<div class="kpi-sub"><span class="badge badge-yellow">NORMAL</span></div>
+<div class="gauge-track" role="progressbar" aria-valuenow="39" aria-valuemin="0" aria-valuemax="100" aria-label="VIX gauge"><div class="gauge-fill gauge-fill-yellow" style="width:39%"></div></div>
+</div>
+<div class="kpi-card kpi-bar-green">
+<div class="kpi-icon"><span class="material-symbols-outlined">account_balance</span></div><div class="kpi-label">Fed</div>
+<div class="kpi-value">3.64%</div>
+<div class="kpi-sub"><span class="badge badge-green">CUTTING</span></div>
+</div>
+<div class="kpi-card kpi-bar-yellow">
+<div class="kpi-icon"><span class="material-symbols-outlined">show_chart</span></div><div class="kpi-label">Yield Curve</div>
+<div class="kpi-value">+0.46%</div>
+<div class="kpi-sub"><span class="badge badge-yellow">NORMAL</span></div>
+<div class="gauge-track" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" aria-label="Yield Curve gauge"><div class="gauge-fill gauge-fill-yellow" style="width:62%"></div></div>
+</div>
+<div class="kpi-card kpi-bar-green">
+<div class="kpi-icon"><span class="material-symbols-outlined">public</span></div><div class="kpi-label">Geopolitical</div>
+<div class="kpi-value">130</div>
+<div class="kpi-sub"><span class="badge badge-green">LOW</span> 130 events</div>
+</div>
+<div class="kpi-card kpi-bar-red">
+<div class="kpi-icon"><span class="material-symbols-outlined">newspaper</span></div><div class="kpi-label">News</div>
+<div class="kpi-value">357</div>
+<div class="kpi-sub"><span class="badge badge-red">BEARISH</span> 357 articles</div>
+</div>
+</div>
+
+</div>
+<div class="rpt-widget">
 <div class="rpt-widget-title">Market Overview</div>
 <section id="market">
 <h2><span class="section-icon"><span class="material-symbols-outlined">monitoring</span></span> Market Conditions</h2>
 <div class="card">
-<p>Risk Assessment: <span class="badge badge-green">RISK_ON</span></p>
-<div class="index-tiles"><div class="index-tile"><div class="index-name">S&amp;P 500</div><div class="index-price">$680.74</div><div class="index-chg pct-up">0.0%</div></div><div class="index-tile"><div class="index-name">NASDAQ</div><div class="index-price">$600.34</div><div class="index-chg pct-up">0.0%</div></div><div class="index-tile"><div class="index-name">DOW</div><div class="index-price">$493.78</div><div class="index-chg pct-up">0.0%</div></div></div>
-<div class="commodity-tiles"><div class="commodity-tile"><div class="commodity-name">Gold</div><div class="commodity-price">$458.94</div><div class="commodity-chg pct-down">-1.7%</div></div><div class="commodity-tile"><div class="commodity-name">Oil</div><div class="commodity-price">$75.97</div><div class="commodity-chg pct-down">-2.6%</div></div><div class="commodity-tile"><div class="commodity-name">DXY</div><div class="commodity-price">$96.94</div><div class="commodity-chg pct-up">+0.1%</div></div></div>
+<p>Risk Assessment: <span class="badge badge-gray">NEUTRAL</span></p>
+<div class="index-tiles"><div class="index-tile"><div class="index-name">S&amp;P 500</div><div class="index-price">$683.85</div><div class="index-chg pct-up">0.0%</div></div><div class="index-tile"><div class="index-name">NASDAQ</div><div class="index-price">$604.62</div><div class="index-chg pct-up">0.0%</div></div><div class="index-tile"><div class="index-name">DOW</div><div class="index-price">$495.85</div><div class="index-chg pct-up">0.0%</div></div></div>
+<div class="commodity-tiles"><div class="commodity-tile"><div class="commodity-name">Gold</div><div class="commodity-price">$462.84</div><div class="commodity-chg pct-down">-0.9%</div></div><div class="commodity-tile"><div class="commodity-name">Oil</div><div class="commodity-price">$76.31</div><div class="commodity-chg pct-down">-2.2%</div></div><div class="commodity-tile"><div class="commodity-name">DXY</div><div class="commodity-price">$96.89</div><div class="commodity-chg pct-up">+0.1%</div></div></div>
 <p class="mt-16"><strong><span class="section-icon"><span class="material-symbols-outlined">currency_exchange</span></span> Global Central Bank Rates</strong></p>
 <div class="rates-grid"><div class="rate-tile"><div class="rate-bank">ECB</div><div class="rate-value">2.00%</div></div><div class="rate-tile"><div class="rate-bank">BOE</div><div class="rate-value">3.73%</div></div><div class="rate-tile"><div class="rate-bank">BOJ</div><div class="rate-value">0.30%</div></div><div class="rate-tile"><div class="rate-bank">BOC</div><div class="rate-value">5.25%</div></div><div class="rate-tile"><div class="rate-bank">RBA</div><div class="rate-value">3.60%</div></div></div>
 </div>
@@ -1017,22 +1029,22 @@ a:focus-visible, summary:focus-visible {
 <h2><span class="section-icon"><span class="material-symbols-outlined">newspaper</span></span> Sentiment Analysis</h2>
 <div class="card">
 <p>News Sentiment: <span class="badge badge-red">BEARISH</span></p>
-<div class="sentiment-bar" role="img" aria-label="Sentiment: 33 bullish, 66 bearish, 264 neutral"><div class="sentiment-fill-bullish" style="width:9.1%"></div><div class="sentiment-fill-bearish" style="width:18.2%"></div><div class="sentiment-fill-neutral" style="width:72.7%"></div></div>
-<div class="sentiment-counts"><span class="sentiment-count-bullish">33 bullish</span><span class="sentiment-count-bearish">66 bearish</span><span>264 neutral</span></div>
+<div class="sentiment-bar" role="img" aria-label="Sentiment: 42 bullish, 55 bearish, 260 neutral"><div class="sentiment-fill-bullish" style="width:11.8%"></div><div class="sentiment-fill-bearish" style="width:15.4%"></div><div class="sentiment-fill-neutral" style="width:72.8%"></div></div>
+<div class="sentiment-counts"><span class="sentiment-count-bullish">42 bullish</span><span class="sentiment-count-bearish">55 bearish</span><span>260 neutral</span></div>
 <p class="mt-12"><strong>Top headlines</strong></p>
 <ul class="headline-list">
-<li><span class="hl-marker hl-bear">Bear</span><a href="https://www.bloomberg.com/news/articles/2026-02-13/pbb-plunges-as-it-cites-slow-recovery-in-property-finance" target="_blank" rel="noopener">PBB Plunges as It Blames SRT Costs for Weak Profit Outlook</a><span class="hl-source">Bloomberg Markets</span></li>
-<li><span class="hl-marker hl-bear">Bear</span><a href="https://www.bloomberg.com/news/videos/2026-02-13/bloomberg-brief-2-13-2026-video" target="_blank" rel="noopener">Trump Team Plans Metals Tariff Rollback; NASA, SpaceX Launches Crew-12 | Bloomberg Brief 2/13/2026</a><span class="hl-source">Bloomberg Markets</span></li>
+<li><span class="hl-marker hl-neu">Neu</span><a href="https://www.bloomberg.com/news/articles/2026-02-12/gold-steadies-after-sharp-drop-sparked-by-wider-market-jitters" target="_blank" rel="noopener">Gold Reclaims $5,000 as Cooling Inflation Lifts Fed Easing Bets</a><span class="hl-source">Bloomberg Markets</span></li>
+<li><span class="hl-marker hl-bull">Bull</span><a href="https://www.bloomberg.com/news/articles/2026-02-13/stocks-drift-as-ai-fears-linger-after-inflation-reading" target="_blank" rel="noopener">Stocks Climb as Traders Bet on Rate Cuts After Inflation Cools</a><span class="hl-source">Bloomberg Markets</span></li>
 <li><span class="hl-marker hl-bull">Bull</span><a href="https://www.wsj.com/finance/stocks/big-tech-accounting-creates-a-blind-spot-in-the-ai-boom-e2d7d1eb?mod=rss_markets_main" target="_blank" rel="noopener">Big Tech Accounting Creates a Blind Spot in the AI Boom</a><span class="hl-source">WSJ Markets</span></li>
 <li><span class="hl-marker hl-bear">Bear</span><a href="https://www.wsj.com/opinion/ai-stock-market-software-companies-selloff-02bef5d0?mod=rss_markets_main" target="_blank" rel="noopener">Opinion | The AI Stock Market Rout</a><span class="hl-source">WSJ Markets</span></li>
 <li><span class="hl-marker hl-neu">Neu</span><a href="https://www.wsj.com/finance/commodities-futures/oil-rises-amid-lingering-u-s-iran-tensions-e01beaae?mod=rss_markets_main" target="_blank" rel="noopener">Oil Futures Turn Lower in Early U.S. Trade</a><span class="hl-source">WSJ Markets</span></li>
 </ul>
 <div class="sector-badges">
 <span class="sector-badge">tech (68)</span>
-<span class="sector-badge">finance (65)</span>
-<span class="sector-badge">energy (17)</span>
-<span class="sector-badge">semiconductors (11)</span>
-<span class="sector-badge">healthcare (9)</span>
+<span class="sector-badge">finance (63)</span>
+<span class="sector-badge">energy (18)</span>
+<span class="sector-badge">semiconductors (14)</span>
+<span class="sector-badge">healthcare (7)</span>
 </div>
 <p class="mt-12">Officials Tone: <span class="badge badge-yellow">HAWKISH</span>
  &nbsp; Policy: <span class="badge badge-gray">CONTRACTIONARY</span>
@@ -1044,32 +1056,33 @@ a:focus-visible, summary:focus-visible {
 <section id="geopolitical">
 <h2><span class="section-icon"><span class="material-symbols-outlined">public</span></span> Geopolitical Risk</h2>
 <div class="card">
-<p>Risk Level: <span class="badge badge-green">LOW</span> &mdash; 80 events tracked (0 high-impact)</p>
+<p>Risk Level: <span class="badge badge-green">LOW</span> &mdash; 130 events tracked (0 high-impact)</p>
 <div class="sector-badges">
-<span class="sector-badge">energy (50)</span>
+<span class="sector-badge">energy (100)</span>
 <span class="sector-badge">defense (50)</span>
+<span class="sector-badge">finance (50)</span>
 <span class="sector-badge">general (30)</span>
 </div>
-<p class="mt-8"><span class="badge badge-gray">MILITARY (50)</span> <span class="badge badge-gray">ELECTIONS (30)</span></p>
+<p class="mt-8"><span class="badge badge-gray">MILITARY (50)</span> <span class="badge badge-gray">SANCTIONS (50)</span> <span class="badge badge-gray">ELECTIONS (30)</span></p>
 <div class="geo-events">
 <div class="geo-event">
-<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://www.sangbadpratidin.in/photo/bangladesh-election-2026-property-details-of-tarique-rahman/" target="_blank" rel="noopener">Bangladesh Election 2026 : Property details of Tarique Rahman</a></div>
+<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://www.tokfm.pl/polityka/safe-przyspieszyloby-modernizacje-polskiej-armii-o-okolo-7-lat" target="_blank" rel="noopener">  SAFE przyśpieszyłoby modernizację polskiej armii o około 7 lat  </a></div>
 <div class="geo-meta">MILITARY &bull; Sectors: energy, defense</div>
 </div>
 <div class="geo-event">
-<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://www.pcguru.hu/hirek/terminator-zero-animacios-sorozat-egy-evad-utan-kaszalta-a-netflix-marlasinger-/98884" target="_blank" rel="noopener">A Netflix szép csendben kivégezte a Terminator Zerót</a></div>
+<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://naslovi.net/2026-02-13/slobodna-evropa/zavrsne-reci-odbrana-selimija-i-krasniqija-na-sudjenju-bivsim-vodjama-oslobodilacke-vojske-kosova/41347821" target="_blank" rel="noopener">Završne reči odbrana Selimija i Krasniqija na suđenju bivšim vođama Oslobodilačke vojske Kosova</a></div>
 <div class="geo-meta">MILITARY &bull; Sectors: energy, defense</div>
 </div>
 <div class="geo-event">
-<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://www.clevelandjewishnews.com/jns/world-s-largest-warship-en-route-to-middle-east/article_03d06cf3-0705-5d42-a7b6-85a5e46f8989.html" target="_blank" rel="noopener">World largest warship en route to Middle East | JNS | clevelandjewishnews . com</a></div>
+<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://www.haberler.com/guncel/izmir-de-13-sanikli-dorukhan-buyukisik-davasinda-yeni-gelismeler-19565342-haberi/" target="_blank" rel="noopener">Dorukhan Büyükışık davasında sanık sayısı 13  e yükseldi</a></div>
 <div class="geo-meta">MILITARY &bull; Sectors: energy, defense</div>
 </div>
 <div class="geo-event">
-<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://www.index.hr/vijesti/clanak/trump-odlucio-salje-drugi-nosac-aviona-prema-iranu-i-to-najveci-na-svijetu/2760457.aspx?index_ref=homepage_comment_box_d&amp;commentId=10484146" target="_blank" rel="noopener">Trump odlučio : Šalje drugi nosač aviona prema Iranu . I to najveći na svijetu</a></div>
+<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://www.nrtoday.com/obits/james-kenneth-mcginnis/article_487b48b0-77b7-436a-870e-dc65b3eaf939.html" target="_blank" rel="noopener">James Kenneth McGinnis</a></div>
 <div class="geo-meta">MILITARY &bull; Sectors: energy, defense</div>
 </div>
 <div class="geo-event">
-<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://www.haber7.com/teknoloji/haber/3604090-8-temmuz-dediler-trump-ufolari-butun-dunyaya-aciklayacak" target="_blank" rel="noopener">  8 Temmuz dediler ! Trump , UFOları bütün dünyaya açıklayacak ! </a></div>
+<div class="geo-title"><span class="badge badge-green">LOW</span> <a href="https://redstate.com/rusty-weiss/2026/02/13/army-issues-savage-valentines-day-advice-for-less-attractive-guys-to-avoid-honeytraps-105-n2199119" target="_blank" rel="noopener">Army Issues Savage Valentine Day Advice for Less Attractive Guys to Avoid  Honeytrap :  10+5=  – RedState</a></div>
 <div class="geo-meta">MILITARY &bull; Sectors: energy, defense</div>
 </div>
 </div>
@@ -1087,6 +1100,7 @@ a:focus-visible, summary:focus-visible {
 <p class="kicker">Events Watchlist</p>
 <p>Ongoing world events being monitored for potential market impact. Each theme is tracked via GDELT global event data and classified by affected sectors.</p>
 <div style="padding:12px 0;border-bottom:1px solid var(--border-light)"><p><strong>Military Conflicts &amp; Defense</strong> <span class="badge badge-red">HIGH</span> <span class="text-muted">(50 events)</span></p><p style="font-size:13px;color:var(--text-secondary);margin-top:4px">Military escalation drives oil prices higher and creates broad risk-off sentiment. Defense sector benefits.</p><p style="font-size:12px;color:var(--text-muted);margin-top:4px"><span class="label">Impact:</span> Oil spikes, flight to safety (bonds, gold), tech selloff on risk aversion.</p><div style="margin-top:6px"><span class="badge badge-blue">UCO</span> <span class="badge badge-blue">TQQQ</span> <span class="badge badge-blue">UPRO</span></div></div>
+<div style="padding:12px 0;border-bottom:1px solid var(--border-light)"><p><strong>Economic Sanctions</strong> <span class="badge badge-red">HIGH</span> <span class="text-muted">(50 events)</span></p><p style="font-size:13px;color:var(--text-secondary);margin-top:4px">Sanctions disrupt energy supply, banking channels, and cross-border trade flows.</p><p style="font-size:12px;color:var(--text-muted);margin-top:4px"><span class="label">Impact:</span> Energy volatility, banking sector stress, commodity price dislocations.</p><div style="margin-top:6px"><span class="badge badge-blue">UCO</span> <span class="badge badge-blue">FAS</span></div></div>
 </div>
 </section>
 
@@ -1144,22 +1158,22 @@ a:focus-visible, summary:focus-visible {
 <div class="card">
 <div class="module-grid">
 <span class="module-pill module-pill-ok">&#10003; etf.signals <span class="pill-dur">1.0s</span></span>
-<span class="module-pill module-pill-ok">&#10003; etf.active <span class="pill-dur">0.9s</span></span>
-<span class="module-pill module-pill-ok">&#10003; macro.dashboard <span class="pill-dur">3.1s</span></span>
+<span class="module-pill module-pill-ok">&#10003; etf.active <span class="pill-dur">0.8s</span></span>
+<span class="module-pill module-pill-ok">&#10003; macro.dashboard <span class="pill-dur">2.9s</span></span>
 <span class="module-pill module-pill-ok">&#10003; macro.yields <span class="pill-dur">1.9s</span></span>
 <span class="module-pill module-pill-ok">&#10003; macro.rates <span class="pill-dur">3.3s</span></span>
 <span class="module-pill module-pill-ok">&#10003; macro.calendar <span class="pill-dur">0.8s</span></span>
-<span class="module-pill module-pill-ok">&#10003; sec.recent <span class="pill-dur">36.9s</span></span>
-<span class="module-pill module-pill-ok">&#10003; sec.institutional <span class="pill-dur">3.3s</span></span>
-<span class="module-pill module-pill-ok">&#10003; geopolitical.summary <span class="pill-dur">24.5s</span></span>
+<span class="module-pill module-pill-ok">&#10003; sec.recent <span class="pill-dur">36.1s</span></span>
+<span class="module-pill module-pill-ok">&#10003; sec.institutional <span class="pill-dur">3.0s</span></span>
+<span class="module-pill module-pill-ok">&#10003; geopolitical.summary <span class="pill-dur">17.2s</span></span>
 <span class="module-pill module-pill-ok">&#10003; social.summary <span class="pill-dur">0.9s</span></span>
-<span class="module-pill module-pill-ok">&#10003; news.summary <span class="pill-dur">4.6s</span></span>
-<span class="module-pill module-pill-ok">&#10003; statistics.dashboard <span class="pill-dur">2.4s</span></span>
-<span class="module-pill module-pill-ok">&#10003; strategy.proposals <span class="pill-dur">33.5s</span></span>
+<span class="module-pill module-pill-ok">&#10003; news.summary <span class="pill-dur">4.2s</span></span>
+<span class="module-pill module-pill-ok">&#10003; statistics.dashboard <span class="pill-dur">2.6s</span></span>
+<span class="module-pill module-pill-ok">&#10003; strategy.proposals <span class="pill-dur">36.6s</span></span>
 <span class="module-pill module-pill-ok">&#10003; strategy.backtest-all <span class="pill-dur">4.8s</span></span>
 <span class="module-pill module-pill-ok">&#10003; strategy.forecast <span class="pill-dur">0.8s</span></span>
 <span class="module-pill module-pill-ok">&#10003; strategy.verify <span class="pill-dur">0.8s</span></span>
-<span class="module-pill module-pill-ok">&#10003; congress.summary <span class="pill-dur">3.3s</span></span>
+<span class="module-pill module-pill-ok">&#10003; congress.summary <span class="pill-dur">3.2s</span></span>
 <span class="module-pill module-pill-ok">&#10003; risk.dashboard <span class="pill-dur">0.8s</span></span>
 <span class="module-pill module-pill-ok">&#10003; portfolio.dashboard <span class="pill-dur">0.8s</span></span>
 <span class="module-pill module-pill-ok">&#10003; quant.summary <span class="pill-dur">3.9s</span></span>
@@ -1175,7 +1189,7 @@ a:focus-visible, summary:focus-visible {
 </main>
 
 <footer class="footer">
-<span>Generated 2026-02-13 16:55 IST &mdash; not financial advice.</span>
+<span>Generated 2026-02-13 21:48 IST &mdash; not financial advice.</span>
 </footer>
 
 <script>
