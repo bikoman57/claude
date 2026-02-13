@@ -454,10 +454,24 @@ a:hover { text-decoration: underline; }
   border-bottom-width: 1px; }
 .rpt-compact .card { padding: 0; margin-bottom: 0; border: none; border-radius: 0;
   box-shadow: none; background: transparent; }
-.rpt-compact .signal-grid { gap: 8px; margin-bottom: 8px; }
+.rpt-compact .signal-grid { grid-template-columns: 1fr;
+  gap: 8px; margin-bottom: 8px; }
 .rpt-compact .signal-card { padding: 10px 12px; border-radius: 6px; }
 .rpt-compact .signal-header { margin-bottom: 4px; }
 .rpt-compact .grid-2col { gap: 0; grid-template-columns: 1fr; }
+
+/* Sidebar widgets */
+.rpt-widget { background: var(--bg-secondary); border: 1px solid var(--border-light);
+  border-radius: 6px; padding: 12px; margin-bottom: 12px; }
+.rpt-widget:last-child { margin-bottom: 0; }
+.rpt-widget-title { font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;
+  padding-bottom: 8px; border-bottom: 1px solid var(--border-primary);
+  margin-bottom: 8px; }
+.rpt-widget section { padding: 0 !important; border-bottom: none !important; }
+.rpt-widget section h2 { display: none; }
+.rpt-widget .card { padding: 0; margin: 0; border: none;
+  border-radius: 0; box-shadow: none; background: transparent; }
 .rpt-sidebar .index-tiles { gap: 6px; margin-bottom: 8px; }
 .rpt-sidebar .index-tile { padding: 8px; border-radius: 4px; }
 .rpt-sidebar .index-price { font-size: 16px; }
@@ -472,8 +486,9 @@ a:hover { text-decoration: underline; }
 .rpt-sidebar .headline-list li { padding: 6px 0; font-size: 13px; }
 .rpt-sidebar .geo-event { padding: 6px 0; }
 .rpt-sidebar .geo-title { font-size: 13px; }
-.rpt-sidebar .congress-grid { grid-template-columns: 1fr; gap: 8px; }
-.rpt-sidebar .congress-member { padding: 8px 12px; }
+.rpt-sidebar .sentiment-bar { height: 8px; margin: 6px 0; }
+.rpt-sidebar .sentiment-counts { font-size: 10px; gap: 10px; }
+.rpt-sidebar .sector-badges { margin-top: 6px; }
 .rpt-compact table th { padding: 6px 8px; font-size: 9px; }
 .rpt-compact table td { padding: 6px 8px; font-size: 12px; }
 .rpt-compact .strategy-entry-exit { padding: 4px 8px; font-size: 11px; }
@@ -759,7 +774,7 @@ a:focus-visible, summary:focus-visible {
 </div>
 
 <header class="header">
-<span>2026-02-13 &bull; 16:45 IST</span>
+<span>2026-02-13 &bull; 17:05 IST</span>
 </header>
 
 <main id="main-content">
@@ -771,9 +786,9 @@ a:focus-visible, summary:focus-visible {
 <table class="mt-12">
 <thead><tr><th scope="col">Strategy</th><th scope="col" class="num">Avg Sharpe</th><th scope="col" class="num">Avg Win Rate</th><th scope="col" class="num">Avg Return</th><th scope="col" class="num">Total Trades</th><th scope="col">Best ETF</th></tr></thead>
 <tbody>
-<tr><td><strong>ATH Mean-Reversion</strong></td><td class="num">0.965</td><td class="num">75.2%</td><td class="num pct-up">+46.1%</td><td class="num">62</td><td>FAS</td></tr>
-<tr><td><strong>Bollinger Band</strong></td><td class="num">1.010</td><td class="num">70.4%</td><td class="num pct-up">+48.7%</td><td class="num">79</td><td>FAS</td></tr>
-<tr><td><strong>MA Dip</strong></td><td class="num">0.946</td><td class="num">76.3%</td><td class="num pct-up">+68.8%</td><td class="num">96</td><td>TECL</td></tr>
+<tr><td><strong>ATH Mean-Reversion</strong></td><td class="num">0.935</td><td class="num">72.0%</td><td class="num pct-up">+45.8%</td><td class="num">62</td><td>UCO</td></tr>
+<tr><td><strong>Bollinger Band</strong></td><td class="num">0.997</td><td class="num">70.4%</td><td class="num pct-up">+48.2%</td><td class="num">79</td><td>FAS</td></tr>
+<tr><td><strong>MA Dip</strong></td><td class="num">0.939</td><td class="num">73.7%</td><td class="num pct-up">+68.4%</td><td class="num">96</td><td>TECL</td></tr>
 <tr><td><strong>RSI Oversold</strong> <span class="badge badge-ok">BEST</span></td><td class="num">1.251</td><td class="num">79.2%</td><td class="num pct-up">+21.3%</td><td class="num">19</td><td>FAS</td></tr>
 </tbody></table>
 </div>
@@ -801,7 +816,7 @@ a:focus-visible, summary:focus-visible {
 <tr><td>#4</td><td><strong>TQQQ</strong></td><td>QQQ</td><td><span class="badge badge-gray" title="Buy when 14-day RSI falls below oversold threshold (typically 30), exit when RSI recovers above overbought level or profit target hit. Targets short-term momentum reversals.">RSI</span></td><td class="num">2.041</td><td class="num">100.0%</td><td class="num pct-up">+46.2%</td><td class="num">0.0%</td></tr>
 <tr><td>#5</td><td><strong>TNA</strong></td><td>IWM</td><td><span class="badge badge-gray" title="Buy when price touches or breaks below the lower Bollinger Band (20-day SMA minus 2 standard deviations), exit at the middle band or profit target. Identifies statistical extremes in price action.">Bollinger</span></td><td class="num">1.548</td><td class="num">77.8%</td><td class="num pct-up">+81.4%</td><td class="num">29.1%</td></tr>
 <tr><td>#6</td><td><strong>SOXL</strong></td><td>SOXX</td><td><span class="badge badge-gray" title="Buy leveraged ETF when its underlying index drops a threshold % from all-time high, exit at profit target. Captures mean-reversion after broad market drawdowns.">ATH</span></td><td class="num">1.376</td><td class="num">73.3%</td><td class="num pct-up">+165.1%</td><td class="num">40.4%</td></tr>
-<tr><td>#7</td><td><strong>TECL</strong></td><td>XLK</td><td><span class="badge badge-gray" title="Buy when price dips a threshold % below its 50-day moving average, exit when price recovers to or above the MA. Captures pullbacks within an established trend.">MA Dip</span></td><td class="num">1.317</td><td class="num">81.2%</td><td class="num pct-up">+118.8%</td><td class="num">30.9%</td></tr>
+<tr><td>#7</td><td><strong>TECL</strong></td><td>XLK</td><td><span class="badge badge-gray" title="Buy when price dips a threshold % below its 50-day moving average, exit when price recovers to or above the MA. Captures pullbacks within an established trend.">MA Dip</span></td><td class="num">1.306</td><td class="num">75.0%</td><td class="num pct-up">+117.4%</td><td class="num">30.9%</td></tr>
 <tr><td>#8</td><td><strong>LABU</strong></td><td>XBI</td><td><span class="badge badge-gray" title="Buy when price dips a threshold % below its 50-day moving average, exit when price recovers to or above the MA. Captures pullbacks within an established trend.">MA Dip</span></td><td class="num">0.479</td><td class="num">66.7%</td><td class="num pct-up">+16.7%</td><td class="num">38.5%</td></tr>
 </tbody></table>
 </div>
@@ -810,7 +825,7 @@ a:focus-visible, summary:focus-visible {
 </main>
 
 <footer class="footer">
-<span>Generated 2026-02-13 16:45 IST &mdash; backtested performance, not live results.</span>
+<span>Generated 2026-02-13 17:05 IST &mdash; backtested performance, not live results.</span>
 </footer>
 
 <script>
@@ -844,10 +859,10 @@ new Chart(sctx, {
   data: {
     labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
     datasets: [
-      {label:"FAS (RSI)",data:[10000.0, 11235.03, 13545.58],borderColor:"#2563eb",backgroundColor:"#2563eb22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"LABU (MA Dip)",data:[10000.0, 11211.58, 12837.35, 14686.84, 12461.8, 14076.68, 15726.99, 11691.77, 9672.34, 11083.64, 12195.76, 10160.37, 11673.61],borderColor:"#0a7c42",backgroundColor:"#0a7c4222",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"SOXL (ATH)",data:[10000.0, 11004.7, 12645.57, 10539.46, 12808.28, 14491.06, 16498.8, 18155.63, 20215.93, 17015.85, 12059.36, 18778.21, 23596.11, 19736.65, 22763.26, 26510.75],borderColor:"#1565c0",backgroundColor:"#1565c022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
-      {label:"TECL (MA Dip)",data:[10000.0, 11045.29, 8614.05, 9479.79, 10458.03, 11552.04, 12869.32, 10555.51, 11623.73, 8898.92, 12044.8, 13256.9, 15619.64, 17622.1, 19598.09, 21824.38, 21876.68],borderColor:"#b86e00",backgroundColor:"#b86e0022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"FAS (RSI)",data:[10000.0, 11235.04, 13545.6],borderColor:"#2563eb",backgroundColor:"#2563eb22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"LABU (MA Dip)",data:[10000.0, 11211.57, 12837.35, 14686.83, 12461.8, 14076.68, 15726.99, 11691.77, 9672.33, 11083.63, 12195.76, 10160.36, 11673.61],borderColor:"#0a7c42",backgroundColor:"#0a7c4222",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"SOXL (ATH)",data:[10000.0, 11004.7, 12645.57, 10539.45, 12808.28, 14491.05, 16498.79, 18155.62, 20215.91, 17015.84, 12059.35, 18778.2, 23596.1, 19736.64, 22763.25, 26510.73],borderColor:"#1565c0",backgroundColor:"#1565c022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
+      {label:"TECL (MA Dip)",data:[10000.0, 11045.3, 8614.06, 9479.8, 10458.04, 11552.05, 12869.33, 10555.53, 11623.75, 8898.94, 12044.82, 13256.93, 15619.67, 17622.14, 19598.13, 21824.42, 21739.76],borderColor:"#b86e00",backgroundColor:"#b86e0022",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
       {label:"TNA (Bollinger)",data:[10000.0, 11082.59, 12738.56, 14287.32, 12047.79, 10122.94, 12704.35, 14812.87, 16378.05, 18143.06],borderColor:"#6a1b9a",backgroundColor:"#6a1b9a22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
       {label:"TQQQ (RSI)",data:[10000.0, 11184.29, 14623.96],borderColor:"#00838f",backgroundColor:"#00838f22",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},
       {label:"UCO (ATH)",data:[10000.0, 11010.72, 12637.81, 13974.03, 15505.76, 12410.78, 13696.23, 15182.17, 16984.09, 19096.02],borderColor:"#c62828",backgroundColor:"#c6282822",borderWidth:2,pointRadius:3,pointHoverRadius:5,tension:0.1,fill:false},

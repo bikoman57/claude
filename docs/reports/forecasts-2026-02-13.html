@@ -454,10 +454,24 @@ a:hover { text-decoration: underline; }
   border-bottom-width: 1px; }
 .rpt-compact .card { padding: 0; margin-bottom: 0; border: none; border-radius: 0;
   box-shadow: none; background: transparent; }
-.rpt-compact .signal-grid { gap: 8px; margin-bottom: 8px; }
+.rpt-compact .signal-grid { grid-template-columns: 1fr;
+  gap: 8px; margin-bottom: 8px; }
 .rpt-compact .signal-card { padding: 10px 12px; border-radius: 6px; }
 .rpt-compact .signal-header { margin-bottom: 4px; }
 .rpt-compact .grid-2col { gap: 0; grid-template-columns: 1fr; }
+
+/* Sidebar widgets */
+.rpt-widget { background: var(--bg-secondary); border: 1px solid var(--border-light);
+  border-radius: 6px; padding: 12px; margin-bottom: 12px; }
+.rpt-widget:last-child { margin-bottom: 0; }
+.rpt-widget-title { font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;
+  padding-bottom: 8px; border-bottom: 1px solid var(--border-primary);
+  margin-bottom: 8px; }
+.rpt-widget section { padding: 0 !important; border-bottom: none !important; }
+.rpt-widget section h2 { display: none; }
+.rpt-widget .card { padding: 0; margin: 0; border: none;
+  border-radius: 0; box-shadow: none; background: transparent; }
 .rpt-sidebar .index-tiles { gap: 6px; margin-bottom: 8px; }
 .rpt-sidebar .index-tile { padding: 8px; border-radius: 4px; }
 .rpt-sidebar .index-price { font-size: 16px; }
@@ -472,8 +486,9 @@ a:hover { text-decoration: underline; }
 .rpt-sidebar .headline-list li { padding: 6px 0; font-size: 13px; }
 .rpt-sidebar .geo-event { padding: 6px 0; }
 .rpt-sidebar .geo-title { font-size: 13px; }
-.rpt-sidebar .congress-grid { grid-template-columns: 1fr; gap: 8px; }
-.rpt-sidebar .congress-member { padding: 8px 12px; }
+.rpt-sidebar .sentiment-bar { height: 8px; margin: 6px 0; }
+.rpt-sidebar .sentiment-counts { font-size: 10px; gap: 10px; }
+.rpt-sidebar .sector-badges { margin-top: 6px; }
 .rpt-compact table th { padding: 6px 8px; font-size: 9px; }
 .rpt-compact table td { padding: 6px 8px; font-size: 12px; }
 .rpt-compact .strategy-entry-exit { padding: 4px 8px; font-size: 11px; }
@@ -758,7 +773,7 @@ a:focus-visible, summary:focus-visible {
 </div>
 
 <header class="header">
-<span>2026-02-13 &bull; 16:45 IST</span>
+<span>2026-02-13 &bull; 17:05 IST</span>
 <div class="header-status"><span class="ok">5</span> actionable / 8 total</div>
 </header>
 
@@ -785,8 +800,8 @@ a:focus-visible, summary:focus-visible {
 <tr><td><strong>UPRO</strong></td><td><span class="badge badge-gray">WATCH</span> WATCH</td><td class="num">1.4%</td><td><span class="badge badge-gray">WATCH</span></td><td class="num pct-down">49.0%</td><td class="num pct-up">+1.3%</td><td class="num">6d</td><td><span class="badge badge-gray" title="Buy when 14-day RSI falls below oversold threshold (typically 30), exit when RSI recovers above overbought level or profit target hit. Targets short-term momentum reversals.">RSI</span></td></tr>
 <tr><td><strong>SOXL</strong></td><td><span class="badge badge-gray">WATCH</span> WATCH</td><td class="num">1.9%</td><td><span class="badge badge-gray">WATCH</span></td><td class="num pct-down">38.3%</td><td class="num pct-down">-4.8%</td><td class="num">5d</td><td><span class="badge badge-gray" title="Buy leveraged ETF when its underlying index drops a threshold % from all-time high, exit at profit target. Captures mean-reversion after broad market drawdowns.">ATH</span></td></tr>
 <tr><td><strong>TNA</strong></td><td><span class="badge badge-gray">WATCH</span> WATCH</td><td class="num">3.3%</td><td><span class="badge badge-gray">WATCH</span></td><td class="num pct-down">40.1%</td><td class="num pct-down">-3.7%</td><td class="num">8d</td><td><span class="badge badge-gray" title="Buy when price touches or breaks below the lower Bollinger Band (20-day SMA minus 2 standard deviations), exit at the middle band or profit target. Identifies statistical extremes in price action.">Bollinger</span></td></tr>
-<tr><td><strong>TECL</strong></td><td><span class="badge badge-green">TARGET</span> SIGNAL</td><td class="num">7.8%</td><td><span class="badge badge-gray">WATCH</span></td><td class="num pct-up">74.0%</td><td class="num pct-up">+4.5%</td><td class="num">5d</td><td><span class="badge badge-gray" title="Buy when price dips a threshold % below its 50-day moving average, exit when price recovers to or above the MA. Captures pullbacks within an established trend.">MA Dip</span></td></tr>
-<tr><td><strong>FAS</strong></td><td><span class="badge badge-green">TARGET</span> SIGNAL</td><td class="num">7.6%</td><td><span class="badge badge-gray">WATCH</span></td><td class="num pct-up">82.0%</td><td class="num pct-up">+8.6%</td><td class="num">5d</td><td><span class="badge badge-gray" title="Buy leveraged ETF when its underlying index drops a threshold % from all-time high, exit at profit target. Captures mean-reversion after broad market drawdowns.">ATH</span></td></tr>
+<tr><td><strong>TECL</strong></td><td><span class="badge badge-green">TARGET</span> SIGNAL</td><td class="num">7.8%</td><td><span class="badge badge-gray">WATCH</span></td><td class="num pct-up">74.5%</td><td class="num pct-up">+3.9%</td><td class="num">5d</td><td><span class="badge badge-gray" title="Buy when price dips a threshold % below its 50-day moving average, exit when price recovers to or above the MA. Captures pullbacks within an established trend.">MA Dip</span></td></tr>
+<tr><td><strong>FAS</strong></td><td><span class="badge badge-green">TARGET</span> SIGNAL</td><td class="num">7.6%</td><td><span class="badge badge-gray">WATCH</span></td><td class="num pct-up">82.0%</td><td class="num pct-up">+10.8%</td><td class="num">4d</td><td><span class="badge badge-gray" title="Buy when 14-day RSI falls below oversold threshold (typically 30), exit when RSI recovers above overbought level or profit target hit. Targets short-term momentum reversals.">RSI</span></td></tr>
 <tr><td><strong>LABU</strong></td><td><span class="badge badge-green">TARGET</span> SIGNAL</td><td class="num">24.1%</td><td><span class="badge badge-gray">WATCH</span></td><td class="num pct-up">68.7%</td><td class="num pct-up">+3.2%</td><td class="num">8d</td><td><span class="badge badge-gray" title="Buy when price dips a threshold % below its 50-day moving average, exit when price recovers to or above the MA. Captures pullbacks within an established trend.">MA Dip</span></td></tr>
 <tr><td><strong>UCO</strong></td><td><span class="badge badge-green">TARGET</span> SIGNAL</td><td class="num">17.0%</td><td><span class="badge badge-gray">WATCH</span></td><td class="num pct-up">77.6%</td><td class="num pct-up">+4.4%</td><td class="num">11d</td><td><span class="badge badge-gray" title="Buy leveraged ETF when its underlying index drops a threshold % from all-time high, exit at profit target. Captures mean-reversion after broad market drawdowns.">ATH</span></td></tr>
 </tbody></table>
@@ -796,7 +811,7 @@ a:focus-visible, summary:focus-visible {
 </main>
 
 <footer class="footer">
-<span>Generated 2026-02-13 16:45 IST &mdash; forecasts are probabilistic, not guarantees.</span>
+<span>Generated 2026-02-13 17:05 IST &mdash; forecasts are probabilistic, not guarantees.</span>
 </footer>
 
 <script>
