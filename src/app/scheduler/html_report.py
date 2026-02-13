@@ -470,10 +470,10 @@ a:hover { text-decoration: underline; }
 .rpt-compact .kpi-sub { font-size: 11px; margin-top: 2px; }
 .rpt-compact .kpi-label { font-size: 9px; }
 .rpt-compact .kpi-icon { margin-bottom: 4px; }
-.rpt-layout { display: grid; grid-template-columns: 1fr 320px; gap: 0;
-  margin-top: 12px; }
-.rpt-main { border-right: 1px solid var(--border-primary); padding-right: 16px; }
-.rpt-sidebar { padding-left: 16px; }
+.rpt-layout { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+  align-items: start; margin-top: 12px; }
+.rpt-main { }
+.rpt-sidebar { }
 .rpt-compact section { padding: 12px 0;
   border-bottom: 1px solid var(--border-primary); }
 .rpt-compact section:last-child { border-bottom: none; }
@@ -482,9 +482,21 @@ a:hover { text-decoration: underline; }
 .rpt-compact .card { padding: 0; margin-bottom: 0; border: none; border-radius: 0;
   box-shadow: none; background: transparent; }
 .rpt-compact .signal-grid { grid-template-columns: 1fr;
-  gap: 8px; margin-bottom: 8px; }
-.rpt-compact .signal-card { padding: 10px 12px; border-radius: 6px; }
-.rpt-compact .signal-header { margin-bottom: 4px; }
+  gap: 6px; margin-bottom: 6px; }
+.rpt-compact .signal-card { padding: 8px 10px; border-radius: 4px; }
+.rpt-compact .signal-header { margin-bottom: 2px; }
+.rpt-widget .signal-grid { gap: 4px; margin-bottom: 4px; }
+.rpt-widget .signal-card { padding: 6px 8px; border-radius: 4px; font-size: 12px; }
+.rpt-widget .signal-card::before { width: 3px; }
+.rpt-widget .signal-ticker { font-size: 13px !important; }
+.rpt-widget .signal-header { margin-bottom: 1px; gap: 4px; }
+.rpt-widget .signal-badge { font-size: 9px; padding: 1px 6px; }
+.rpt-widget .signal-details { font-size: 11px; gap: 2px; }
+.rpt-widget .signal-details .grid-2col { gap: 2px; }
+.rpt-widget .confidence-drilldown { font-size: 10px; padding: 4px 0 0; }
+.rpt-widget .confidence-drilldown summary { font-size: 10px; }
+.rpt-widget details.watch-group { font-size: 11px; }
+.rpt-widget details.watch-group summary { padding: 4px 0; }
 .rpt-compact .grid-2col { gap: 0; grid-template-columns: 1fr; }
 
 /* Sidebar widgets */
@@ -508,23 +520,23 @@ a:hover { text-decoration: underline; }
 .rpt-widget .kpi-label { font-size: 8px; }
 .rpt-widget .kpi-sub { font-size: 10px; margin-top: 2px; }
 .rpt-widget .gauge-track { margin-top: 6px; }
-.rpt-sidebar .index-tiles { gap: 6px; margin-bottom: 8px; }
-.rpt-sidebar .index-tile { padding: 8px; border-radius: 4px; }
-.rpt-sidebar .index-price { font-size: 16px; }
-.rpt-sidebar .index-chg { font-size: 11px; }
-.rpt-sidebar .commodity-tiles { gap: 6px; }
-.rpt-sidebar .commodity-tile { padding: 8px; }
-.rpt-sidebar .commodity-price { font-size: 16px; }
-.rpt-sidebar .commodity-chg { font-size: 11px; }
-.rpt-sidebar .rates-grid { gap: 4px; }
-.rpt-sidebar .rate-tile { padding: 6px; }
-.rpt-sidebar .rate-value { font-size: 14px; }
-.rpt-sidebar .headline-list li { padding: 6px 0; font-size: 13px; }
-.rpt-sidebar .geo-event { padding: 6px 0; }
-.rpt-sidebar .geo-title { font-size: 13px; }
-.rpt-sidebar .sentiment-bar { height: 8px; margin: 6px 0; }
-.rpt-sidebar .sentiment-counts { font-size: 10px; gap: 10px; }
-.rpt-sidebar .sector-badges { margin-top: 6px; }
+.rpt-widget .index-tiles { gap: 6px; margin-bottom: 8px; }
+.rpt-widget .index-tile { padding: 8px; border-radius: 4px; }
+.rpt-widget .index-price { font-size: 16px; }
+.rpt-widget .index-chg { font-size: 11px; }
+.rpt-widget .commodity-tiles { gap: 6px; }
+.rpt-widget .commodity-tile { padding: 8px; }
+.rpt-widget .commodity-price { font-size: 16px; }
+.rpt-widget .commodity-chg { font-size: 11px; }
+.rpt-widget .rates-grid { gap: 4px; }
+.rpt-widget .rate-tile { padding: 6px; }
+.rpt-widget .rate-value { font-size: 14px; }
+.rpt-widget .headline-list li { padding: 6px 0; font-size: 13px; }
+.rpt-widget .geo-event { padding: 6px 0; }
+.rpt-widget .geo-title { font-size: 13px; }
+.rpt-widget .sentiment-bar { height: 8px; margin: 6px 0; }
+.rpt-widget .sentiment-counts { font-size: 10px; gap: 10px; }
+.rpt-widget .sector-badges { margin-top: 6px; }
 .rpt-compact table th { padding: 6px 8px; font-size: 9px; }
 .rpt-compact table td { padding: 6px 8px; font-size: 12px; }
 .rpt-compact .strategy-entry-exit { padding: 4px 8px; font-size: 11px; }
@@ -641,9 +653,6 @@ a:focus-visible, summary:focus-visible {
   .idx-main { border-right: none; padding-right: 0; }
   .idx-sidebar { padding-left: 0; border-top: 1px solid var(--border-primary); }
   .rpt-layout { grid-template-columns: 1fr; }
-  .rpt-main { border-right: none; padding-right: 0; }
-  .rpt-sidebar { padding-left: 0; border-top: 1px solid var(--border-primary);
-    padding-top: 12px; }
 }
 
 /* Mobile */
@@ -2368,7 +2377,9 @@ def _page_header_bar(
         (f"trade-logs-{date}.html", "Trade Logs", "trade-logs"),
         (f"forecasts-{date}.html", "Forecasts", "forecasts"),
         (f"strategies-{date}.html", "Strategies", "strategies"),
+        (f"financials-{date}.html", "Financials", "financials"),
         (f"company-{date}.html", "Company", "company"),
+        (f"about-{date}.html", "About", "about"),
     ]
     page_items = []
     for href, label, key in pages:
@@ -2475,29 +2486,26 @@ def build_html_report(
         "</div>\n</header>\n"
     )
 
-    # Build sidebar widgets
-    sidebar_html = ""
+    # Build widget grid — all 4 sections as equal widgets in 2-col grid
+    def _widget(title: str, content: str) -> str:
+        return (
+            '<div class="rpt-widget">\n'
+            f'<div class="rpt-widget-title">{html.escape(title)}</div>\n'
+            f"{content}\n"
+            "</div>\n"
+        )
+
+    grid_widgets: list[str] = []
+    if signal_cards:
+        grid_widgets.append(_widget("Entry Signals & Positions", signal_cards))
     if kpi:
-        sidebar_html += (
-            '<div class="rpt-widget">\n'
-            '<div class="rpt-widget-title">Key Indicators</div>\n'
-            f"{kpi}\n"
-            "</div>\n"
-        )
+        grid_widgets.append(_widget("Key Indicators", kpi))
     if conditions:
-        sidebar_html += (
-            '<div class="rpt-widget">\n'
-            '<div class="rpt-widget-title">Market Overview</div>\n'
-            f"{conditions}\n"
-            "</div>\n"
-        )
+        grid_widgets.append(_widget("Market Overview", conditions))
     events_parts = [p for p in [sentiment, geopolitical] if p]
     if events_parts:
-        sidebar_html += (
-            '<div class="rpt-widget">\n'
-            '<div class="rpt-widget-title">Market-Moving Events</div>\n'
-            + "\n".join(events_parts)
-            + "\n</div>\n"
+        grid_widgets.append(
+            _widget("Market-Moving Events", "\n".join(events_parts)),
         )
 
     footer = (
@@ -2514,11 +2522,9 @@ def build_html_report(
         '<main id="main-content">\n',
         '<div class="rpt-compact">\n',
         exec_summary,
-        '<div class="rpt-layout">\n<div class="rpt-main">\n',
-        signal_cards,
-        '</div>\n<div class="rpt-sidebar">\n',
-        sidebar_html,
-        "</div>\n</div>\n",
+        '<div class="rpt-layout">\n',
+        *grid_widgets,
+        "</div>\n",
         market_risks,
         congress,
         strategy,
@@ -4104,3 +4110,810 @@ def build_strategies_html(
         )
 
     return result
+
+
+# ---------------------------------------------------------------------------
+# Financials page — portfolio P&L, equity curve, operating costs
+# ---------------------------------------------------------------------------
+
+
+def _section_portfolio_kpis() -> str:
+    """Render portfolio KPI cards."""
+    try:
+        from app.portfolio.tracker import PortfolioConfig, load_history
+    except ImportError:
+        return ""
+
+    config = PortfolioConfig.load()
+    history = load_history()
+
+    total_return = (
+        (config.total_value - 10_000.0) / 10_000.0 if config.total_value else 0
+    )
+    net_value = config.total_value - config.total_operating_costs
+    net_return = (net_value - 10_000.0) / 10_000.0
+
+    total_cls = "pct-up" if total_return >= 0 else "pct-down"
+    net_cls = "pct-up" if net_return >= 0 else "pct-down"
+    realized_cls = "pct-up" if config.realized_pl >= 0 else "pct-down"
+
+    cards = [
+        _kpi_card(
+            "Portfolio Value",
+            f"${config.total_value:,.2f}",
+            "GREEN" if total_return >= 0 else "RED",
+            sub=f'<span class="{total_cls}">{total_return:+.1%}</span> total return',
+            icon_name="account_balance",
+        ),
+        _kpi_card(
+            "Cash Balance",
+            f"${config.cash_balance:,.2f}",
+            "NEUTRAL",
+            sub=f"{config.cash_balance / config.total_value:.0%} of portfolio"
+            if config.total_value > 0
+            else "",
+            icon_name="payments",
+        ),
+        _kpi_card(
+            "Realized P&L",
+            f"${config.realized_pl:+,.2f}",
+            "GREEN" if config.realized_pl >= 0 else "RED",
+            sub=(f'<span class="{realized_cls}">from {len(history)} snapshots</span>'),
+            icon_name="trending_up",
+        ),
+        _kpi_card(
+            "Operating Costs",
+            f"${config.total_operating_costs:,.2f}",
+            "YELLOW" if config.total_operating_costs > 0 else "GREEN",
+            sub="$100/month run rate",
+            icon_name="receipt_long",
+        ),
+        _kpi_card(
+            "Net Value",
+            f"${net_value:,.2f}",
+            "GREEN" if net_return >= 0 else "RED",
+            sub=f'<span class="{net_cls}">{net_return:+.1%}</span> after costs',
+            icon_name="savings",
+        ),
+        _kpi_card(
+            "Open Positions",
+            str(len(config.positions)),
+            "NEUTRAL",
+            sub=", ".join(p.ticker for p in config.positions) or "none",
+            icon_name="inventory_2",
+        ),
+    ]
+
+    return (
+        '<section id="portfolio-kpis">\n'
+        "<h2>Portfolio Overview</h2>\n"
+        '<div class="kpi-strip">\n' + "\n".join(cards) + "\n</div>\n</section>\n"
+    )
+
+
+def _section_equity_curve() -> tuple[str, str]:
+    """Render equity curve section. Returns (html, chart_js)."""
+    try:
+        from app.portfolio.tracker import load_history
+    except ImportError:
+        return "", ""
+
+    history = load_history()
+    if len(history) < 2:
+        return (
+            "<section>\n<h2>Equity Curve</h2>\n"
+            '<div class="card"><p class="text-muted">'
+            "Need at least 2 snapshots to display equity curve. "
+            "Run daily to build history.</p></div>\n</section>\n"
+        ), ""
+
+    labels = [h.date for h in history]
+    gross_values = [h.total_value for h in history]
+    net_values = [h.net_value for h in history]
+    baseline = [10_000.0] * len(history)
+
+    import json as _json
+
+    chart_js = (
+        "<script>\n"
+        "const eqCtx = document.getElementById('equityCurveChart')"
+        ".getContext('2d');\n"
+        "new Chart(eqCtx, {\n"
+        "  type: 'line',\n"
+        "  data: {\n"
+        f"    labels: {_json.dumps(labels)},\n"
+        "    datasets: [{\n"
+        '      label: "Portfolio Value",\n'
+        f"      data: {_json.dumps(gross_values)},\n"
+        '      borderColor: "#2563eb",\n'
+        '      backgroundColor: "#2563eb22",\n'
+        "      borderWidth: 2, pointRadius: 3, tension: 0.1, fill: false\n"
+        "    },{\n"
+        '      label: "Net Value (after costs)",\n'
+        f"      data: {_json.dumps(net_values)},\n"
+        '      borderColor: "#0a7c42",\n'
+        '      backgroundColor: "#0a7c4222",\n'
+        "      borderWidth: 2, pointRadius: 3, tension: 0.1, fill: false\n"
+        "    },{\n"
+        '      label: "Initial Capital ($10K)",\n'
+        f"      data: {_json.dumps(baseline)},\n"
+        '      borderColor: "#94a3b8",\n'
+        "      borderWidth: 1, borderDash: [5,5], pointRadius: 0,\n"
+        "      fill: false\n"
+        "    }]\n"
+        "  },\n"
+        "  options: {\n"
+        "    responsive: true,\n"
+        "    maintainAspectRatio: false,\n"
+        "    plugins: { legend: { position: 'top' } },\n"
+        "    scales: {\n"
+        "      y: {\n"
+        '        title: { display: true, text: "Value ($)" },\n'
+        "        ticks: { callback: v => '$' + v.toLocaleString() }\n"
+        "      }\n"
+        "    }\n"
+        "  }\n"
+        "});\n"
+        "</script>\n"
+    )
+
+    chart_html = (
+        "<section>\n<h2>Equity Curve</h2>\n"
+        '<div class="card">\n'
+        '<div style="position:relative;height:400px">\n'
+        '<canvas id="equityCurveChart"></canvas>\n'
+        "</div>\n</div>\n</section>\n"
+    )
+
+    return chart_html, chart_js
+
+
+def _section_operating_costs() -> str:
+    """Render operating costs breakdown."""
+    try:
+        from app.portfolio.tracker import PortfolioConfig, load_history
+    except ImportError:
+        return ""
+
+    config = PortfolioConfig.load()
+    history = load_history()
+
+    monthly_cost = 100.0
+    annual_cost = monthly_cost * 12
+    cost_pct = (
+        config.total_operating_costs / 10_000.0 * 100
+        if config.total_operating_costs > 0
+        else 0
+    )
+
+    # Calculate months running
+    if history and len(history) >= 2:
+        from datetime import UTC as _UTC
+        from datetime import datetime as _dt
+
+        first = _dt.strptime(history[0].date, "%Y-%m-%d").replace(tzinfo=_UTC)
+        last = _dt.strptime(history[-1].date, "%Y-%m-%d").replace(tzinfo=_UTC)
+        months = max((last - first).days / 30.0, 0.1)
+        effective_monthly = config.total_operating_costs / months
+    else:
+        months = 0
+        effective_monthly = 0
+
+    return (
+        "<section>\n<h2>Operating Costs</h2>\n"
+        '<div class="card">\n'
+        "<table>\n<thead><tr>"
+        "<th>Metric</th><th>Value</th>"
+        "</tr></thead>\n<tbody>\n"
+        f"<tr><td>Monthly run rate</td>"
+        f'<td class="num">${monthly_cost:,.0f}/mo</td></tr>\n'
+        f"<tr><td>Annual projected</td>"
+        f'<td class="num">${annual_cost:,.0f}/yr</td></tr>\n'
+        f"<tr><td>Total costs to date</td>"
+        f'<td class="num">${config.total_operating_costs:,.2f}</td></tr>\n'
+        f"<tr><td>Cost as % of initial capital</td>"
+        f'<td class="num">{cost_pct:.1f}%</td></tr>\n'
+        + (
+            f"<tr><td>Effective monthly cost</td>"
+            f'<td class="num">${effective_monthly:,.2f}/mo</td></tr>\n'
+            if months > 0
+            else ""
+        )
+        + "</tbody>\n</table>\n</div>\n</section>\n"
+    )
+
+
+def _section_trade_history() -> str:
+    """Render completed trades table."""
+    try:
+        from app.history.outcomes import get_completed_outcomes, load_outcomes
+    except ImportError:
+        return ""
+
+    all_outcomes = load_outcomes()
+    completed = get_completed_outcomes()
+
+    if not all_outcomes:
+        return (
+            "<section>\n<h2>Trade History</h2>\n"
+            '<div class="card"><p class="text-muted">'
+            "No trades recorded yet. Use "
+            "<code>uv run python -m app.etf enter TICKER PRICE</code>"
+            " to record entries.</p></div>\n</section>\n"
+        )
+
+    rows = ""
+    total_pl = 0.0
+    wins = 0
+
+    for o in completed:
+        pl_pct = o.pl_pct or 0.0
+        entry_val = o.entry_price
+        exit_val = o.exit_price or 0.0
+        pl_class = "pct-up" if pl_pct >= 0 else "pct-down"
+        if o.win:
+            wins += 1
+        total_pl += pl_pct
+
+        rows += (
+            "<tr>"
+            f"<td>{html.escape(o.leveraged_ticker)}</td>"
+            f"<td>{html.escape(o.entry_date[:10])}</td>"
+            f"<td>{html.escape((o.exit_date or '')[:10])}</td>"
+            f'<td class="num">${entry_val:,.2f}</td>'
+            f'<td class="num">${exit_val:,.2f}</td>'
+            f'<td class="num {pl_class}">{pl_pct:+.1%}</td>'
+            f"<td>{'W' if o.win else 'L'}</td>"
+            "</tr>\n"
+        )
+
+    # Open positions
+    open_trades = [o for o in all_outcomes if o.exit_date is None]
+    for o in open_trades:
+        rows += (
+            "<tr>"
+            f"<td>{html.escape(o.leveraged_ticker)}</td>"
+            f"<td>{html.escape(o.entry_date[:10])}</td>"
+            f"<td>—</td>"
+            f'<td class="num">${o.entry_price:,.2f}</td>'
+            f"<td>—</td><td>—</td>"
+            f'<td><span class="badge badge-blue">OPEN</span></td>'
+            "</tr>\n"
+        )
+
+    win_rate = wins / len(completed) * 100 if completed else 0
+    avg_pl = total_pl / len(completed) if completed else 0
+
+    summary = (
+        '<div class="kpi-strip" style="margin-bottom:16px">\n'
+        + _kpi_card(
+            "Total Trades",
+            str(len(completed)),
+            "NEUTRAL",
+            sub=f"{len(open_trades)} open",
+        )
+        + _kpi_card(
+            "Win Rate",
+            f"{win_rate:.0f}%",
+            "GREEN" if win_rate >= 50 else "RED",
+            sub=f"{wins}W / {len(completed) - wins}L",
+        )
+        + _kpi_card(
+            "Avg P&L",
+            f"{avg_pl:+.1%}",
+            "GREEN" if avg_pl >= 0 else "RED",
+        )
+        + "\n</div>\n"
+    )
+
+    return (
+        "<section>\n<h2>Trade History</h2>\n" + summary + '<div class="card">\n'
+        "<table>\n<thead><tr>"
+        "<th>Ticker</th><th>Entry Date</th><th>Exit Date</th>"
+        "<th>Entry $</th><th>Exit $</th><th>P&L</th><th>Result</th>"
+        "</tr></thead>\n<tbody>\n" + rows + "</tbody>\n</table>\n</div>\n</section>\n"
+    )
+
+
+def _section_monthly_summary() -> str:
+    """Render monthly P&L breakdown from portfolio history."""
+    try:
+        from app.portfolio.tracker import load_history
+    except ImportError:
+        return ""
+
+    history = load_history()
+    if not history:
+        return ""
+
+    # Group snapshots by month
+    months: dict[str, list[object]] = {}
+    for s in history:
+        month_key = s.date[:7]  # YYYY-MM
+        months.setdefault(month_key, []).append(s)
+
+    rows = ""
+    prev_end_value = 10_000.0
+    for month_key in sorted(months):
+        snaps = months[month_key]
+        start_val = snaps[0].total_value  # type: ignore[union-attr]
+        end_val = snaps[-1].total_value  # type: ignore[union-attr]
+        end_costs = snaps[-1].operating_costs_cumulative  # type: ignore[union-attr]
+        end_realized = snaps[-1].realized_pl_cumulative  # type: ignore[union-attr]
+        change = end_val - prev_end_value
+        change_pct = change / prev_end_value if prev_end_value > 0 else 0
+        change_cls = "pct-up" if change >= 0 else "pct-down"
+
+        rows += (
+            "<tr>"
+            f"<td>{html.escape(month_key)}</td>"
+            f'<td class="num">${start_val:,.2f}</td>'
+            f'<td class="num">${end_val:,.2f}</td>'
+            f'<td class="num {change_cls}">${change:+,.2f}</td>'
+            f'<td class="num {change_cls}">{change_pct:+.1%}</td>'
+            f'<td class="num">${end_realized:+,.2f}</td>'
+            f'<td class="num">${end_costs:,.2f}</td>'
+            "</tr>\n"
+        )
+        prev_end_value = end_val
+
+    return (
+        "<section>\n<h2>Monthly Summary</h2>\n"
+        '<div class="card">\n'
+        "<table>\n<thead><tr>"
+        "<th>Month</th><th>Start</th><th>End</th>"
+        "<th>Change $</th><th>Change %</th>"
+        "<th>Realized P&L</th><th>Costs</th>"
+        "</tr></thead>\n<tbody>\n" + rows + "</tbody>\n</table>\n</div>\n</section>\n"
+    )
+
+
+def build_financials_html(
+    *,
+    date: str = "",
+    report_dates: list[str] | None = None,
+) -> str:
+    """Build financials page with portfolio P&L, equity curve, costs."""
+    report_date = date or datetime.now(tz=_ISRAEL_TZ).strftime("%Y-%m-%d")
+    report_time = datetime.now(tz=_ISRAEL_TZ).strftime("%H:%M IST")
+
+    kpis = _section_portfolio_kpis()
+    equity_html, equity_js = _section_equity_curve()
+    costs = _section_operating_costs()
+    trades = _section_trade_history()
+    monthly = _section_monthly_summary()
+
+    top_bar = _page_header_bar(report_date, "financials", report_dates)
+
+    header = (
+        '<header class="header">\n'
+        f"<span>{html.escape(report_date)} &bull; "
+        f"{html.escape(report_time)}</span>\n"
+        "</header>\n"
+    )
+
+    footer = (
+        '<footer class="footer">\n'
+        f"<span>Generated {html.escape(report_date)} "
+        f"{html.escape(report_time)} &mdash; "
+        "portfolio financials &amp; performance.</span>\n"
+        "</footer>\n"
+    )
+
+    body_parts = [
+        top_bar,
+        header,
+        '<main id="main-content">\n',
+        kpis,
+        equity_html,
+        costs,
+        trades,
+        monthly,
+        "</main>\n",
+        footer,
+    ]
+
+    chart_cdn = (
+        '<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist'
+        '/chart.umd.min.js"></script>\n'
+    )
+
+    result = _html_page(
+        title=f"Financials {report_date}",
+        body="\n".join(p for p in body_parts if p),
+        description=f"Portfolio financial performance for {report_date}",
+    )
+
+    if equity_js:
+        result = result.replace("</head>", f"{chart_cdn}</head>", 1).replace(
+            "</body>", f"{equity_js}</body>", 1
+        )
+
+    return result
+
+
+# ---------------------------------------------------------------------------
+# About page — company overview, strategy, org chart, team roster
+# ---------------------------------------------------------------------------
+
+
+def _section_about_hero() -> str:
+    """Render hero section with mission and strategy overview."""
+    return (
+        '<section id="about-hero">\n'
+        "<h2>About This System</h2>\n"
+        '<div class="card">\n'
+        "<p><strong>AI-Powered Leveraged ETF Mean-Reversion "
+        "Swing Trading System</strong></p>\n"
+        "<p>This is a fully automated financial analysis platform that "
+        "monitors underlying index drawdowns from all-time highs, "
+        "identifies mean-reversion entry opportunities in leveraged ETFs, "
+        "and takes profit at predetermined targets.</p>\n"
+        '<p style="margin-top:12px"><strong>Core Strategy:</strong> '
+        "When an underlying index drops significantly from its ATH, "
+        "history shows it tends to recover. We buy the leveraged ETF "
+        "during the dip and sell when it recovers for amplified returns."
+        "</p>\n"
+        '<p style="margin-top:12px"><strong>Initial Capital:</strong> '
+        "$10,000 &bull; <strong>Operating Cost:</strong> $100/month "
+        "&bull; <strong>Analysis Frequency:</strong> Twice daily "
+        "(pre-market &amp; post-market)</p>\n"
+        "</div>\n</section>\n"
+    )
+
+
+def _section_about_strategy() -> str:
+    """Render strategy details: sectors, signal lifecycle, confidence."""
+    # Sector-to-ETF mapping
+    sectors = [
+        ("Technology", "AAPL, MSFT, GOOGL, META", "TQQQ, TECL"),
+        ("Semiconductors", "NVDA, AMD, AVGO", "SOXL"),
+        ("Finance", "JPM, GS, BAC", "FAS"),
+        ("Energy", "XOM, CVX", "UCO"),
+        ("Biotech / Healthcare", "LLY, PFE, JNJ", "LABU"),
+        ("Broad Market / Small Cap", "SPY, IWM", "UPRO, TNA"),
+    ]
+    sector_rows = ""
+    for sector, tickers, etfs in sectors:
+        sector_rows += (
+            f"<tr><td>{html.escape(sector)}</td>"
+            f"<td>{html.escape(tickers)}</td>"
+            f"<td><strong>{html.escape(etfs)}</strong></td></tr>\n"
+        )
+
+    sector_table = (
+        '<div class="card">\n'
+        "<h3>Sector-to-ETF Mapping</h3>\n"
+        "<table>\n<thead><tr>"
+        "<th>Sector</th><th>Underlying Tickers</th>"
+        "<th>Leveraged ETF</th>"
+        "</tr></thead>\n<tbody>\n" + sector_rows + "</tbody>\n</table>\n</div>\n"
+    )
+
+    # Signal lifecycle
+    states = [
+        ("WATCH", "#64748b", "0-3% below ATH", "Baseline monitoring, no action"),
+        (
+            "ALERT",
+            "#b86e00",
+            "3-5% below ATH",
+            "Heightened monitoring, confidence scoring begins",
+        ),
+        (
+            "SIGNAL",
+            "#c62828",
+            "5%+ below ATH",
+            "Entry opportunity — CIO synthesizes all domains",
+        ),
+        ("ACTIVE", "#2563eb", "Position entered", "Tracking P&amp;L, daily updates"),
+        (
+            "TARGET",
+            "#0a7c42",
+            "Profit target hit",
+            "Exit signal, position closed, outcome recorded",
+        ),
+    ]
+    lifecycle_items = ""
+    for state, color, threshold, desc in states:
+        lifecycle_items += (
+            f'<div style="flex:1;min-width:140px;text-align:center;'
+            f"padding:12px;border-radius:8px;"
+            f'border:2px solid {color};background:{color}11">\n'
+            f'<div style="font-weight:700;font-size:1.1em;'
+            f'color:{color}">{state}</div>\n'
+            f'<div style="font-size:0.85em;margin-top:4px;'
+            f'color:#94a3b8">{threshold}</div>\n'
+            f'<div style="font-size:0.8em;margin-top:6px">{desc}</div>\n'
+            "</div>\n"
+        )
+
+    lifecycle_html = (
+        '<div class="card">\n'
+        "<h3>Signal Lifecycle</h3>\n"
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;'
+        'align-items:stretch">\n' + lifecycle_items + "</div>\n</div>\n"
+    )
+
+    # Confidence factors
+    factors = [
+        "Drawdown Depth",
+        "VIX Regime",
+        "Fed Policy",
+        "Yield Curve",
+        "SEC Filings",
+        "Earnings Risk",
+        "Geopolitical Risk",
+        "Social Sentiment",
+        "News Sentiment",
+        "Market Statistics",
+        "Congress Trades",
+        "Portfolio Risk",
+    ]
+    factor_chips = " ".join(
+        f'<span class="badge badge-gray" style="margin:2px">{html.escape(f)}</span>'
+        for f in factors
+    )
+    confidence_html = (
+        '<div class="card">\n'
+        "<h3>12-Factor Confidence Scoring</h3>\n"
+        f"<p>{factor_chips}</p>\n"
+        '<p style="margin-top:8px">'
+        '<span class="badge badge-green">HIGH</span> 9+ favorable &bull; '
+        '<span class="badge badge-yellow">MEDIUM</span> 5-8 &bull; '
+        '<span class="badge badge-red">LOW</span> 0-4'
+        "</p>\n</div>\n"
+    )
+
+    return (
+        '<section id="about-strategy">\n'
+        "<h2>Trading Strategy</h2>\n"
+        + sector_table
+        + lifecycle_html
+        + confidence_html
+        + "</section>\n"
+    )
+
+
+def _section_about_org_chart() -> str:
+    """Render org chart as HTML/CSS layout."""
+    # Board
+    board = (
+        '<div style="text-align:center;margin-bottom:24px">\n'
+        '<div style="display:inline-block;padding:12px 24px;'
+        "background:#1e293b;color:#f8fafc;border-radius:8px;"
+        'font-weight:700;font-size:1.1em">'
+        "Board of Directors (You)</div>\n"
+        '<div style="width:2px;height:20px;background:#475569;'
+        'margin:0 auto"></div>\n'
+        "</div>\n"
+    )
+
+    # Executives
+    executives = (
+        '<div style="display:flex;justify-content:center;gap:24px;'
+        'margin-bottom:24px;flex-wrap:wrap">\n'
+        '<div style="padding:12px 20px;background:#1e3a5f;color:#f8fafc;'
+        'border-radius:8px;text-align:center;min-width:200px">\n'
+        '<div style="font-weight:700">CIO</div>'
+        '<div style="font-size:0.85em;color:#94a3b8">'
+        "exec-cio &bull; opus</div>\n"
+        '<div style="font-size:0.8em;margin-top:4px">'
+        "Cross-domain synthesis &amp; unified report</div>\n"
+        "</div>\n"
+        '<div style="padding:12px 20px;background:#1e3a5f;color:#f8fafc;'
+        'border-radius:8px;text-align:center;min-width:200px">\n'
+        '<div style="font-weight:700">COO</div>'
+        '<div style="font-size:0.85em;color:#94a3b8">'
+        "exec-coo &bull; haiku</div>\n"
+        '<div style="font-size:0.8em;margin-top:4px">'
+        "System health &amp; operations</div>\n"
+        "</div>\n"
+        "</div>\n"
+    )
+
+    # Departments
+    departments = [
+        (
+            "Trading Desk",
+            "#2563eb",
+            [
+                ("trading-drawdown-monitor", "Drawdown monitoring"),
+                ("trading-market-analyst", "Momentum &amp; volatility"),
+                ("trading-swing-screener", "Entry/exit signals"),
+            ],
+        ),
+        (
+            "Research",
+            "#7c3aed",
+            [
+                ("research-macro", "Macro data (VIX, Fed, yields)"),
+                ("research-sec", "SEC filings &amp; 13F"),
+                ("research-statistics", "Sector rotation &amp; breadth"),
+                ("research-strategy-analyst", "Backtesting &amp; optimization"),
+                ("research-strategy-researcher", "New strategies (opus)"),
+                ("research-quant", "Statistical analysis (opus)"),
+            ],
+        ),
+        (
+            "Intelligence",
+            "#0891b2",
+            [
+                ("intel-chief", "Intel aggregation &amp; briefing"),
+                ("intel-news", "Financial news sentiment"),
+                ("intel-geopolitical", "GDELT &amp; geopolitical risk"),
+                ("intel-social", "Reddit &amp; social sentiment"),
+                ("intel-congress", "Congressional stock trades"),
+            ],
+        ),
+        (
+            "Risk Management",
+            "#dc2626",
+            [
+                ("risk-manager", "Portfolio limits &amp; VETO authority"),
+                ("risk-portfolio", "Position sizing &amp; allocations"),
+            ],
+        ),
+        (
+            "Operations",
+            "#475569",
+            [
+                ("ops-code-reviewer", "Code quality (haiku)"),
+                ("ops-design-reviewer", "UI/UX review"),
+                ("ops-security-reviewer", "Security audit (haiku)"),
+                ("ops-token-optimizer", "Token efficiency (haiku)"),
+                ("ops-devops", "Pipeline health (haiku)"),
+            ],
+        ),
+    ]
+
+    dept_cards = ""
+    for dept_name, color, agents in departments:
+        agent_list = "".join(
+            f'<div style="font-size:0.8em;padding:3px 0;'
+            f'border-bottom:1px solid #1e293b">'
+            f"<strong>{html.escape(name)}</strong> &mdash; {desc}</div>\n"
+            for name, desc in agents
+        )
+        dept_cards += (
+            f'<div style="flex:1;min-width:250px;border:2px solid {color};'
+            f'border-radius:8px;overflow:hidden">\n'
+            f'<div style="background:{color};color:#f8fafc;padding:8px 12px;'
+            f'font-weight:700">{html.escape(dept_name)}'
+            f'<span style="float:right;font-size:0.8em;opacity:0.8">'
+            f"{len(agents)} agents</span></div>\n"
+            f'<div style="padding:8px 12px">{agent_list}</div>\n'
+            "</div>\n"
+        )
+
+    dept_html = (
+        '<div style="display:flex;gap:16px;flex-wrap:wrap">\n' + dept_cards + "</div>\n"
+    )
+
+    return (
+        '<section id="about-org">\n'
+        "<h2>Organization</h2>\n"
+        '<div class="card">\n' + board + executives + dept_html + "</div>\n</section>\n"
+    )
+
+
+def _section_about_data_sources() -> str:
+    """Render data sources overview."""
+    sources = [
+        ("Yahoo Finance", "Stock prices, ATH, drawdown calculation"),
+        ("FRED API", "VIX, CPI, GDP, unemployment, Fed funds rate"),
+        ("SEC EDGAR", "10-K, 10-Q, 8-K filings, institutional 13F"),
+        ("GDELT", "Global geopolitical events, conflict monitoring"),
+        ("Congress.gov", "STOCK Act disclosures, member trading"),
+        ("Reddit", "r/wallstreetbets, r/stocks sentiment"),
+        ("Financial RSS", "Reuters, CNBC, AP Business news feeds"),
+        ("Treasury.gov", "Yield curve rates across maturities"),
+        ("Fed Reserve", "FOMC calendar, rate decisions, dot plot"),
+        ("Geopolitical RSS", "Trade war, sanctions, territorial events"),
+    ]
+
+    items = ""
+    for name, desc in sources:
+        items += (
+            f"<tr><td><strong>{html.escape(name)}</strong></td>"
+            f"<td>{html.escape(desc)}</td></tr>\n"
+        )
+
+    return (
+        '<section id="about-sources">\n'
+        "<h2>Data Sources</h2>\n"
+        '<div class="card">\n'
+        "<table>\n<thead><tr>"
+        "<th>Source</th><th>Data</th>"
+        "</tr></thead>\n<tbody>\n" + items + "</tbody>\n</table>\n</div>\n</section>\n"
+    )
+
+
+def _section_about_schedule() -> str:
+    """Render daily operational cadence."""
+    return (
+        '<section id="about-schedule">\n'
+        "<h2>Daily Operations</h2>\n"
+        '<div class="card">\n'
+        '<div style="display:flex;gap:24px;flex-wrap:wrap">\n'
+        # Pre-market
+        '<div style="flex:1;min-width:280px">\n'
+        '<h3 style="color:#2563eb">Pre-Market (7:00 AM ET)</h3>\n'
+        "<ol>\n"
+        "<li>Daily standup ceremony</li>\n"
+        "<li>Data pipeline &mdash; 20+ modules (~2 min)</li>\n"
+        "<li>HTML report published to GitHub Pages</li>\n"
+        "<li>CIO synthesizes unified analysis</li>\n"
+        "<li>Telegram alert with key signals</li>\n"
+        "<li>Token usage &amp; pipeline health recorded</li>\n"
+        "</ol>\n"
+        '<p style="font-size:0.85em;color:#94a3b8">'
+        "Monday: also runs sprint planning</p>\n"
+        "</div>\n"
+        # Post-market
+        '<div style="flex:1;min-width:280px">\n'
+        '<h3 style="color:#0a7c42">Post-Market (4:30 PM ET)</h3>\n'
+        "<ol>\n"
+        "<li>Data pipeline refresh with EOD data</li>\n"
+        "<li>HTML report updated</li>\n"
+        "<li>CIO reviews daily P&amp;L, signal state changes</li>\n"
+        "<li>Overnight positioning &amp; catalysts</li>\n"
+        "<li>Telegram summary</li>\n"
+        "<li>Postmortem detection (Fridays)</li>\n"
+        "</ol>\n"
+        '<p style="font-size:0.85em;color:#94a3b8">'
+        "Friday: also runs sprint retrospective</p>\n"
+        "</div>\n"
+        "</div>\n</div>\n</section>\n"
+    )
+
+
+def build_about_html(
+    *,
+    date: str = "",
+    report_dates: list[str] | None = None,
+) -> str:
+    """Build about page with company overview, strategy, and team."""
+    report_date = date or datetime.now(tz=_ISRAEL_TZ).strftime("%Y-%m-%d")
+    report_time = datetime.now(tz=_ISRAEL_TZ).strftime("%H:%M IST")
+
+    hero = _section_about_hero()
+    strategy = _section_about_strategy()
+    org = _section_about_org_chart()
+    sources = _section_about_data_sources()
+    schedule = _section_about_schedule()
+
+    top_bar = _page_header_bar(report_date, "about", report_dates)
+
+    header = (
+        '<header class="header">\n'
+        f"<span>{html.escape(report_date)} &bull; "
+        f"{html.escape(report_time)}</span>\n"
+        "</header>\n"
+    )
+
+    footer = (
+        '<footer class="footer">\n'
+        f"<span>Generated {html.escape(report_date)} "
+        f"{html.escape(report_time)} &mdash; "
+        "system overview &amp; methodology.</span>\n"
+        "</footer>\n"
+    )
+
+    body_parts = [
+        top_bar,
+        header,
+        '<main id="main-content">\n',
+        hero,
+        strategy,
+        org,
+        sources,
+        schedule,
+        "</main>\n",
+        footer,
+    ]
+
+    return _html_page(
+        title=f"About {report_date}",
+        body="\n".join(p for p in body_parts if p),
+        description="System overview, trading strategy, and team structure",
+    )
