@@ -111,8 +111,7 @@ def detect_failures(
                     category="trade_loss",
                     severity="major",
                     title=(
-                        f"Trade loss: {outcome.leveraged_ticker}"
-                        f" ({outcome.pl_pct:.1%})"
+                        f"Trade loss: {outcome.leveraged_ticker} ({outcome.pl_pct:.1%})"
                     ),
                     timeline=[
                         f"Entry: {outcome.entry_date} at ${outcome.entry_price:.2f}",
@@ -124,8 +123,7 @@ def detect_failures(
                     ],
                     root_cause="Under investigation",
                     impact=(
-                        f"Loss of {outcome.pl_pct:.1%}"
-                        f" on {outcome.leveraged_ticker}"
+                        f"Loss of {outcome.pl_pct:.1%} on {outcome.leveraged_ticker}"
                     ),
                     action_items=[
                         "Review entry signal confidence at time of entry",

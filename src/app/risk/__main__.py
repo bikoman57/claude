@@ -57,8 +57,7 @@ def _format_exposure(report: ExposureReport) -> str:
         f"Portfolio: ${report.total_value:,.0f}",
         f"Invested: ${report.invested_value:,.0f} ({report.invested_pct:.0%})"
         f" | Cash: ${report.cash_value:,.0f} ({report.cash_pct:.0%})",
-        f"Positions: {report.position_count}"
-        f"/{DEFAULT_LIMITS.max_concurrent_positions}",
+        f"Positions: {report.position_count}/{DEFAULT_LIMITS.max_concurrent_positions}",
         f"Leveraged exposure: ${report.total_leveraged_exposure:,.0f}"
         f" ({report.leveraged_exposure_ratio:.1f}x)",
         f"Unrealized P/L: ${report.unrealized_pl:+,.0f}"

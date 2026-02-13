@@ -26,13 +26,13 @@ _UNDERLYING_TO_SECTOR: dict[str, str] = {
 # Lower number = higher priority (checked first).
 _INDEX_PRIORITY: tuple[str, ...] = (
     "SOXX",  # semiconductor-specific
-    "XLE",   # energy-specific
-    "XBI",   # biotech-specific
-    "XLF",   # financials-specific
-    "IWM",   # small-cap-specific
-    "QQQ",   # broad tech (catches remaining tech names)
-    "XLK",   # tech select (subset of QQQ mostly)
-    "SPY",   # broadest — fallback
+    "XLE",  # energy-specific
+    "XBI",  # biotech-specific
+    "XLF",  # financials-specific
+    "IWM",  # small-cap-specific
+    "QQQ",  # broad tech (catches remaining tech names)
+    "XLK",  # tech select (subset of QQQ mostly)
+    "SPY",  # broadest — fallback
 )
 
 # Map sector categories to underlying ETF tickers from the universe
@@ -255,14 +255,17 @@ def aggregate_sectors(
         sec_buys = ticker_buys.get(sector, {})
         sec_sells = ticker_sells.get(sector, {})
         sorted_tickers = sorted(
-            sec_tickers.items(), key=lambda x: x[1], reverse=True,
+            sec_tickers.items(),
+            key=lambda x: x[1],
+            reverse=True,
         )[:5]
         top_ticker_details = tuple(
             TickerDetail(
                 ticker=tk,
                 trade_count=cnt,
                 net_usd=round(
-                    sec_buys.get(tk, 0.0) - sec_sells.get(tk, 0.0), 2,
+                    sec_buys.get(tk, 0.0) - sec_sells.get(tk, 0.0),
+                    2,
                 ),
             )
             for tk, cnt in sorted_tickers
@@ -281,8 +284,7 @@ def aggregate_sectors(
                 top_buyers=tuple(top_b),
                 top_sellers=tuple(top_s),
                 trade_count=(
-                    sector_buy_count.get(sector, 0)
-                    + sector_sell_count.get(sector, 0)
+                    sector_buy_count.get(sector, 0) + sector_sell_count.get(sector, 0)
                 ),
                 top_tickers=top_ticker_details,
             ),

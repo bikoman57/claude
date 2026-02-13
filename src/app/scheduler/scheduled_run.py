@@ -110,8 +110,7 @@ def _find_previous_claude_log(
     previous = [
         p
         for p in candidates
-        if _claude_log_sort_key(p) < current_key
-        and p.stat().st_size > 0
+        if _claude_log_sort_key(p) < current_key and p.stat().st_size > 0
     ]
 
     return previous[-1] if previous else None
@@ -125,12 +124,15 @@ def _continuity_previous_analysis(
     """Summarize the most recent Claude analysis log."""
     try:
         prev_log = _find_previous_claude_log(
-            session, config.logs_dir, date_now,
+            session,
+            config.logs_dir,
+            date_now,
         )
         if prev_log is None:
             return []
         content = prev_log.read_text(
-            encoding="utf-8", errors="replace",
+            encoding="utf-8",
+            errors="replace",
         )
         if len(content) < 50:
             return []
@@ -140,8 +142,7 @@ def _continuity_previous_analysis(
         parts = [f"### Previous Analysis ({label})\n```\n{head}\n```"]
         if tail:
             parts.append(
-                f"\n... ({len(content):,} chars total) ...\n"
-                f"\n```\n{tail}\n```"
+                f"\n... ({len(content):,} chars total) ...\n\n```\n{tail}\n```"
             )
         return ["\n".join(parts)]
     except Exception:
@@ -159,18 +160,12 @@ def _continuity_sprint() -> list[str]:
             return []
         total = len(sprint.tasks)
         done = sum(1 for t in sprint.tasks if t.status.value == "DONE")
-        in_prog = sum(
-            1 for t in sprint.tasks if t.status.value == "IN_PROGRESS"
-        )
-        blocked = sum(
-            1 for t in sprint.tasks if t.status.value == "BLOCKED"
-        )
+        in_prog = sum(1 for t in sprint.tasks if t.status.value == "IN_PROGRESS")
+        blocked = sum(1 for t in sprint.tasks if t.status.value == "BLOCKED")
         goals_str = ", ".join(sprint.goals) if sprint.goals else "none"
         lines = [
-            f"### Sprint {sprint.number}"
-            f" ({sprint.start_date} to {sprint.end_date})",
-            f"- Tasks: {done}/{total} done,"
-            f" {in_prog} in-progress, {blocked} blocked",
+            f"### Sprint {sprint.number} ({sprint.start_date} to {sprint.end_date})",
+            f"- Tasks: {done}/{total} done, {in_prog} in-progress, {blocked} blocked",
             f"- Goals: {goals_str}",
         ]
         return ["\n".join(lines)]
@@ -191,9 +186,7 @@ def _continuity_standup(today_str: str) -> list[str]:
         if standup.summary:
             lines.append(f"Summary: {standup.summary}")
         for entry in standup.entries[:5]:
-            blocker = (
-                f" [BLOCKED: {entry.blockers}]" if entry.blockers else ""
-            )
+            blocker = f" [BLOCKED: {entry.blockers}]" if entry.blockers else ""
             lines.append(f"- {entry.department}: {entry.today}{blocker}")
         return ["\n".join(lines)]
     except Exception:
@@ -480,9 +473,7 @@ def _run_claude_analysis(
     pipeline_summary = _build_pipeline_summary(pipeline_run)
     continuity = _build_continuity_context(session, config)
     prompt_template = (
-        _PRE_MARKET_PROMPT
-        if session == RunSession.PRE_MARKET
-        else _POST_MARKET_PROMPT
+        _PRE_MARKET_PROMPT if session == RunSession.PRE_MARKET else _POST_MARKET_PROMPT
     )
     prompt = prompt_template.format(
         date=date_str,
@@ -537,17 +528,11 @@ def _run_claude_analysis(
         duration = time.monotonic() - start_time
 
         # Read captured output (files are closed by the with-block).
-        output = claude_stdout_log.read_text(
-            encoding="utf-8", errors="replace"
-        ).strip()
-        stderr = claude_stderr_log.read_text(
-            encoding="utf-8", errors="replace"
-        ).strip()
+        output = claude_stdout_log.read_text(encoding="utf-8", errors="replace").strip()
+        stderr = claude_stderr_log.read_text(encoding="utf-8", errors="replace").strip()
 
         if timed_out:
-            logger.error(
-                "Claude analysis timed out after %ds", config.claude_timeout
-            )
+            logger.error("Claude analysis timed out after %ds", config.claude_timeout)
             logger.info(
                 "Partial output saved to %s (%d chars)",
                 claude_stdout_log,

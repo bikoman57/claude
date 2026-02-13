@@ -84,9 +84,7 @@ def calculate_exposure(
     cash_pct = cash / portfolio_value if portfolio_value > 0 else 1.0
 
     total_leveraged = sum(p.leveraged_exposure for p in positions)
-    leverage_ratio = (
-        total_leveraged / portfolio_value if portfolio_value > 0 else 0.0
-    )
+    leverage_ratio = total_leveraged / portfolio_value if portfolio_value > 0 else 0.0
 
     sector_exp: dict[str, float] = {}
     for p in positions:

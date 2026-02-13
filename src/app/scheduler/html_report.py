@@ -2493,7 +2493,7 @@ def build_index_html(
         parts: list[str] = []
         for pfx, label, _icon in _SUB_PAGES:
             if pfx in available:
-                href = f'{prefix_path}{pfx}{html.escape(d)}.html'
+                href = f"{prefix_path}{pfx}{html.escape(d)}.html"
                 parts.append(f'<a href="{href}" class="idx-tab">{label}</a>')
         if not parts:
             return ""
@@ -2521,7 +2521,7 @@ def build_index_html(
             f'<h2><a href="reports/{escaped}.html">'
             f"Market Report &mdash; {escaped}</a></h2>\n"
             f'<div class="idx-featured-meta">{escaped} '
-            f'&middot; {len(report_dates)} report(s) available</div>\n'
+            f"&middot; {len(report_dates)} report(s) available</div>\n"
             f"{_tabs(latest)}\n"
             "</div>\n"
         )
@@ -2532,7 +2532,7 @@ def build_index_html(
             available = sub_pages.get(d, [""])
             for pfx, label, _icon in _SUB_PAGES:
                 if pfx in available:
-                    href = f'reports/{pfx}{ed}.html'
+                    href = f"reports/{pfx}{ed}.html"
                     page_links.append(
                         f'<a href="{href}" class="idx-page-link">{label}</a>',
                     )

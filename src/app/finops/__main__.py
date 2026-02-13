@@ -136,8 +136,7 @@ def _cmd_roi() -> int:
         cost = roi.token_cost_usd
         ratio = roi.roi_ratio
         print(  # noqa: T201
-            f"  {roi.department:<15}"
-            f" cost=${cost:>7.4f}  ROI={ratio:>6.1f}x"
+            f"  {roi.department:<15} cost=${cost:>7.4f}  ROI={ratio:>6.1f}x"
         )
 
     return 0

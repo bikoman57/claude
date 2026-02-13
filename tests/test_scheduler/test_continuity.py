@@ -149,7 +149,8 @@ def test_find_previous_log_picks_most_recent(
 
 
 def test_continuity_empty_no_data(
-    tmp_path: Path, monkeypatch: object,
+    tmp_path: Path,
+    monkeypatch: object,
 ) -> None:
     import app.agile.store as store
 
@@ -164,14 +165,16 @@ def test_continuity_includes_signals(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
     data_dir.mkdir()
     (data_dir / "signals.json").write_text(
-        json.dumps([
-            {
-                "leveraged_ticker": "TQQQ",
-                "state": "ALERT",
-                "underlying_drawdown_pct": -0.05,
-                "current_pl_pct": None,
-            },
-        ]),
+        json.dumps(
+            [
+                {
+                    "leveraged_ticker": "TQQQ",
+                    "state": "ALERT",
+                    "underlying_drawdown_pct": -0.05,
+                    "current_pl_pct": None,
+                },
+            ]
+        ),
     )
     config = _make_config(tmp_path)
     result = _build_continuity_context(RunSession.PRE_MARKET, config)
@@ -186,12 +189,14 @@ def test_continuity_includes_forecast_accuracy(
     data_dir = tmp_path / "data"
     data_dir.mkdir()
     (data_dir / "forecast_accuracy.json").write_text(
-        json.dumps({
-            "hit_rate": 0.625,
-            "recent_hit_rate": 0.7,
-            "trend": "STABLE",
-            "total_verifications": 16,
-        }),
+        json.dumps(
+            {
+                "hit_rate": 0.625,
+                "recent_hit_rate": 0.7,
+                "trend": "STABLE",
+                "total_verifications": 16,
+            }
+        ),
     )
     config = _make_config(tmp_path)
     result = _build_continuity_context(RunSession.PRE_MARKET, config)
