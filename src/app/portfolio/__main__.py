@@ -6,7 +6,12 @@ import sys
 
 from app.etf.store import get_active_signals
 from app.portfolio.sizing import fixed_fraction_size, kelly_size
-from app.portfolio.tracker import PortfolioConfig
+from app.portfolio.tracker import (
+    PortfolioConfig,
+    apply_operating_costs,
+    load_history,
+    take_snapshot,
+)
 from app.risk.exposure import Position, calculate_exposure, get_sector
 
 USAGE = """\
@@ -15,13 +20,29 @@ Usage:
   uv run python -m app.portfolio allocations    Sector allocations
   uv run python -m app.portfolio sizing         Position sizing recommendations
   uv run python -m app.portfolio history        Portfolio value history
+  uv run python -m app.portfolio snapshot       Save daily portfolio snapshot
 """
 
 
 def _build_positions(config: PortfolioConfig) -> list[Position]:
-    """Build position list from active signals."""
-    signals = get_active_signals()
+    """Build position list from active signals and portfolio positions."""
+    # First try portfolio positions (preferred — has actual shares)
     positions: list[Position] = []
+    for pos in config.positions:
+        positions.append(
+            Position(
+                leveraged_ticker=pos.ticker,
+                entry_price=pos.entry_price,
+                current_price=pos.entry_price,  # use entry as proxy
+                shares=pos.shares,
+            )
+        )
+
+    if positions:
+        return positions
+
+    # Fallback: estimate from active signals (legacy behavior)
+    signals = get_active_signals()
     for sig in signals:
         if sig.leveraged_entry_price and sig.leveraged_current_price:
             est_value = config.total_value * 0.15
@@ -54,6 +75,10 @@ def cmd_dashboard() -> int:
         f"Unrealized P/L: ${report.unrealized_pl:+,.0f}"
         f" ({report.unrealized_pl_pct:+.1%})"
     )
+    print(f"Realized P/L: ${config.realized_pl:+,.2f}")  # noqa: T201
+    print(f"Operating costs: ${config.total_operating_costs:,.2f}")  # noqa: T201
+    net = config.total_value - config.total_operating_costs
+    print(f"Net value (after costs): ${net:,.2f}")  # noqa: T201
     return 0
 
 
@@ -110,10 +135,44 @@ def cmd_sizing() -> int:
     return 0
 
 
+def cmd_snapshot() -> int:
+    """Save a daily portfolio snapshot."""
+    config = PortfolioConfig.load()
+    config = apply_operating_costs(config)
+    snapshot = take_snapshot(config)
+
+    print("=== PORTFOLIO SNAPSHOT ===")  # noqa: T201
+    print(f"Date: {snapshot.date}")  # noqa: T201
+    print(f"Total value: ${snapshot.total_value:,.2f}")  # noqa: T201
+    print(f"Cash: ${snapshot.cash_balance:,.2f}")  # noqa: T201
+    print(f"Invested: ${snapshot.invested_value:,.2f}")  # noqa: T201
+    print(f"Realized P/L: ${snapshot.realized_pl_cumulative:+,.2f}")  # noqa: T201
+    print(f"Operating costs: ${snapshot.operating_costs_cumulative:,.2f}")  # noqa: T201
+    print(f"Net value: ${snapshot.net_value:,.2f}")  # noqa: T201
+    print(f"Positions: {snapshot.position_count}")  # noqa: T201
+    print("Snapshot saved.")  # noqa: T201
+    return 0
+
+
 def cmd_history() -> int:
     """Show portfolio value history."""
     print("=== PORTFOLIO HISTORY ===")  # noqa: T201
-    print("No history snapshots yet. Run daily to build history.")  # noqa: T201
+    history = load_history()
+    if not history:
+        print("No history snapshots yet. Run 'snapshot' to start tracking.")  # noqa: T201
+        return 0
+
+    print(  # noqa: T201
+        f"{'Date':<12} {'Value':>10} {'Cash':>10} {'Invested':>10}"
+        f" {'Real P/L':>10} {'Costs':>8} {'Net':>10}"
+    )
+    print("-" * 72)  # noqa: T201
+    for s in history:
+        print(  # noqa: T201
+            f"{s.date:<12} ${s.total_value:>9,.2f} ${s.cash_balance:>9,.2f}"
+            f" ${s.invested_value:>9,.2f} ${s.realized_pl_cumulative:>+9,.2f}"
+            f" ${s.operating_costs_cumulative:>7,.2f} ${s.net_value:>9,.2f}"
+        )
     return 0
 
 
@@ -129,6 +188,7 @@ def main() -> int:
         "allocations": cmd_allocations,
         "sizing": cmd_sizing,
         "history": cmd_history,
+        "snapshot": cmd_snapshot,
     }
 
     cmd = args[0]

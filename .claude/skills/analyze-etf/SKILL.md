@@ -4,7 +4,7 @@ description: Analyze a specific leveraged ETF opportunity for mean-reversion swi
 disable-model-invocation: true
 metadata:
   author: bikoman57
-  version: 1.0.0
+  version: 2.0.0
   category: financial-analysis
 ---
 
@@ -42,14 +42,32 @@ uv run python -m app.macro rates
 uv run python -m app.sec recent
 ```
 
+### Step 5b: Fundamentals & Earnings Risk
+```bash
+uv run python -m app.sec fundamentals <underlying_ticker>
+uv run python -m app.sec earnings <underlying_ticker>
+```
+
+### Step 5c: Congressional Trades & Prediction Markets
+```bash
+uv run python -m app.congress trades --ticker <underlying_ticker>
+uv run python -m app.polymarket markets
+```
+
+### Step 5d: Strategy Comparison
+```bash
+uv run python -m app.strategy compare <underlying_ticker>
+uv run python -m app.strategy forecast
+```
+
 ### Step 6: Market Momentum
 Use the `trading-market-analyst` subagent:
 > "Use the trading-market-analyst agent to assess momentum and volatility conditions for [underlying_ticker] to determine if conditions favor a mean-reversion entry on [leveraged_ticker]."
 
 ### Step 7: Synthesize with Confidence Score
 
-Assess 5 factors: drawdown depth, VIX regime, Fed regime, yield curve, SEC sentiment.
-Score: HIGH (4-5 favorable), MEDIUM (2-3), LOW (0-1).
+Assess 9 factors: drawdown depth, VIX regime, Fed regime, yield curve, SEC sentiment, earnings proximity, fundamentals health, congress sentiment, prediction markets.
+Score: HIGH (7-9 favorable), MEDIUM (4-6), LOW (0-3).
 
 ```
 === [LEVERAGED_TICKER] ANALYSIS ===
@@ -65,10 +83,18 @@ RECOVERY HISTORY (from [threshold]% drawdowns):
 
 MACRO: VIX [val] [{regime}] | Fed [{trajectory}] | Yields [{curve}]
 SEC: [material filings summary or "No material filings"]
+FUNDAMENTALS: [sector health — STRONG/NEUTRAL/WEAK]
+EARNINGS: [next earnings date] ([RISK if within 14 days / CLEAR])
+CONGRESS: [net flow for this sector — BUYING/SELLING/NEUTRAL]
+PREDICTION MARKETS: [relevant market + probability or "N/A"]
 
-CONFIDENCE: [HIGH/MEDIUM/LOW] ([N]/5 factors)
-  Drawdown: [assessment] | VIX: [assessment]
-  Macro: [assessment] | Yields: [assessment] | SEC: [assessment]
+STRATEGY: Best strategy [type] at [threshold]%/[target]% (Sharpe: [val], Win: [%])
+FORECAST: [active forecast direction + confidence or "None"]
+
+CONFIDENCE: [HIGH/MEDIUM/LOW] ([N]/9 factors)
+  Drawdown: [FAV/UNF/NEU] | VIX: [FAV/UNF/NEU] | Fed: [FAV/UNF/NEU]
+  Yields: [FAV/UNF/NEU] | SEC: [FAV/UNF/NEU] | Earnings: [FAV/UNF/NEU]
+  Fundamentals: [FAV/UNF/NEU] | Congress: [FAV/UNF/NEU] | Prediction Mkts: [FAV/UNF/NEU]
 
 ASSESSMENT: [Is this near an entry zone? What's the risk?]
 Entry price: $[X] → Target: +[Y]% ($[Z])

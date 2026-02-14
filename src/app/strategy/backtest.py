@@ -2,9 +2,19 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
 from enum import StrEnum
+from typing import Any
 
 import yfinance as yf
+
+# Recency weighting: trades from HALF_LIFE years ago get 50% weight
+RECENCY_HALF_LIFE_YEARS: float = 3.0
+
+# yfinance built-in period strings
+_VALID_YF_PERIODS = {
+    "1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max",
+}
 
 
 class StrategyType(StrEnum):
@@ -49,7 +59,7 @@ class BacktestConfig:
     entry_threshold: float
     profit_target: float  # exit gain % (e.g. 0.10 = 10%)
     stop_loss: float  # exit loss % (e.g. 0.15 = 15%)
-    period: str  # yfinance period (e.g. "2y", "5y")
+    period: str  # yfinance period (e.g. "2y", "15y") or custom like "15y"
     strategy_type: str = StrategyType.ATH_MEAN_REVERSION
 
 
@@ -81,6 +91,33 @@ class BacktestResult:
     avg_gain: float | None
     avg_loss: float | None
     total_days: int
+    # Recency-weighted metrics (recent trades count more)
+    weighted_sharpe_ratio: float | None = None
+    weighted_win_rate: float | None = None
+
+
+def _recency_weight(entry_day: int, total_days: int) -> float:
+    """Exponential decay weight: 1.0 for most recent, 0.5 at half-life ago."""
+    if total_days <= 0:
+        return 1.0
+    days_ago = total_days - entry_day
+    half_life_days = RECENCY_HALF_LIFE_YEARS * 252  # trading days per year
+    return float(0.5 ** (days_ago / half_life_days))
+
+
+def _fetch_history(ticker: yf.Ticker, period: str) -> Any:
+    """Fetch history supporting periods beyond yfinance built-ins (e.g. '15y')."""
+    if period in _VALID_YF_PERIODS:
+        return ticker.history(period=period)
+    # Parse custom period like "15y" or "20y"
+    if period.endswith("y"):
+        try:
+            years = int(period[:-1])
+            start = datetime.now(tz=UTC) - timedelta(days=years * 365)
+            return ticker.history(start=start.strftime("%Y-%m-%d"))
+        except ValueError:
+            pass
+    return ticker.history(period=period)
 
 
 def _calculate_sharpe(
@@ -178,6 +215,31 @@ def _compute_ma(
     return ma
 
 
+def _weighted_sharpe(
+    returns: list[float],
+    weights: list[float],
+    risk_free_annual: float = 0.04,
+) -> float | None:
+    """Sharpe ratio using recency-weighted mean and std."""
+    if len(returns) < 2:
+        return None
+    total_w = sum(weights)
+    if total_w < 1e-12:
+        return None
+    w_mean = sum(r * w for r, w in zip(returns, weights, strict=True)) / total_w
+    w_var = (
+        sum(w * (r - w_mean) ** 2 for r, w in zip(returns, weights, strict=True))
+        / total_w
+    )
+    w_std = math.sqrt(w_var)
+    if w_std < 1e-12:
+        return None
+    trades_per_year = min(len(returns), 12)
+    annual_mean = w_mean * trades_per_year
+    annual_std = w_std * math.sqrt(trades_per_year)
+    return (annual_mean - risk_free_annual) / annual_std
+
+
 def _build_result(
     config: BacktestConfig,
     trades: list[BacktestTrade],
@@ -210,6 +272,18 @@ def _build_result(
 
     sharpe = _calculate_sharpe(returns)
 
+    # Recency-weighted metrics
+    weights = [_recency_weight(t.entry_day, total_days) for t in trades]
+    w_sharpe = _weighted_sharpe(returns, weights)
+
+    w_win_rate: float | None = None
+    if trades:
+        total_w = sum(weights)
+        if total_w > 1e-12:
+            w_win_rate = (
+                sum(w for r, w in zip(returns, weights, strict=True) if r > 0) / total_w
+            )
+
     return BacktestResult(
         config=config,
         trades=tuple(trades),
@@ -220,6 +294,8 @@ def _build_result(
         avg_gain=avg_gain,
         avg_loss=avg_loss,
         total_days=total_days,
+        weighted_sharpe_ratio=w_sharpe,
+        weighted_win_rate=w_win_rate,
     )
 
 
@@ -471,7 +547,7 @@ def run_backtest(config: BacktestConfig) -> BacktestResult | None:
     """
     try:
         ticker = yf.Ticker(config.underlying_ticker)
-        hist = ticker.history(period=config.period)
+        hist = _fetch_history(ticker, config.period)
     except Exception:
         return None
 

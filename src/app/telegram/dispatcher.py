@@ -35,9 +35,18 @@ _ALLOWED_TOOLS: list[str] = [
 
 # Mapping of bot commands to Claude skill prompts
 _COMMAND_SKILLS: dict[str, str] = {
-    "analyze": "Use /analyze-stock",
-    "report": "Use /market-report",
-    "screen": "Use /screen-stocks",
+    "analyze": "Use /analyze-etf",
+    "report": "Use /unified-report",
+    "screen": "Use /scan-opportunities",
+    "scan": "Use /scan-opportunities",
+    "intel": "Use /intel-briefing",
+    "macro": "Use /macro-check",
+    "risk": "Use /risk-check",
+    "portfolio": "Use /risk-check",
+    "strategy": "Use /strategy-lab",
+    "research": "Use /research",
+    "ops": "Use /ops-health",
+    "health": "Use /ops-health",
 }
 
 
@@ -146,9 +155,15 @@ class CommandDispatcher:
 
     async def _handle_help(self) -> None:
         lines = [
-            "/analyze <TICKER> — Full stock analysis",
-            "/report — Daily market summary",
-            "/screen [TICKERS] — Screen for trading signals",
+            "/analyze <TICKER> — Analyze a leveraged ETF opportunity",
+            "/report — Full unified daily report",
+            "/scan or /screen — Scan for entry/exit signals",
+            "/intel — Intelligence briefing (news, geo, social, congress)",
+            "/macro — Macro environment check (VIX, Fed, yields)",
+            "/risk or /portfolio — Risk & portfolio status",
+            "/strategy [TICKER] — Strategy lab (backtests, proposals)",
+            "/research — Research pipeline status",
+            "/ops or /health — Operations health dashboard",
             "/status — Check if the bot is alive",
             "/help — Show this message",
             "",

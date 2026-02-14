@@ -24,9 +24,11 @@ from app.etf.confidence import (
     assess_drawdown_depth,
     assess_earnings_risk,
     assess_fed_regime,
+    assess_fundamentals_health,
     assess_geopolitical_risk,
     assess_market_statistics,
     assess_news_sentiment,
+    assess_prediction_markets,
     assess_social_sentiment,
     assess_vix_regime,
     assess_yield_curve,
@@ -124,6 +126,8 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
   border-bottom-color: #fff; text-decoration: none; }
 .nav-menu a.nav-active { color: #fff;
   border-bottom-color: #fff; }
+.nav-dropdown-btn.nav-active { color: #fff;
+  border-bottom: 2px solid #fff; }
 .nav-menu .nav-divider { width: 1px; background: rgba(255,255,255,0.2);
   margin: 12px 0; flex-shrink: 0; }
 
@@ -153,6 +157,21 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
 .nav-dropdown-menu a:hover, .nav-dropdown-menu a:focus {
   background: rgba(255,255,255,0.08); color: #fff;
   border-bottom: none; text-decoration: none; }
+
+/* Summary link cards (dashboard → sub-page teasers) */
+.summary-link-card { display: block; padding: 16px 20px;
+  background: var(--bg-secondary); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px; text-decoration: none; transition: border-color 0.15s;
+  margin-bottom: 12px; }
+.summary-link-card:hover { border-color: rgba(255,255,255,0.2);
+  text-decoration: none; }
+.summary-link-card .card-title { font-family: var(--font-serif);
+  font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.summary-link-card .card-detail { font-size: 13px;
+  color: var(--text-muted); margin-top: 4px; }
+.summary-link-card .card-cta { font-family: var(--font-mono);
+  font-size: 11px; color: var(--accent); margin-top: 8px;
+  text-transform: uppercase; letter-spacing: 0.08em; }
 
 /* Report date picker */
 .nav-date-picker { font-family: var(--font-mono); font-size: 11px;
@@ -470,7 +489,7 @@ a:hover { text-decoration: underline; }
 .rpt-compact .kpi-sub { font-size: 11px; margin-top: 2px; }
 .rpt-compact .kpi-label { font-size: 9px; }
 .rpt-compact .kpi-icon { margin-bottom: 4px; }
-.rpt-layout { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+.rpt-layout { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
   align-items: start; margin-top: 12px; }
 .rpt-main { }
 .rpt-sidebar { }
@@ -652,7 +671,7 @@ a:focus-visible, summary:focus-visible {
   .idx-layout { grid-template-columns: 1fr; }
   .idx-main { border-right: none; padding-right: 0; }
   .idx-sidebar { padding-left: 0; border-top: 1px solid var(--border-primary); }
-  .rpt-layout { grid-template-columns: 1fr; }
+  .rpt-layout { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* Mobile */
@@ -667,6 +686,7 @@ a:focus-visible, summary:focus-visible {
   .rates-grid { grid-template-columns: repeat(2, 1fr); }
   .nav-menu a { padding: 12px 12px; font-size: 10px; }
   .strategy-entry-exit { flex-direction: column; gap: 4px; }
+  .rpt-layout { grid-template-columns: 1fr; }
 }
 
 /* Reduced motion */
@@ -946,6 +966,7 @@ _MATERIAL_ICONS: dict[str, str] = {
     "yield": "show_chart",
     "rates": "currency_exchange",
     "congress": "account_balance",
+    "predictions": "casino",
 }
 
 
@@ -1200,6 +1221,43 @@ def _compute_signal_confidence(
         if isinstance(risk_ind, dict):
             mkt_assess = str(risk_ind.get("risk_assessment", "NEUTRAL"))
     factors.append(assess_market_statistics(mkt_assess))
+
+    # 10. Fundamentals health (from SEC XBRL filings)
+    try:
+        import os
+
+        from app.sec.fundamentals import classify_sector_health, fetch_all_fundamentals
+        from app.sec.holdings import get_all_unique_holdings as _get_all_holdings
+
+        _sec_email = os.environ.get("SEC_EDGAR_EMAIL", "")
+        if _sec_email:
+            _all_holdings = _get_all_holdings()
+            _analyses = fetch_all_fundamentals(_all_holdings, _sec_email)
+            _sector_health = classify_sector_health(_analyses)
+            factors.append(assess_fundamentals_health(_sector_health))
+        else:
+            factors.append(
+                FactorResult(
+                    "fundamentals_health",
+                    FactorAssessment.NEUTRAL,
+                    "SEC_EDGAR_EMAIL not set",
+                )
+            )
+    except Exception:
+        factors.append(
+            FactorResult(
+                "fundamentals_health",
+                FactorAssessment.NEUTRAL,
+                "Fundamentals data unavailable",
+            )
+        )
+
+    # 11. Prediction markets (Polymarket)
+    poly = _parse_output(outputs.get("polymarket.summary", ""))
+    poly_signal = "NEUTRAL"
+    if isinstance(poly, dict):
+        poly_signal = str(poly.get("overall_signal", "NEUTRAL"))
+    factors.append(assess_prediction_markets(poly_signal))
 
     return compute_confidence(factors)
 
@@ -2128,6 +2186,156 @@ def _section_geopolitical(outputs: dict[str, str]) -> str:
     )
 
 
+# --- Sector fundamentals section ---
+
+
+def _fund_pct(val: float | None) -> str:
+    """Format a fundamentals percentage, or dash if None."""
+    if val is None:
+        return '<span class="text-muted">&mdash;</span>'
+    return f"{val:.0%}"
+
+
+def _fund_ratio(val: float | None) -> str:
+    """Format a fundamentals ratio, or dash if None."""
+    if val is None:
+        return '<span class="text-muted">&mdash;</span>'
+    return f"{val:.1f}"
+
+
+def _fund_trend(trend: str) -> str:
+    """Return a colored arrow for margin trends."""
+    if trend == "IMPROVING":
+        return '<span class="pct-up">&#x25B2;</span>'
+    if trend == "DECLINING":
+        return '<span class="pct-down">&#x25BC;</span>'
+    return '<span class="text-muted">&#x2014;</span>'
+
+
+def _section_fundamentals(outputs: dict[str, str]) -> str:
+    """Render sector fundamentals from SEC XBRL filings."""
+    import os
+
+    from app.sec.fundamentals import (
+        classify_sector_health,
+        fetch_all_fundamentals,
+    )
+    from app.sec.holdings import INDEX_HOLDINGS
+
+    sec_email = os.environ.get("SEC_EDGAR_EMAIL", "")
+    if not sec_email:
+        return ""
+
+    # Map index -> leveraged ETF for display context
+    index_etf: dict[str, str] = {
+        "QQQ": "TQQQ/TECL",
+        "SOXX": "SOXL",
+        "XLF": "FAS",
+        "XLE": "UCO",
+        "XBI": "LABU",
+        "SPY": "UPRO",
+        "IWM": "TNA",
+        "XLK": "TECL",
+    }
+
+    sector_parts: list[str] = []
+
+    for index, holdings in INDEX_HOLDINGS.items():
+        if not holdings:
+            continue
+
+        try:
+            analyses = fetch_all_fundamentals(holdings, sec_email)
+        except Exception:  # noqa: S112
+            continue
+
+        if not analyses:
+            continue
+
+        sector_health = classify_sector_health(analyses)
+        etf_label = index_etf.get(index, "")
+        etf_badge = ""
+        if etf_label:
+            etf_badge = (
+                f' <span class="badge badge-blue">'
+                f"{html.escape(etf_label)}</span>"
+            )
+
+        health_badge = _badge(sector_health)
+
+        rows: list[str] = []
+        for a in analyses:
+            ticker = html.escape(a.ticker)
+            h_badge = _badge(a.health)
+            rev_growth = _fmt_growth(a.revenue_growth_yoy)
+            gm = _fund_pct(a.gross_margin)
+            om = _fund_pct(a.operating_margin)
+            de = _fund_ratio(a.debt_to_equity)
+            fcf = _fund_ratio(a.fcf_to_net_income)
+            gm_arrow = _fund_trend(a.gross_margin_trend)
+            om_arrow = _fund_trend(a.operating_margin_trend)
+
+            rows.append(
+                f"<tr>"
+                f"<td><strong>{ticker}</strong></td>"
+                f'<td class="num">{rev_growth}</td>'
+                f'<td class="num">{gm} {gm_arrow}</td>'
+                f'<td class="num">{om} {om_arrow}</td>'
+                f'<td class="num">{de}</td>'
+                f'<td class="num">{fcf}</td>'
+                f"<td>{h_badge}</td>"
+                f"</tr>",
+            )
+
+        table = (
+            '<table class="mt-8">\n'
+            "<thead><tr>"
+            '<th scope="col">Ticker</th>'
+            '<th scope="col" class="num">Rev YoY</th>'
+            '<th scope="col" class="num">Gross M</th>'
+            '<th scope="col" class="num">Op M</th>'
+            '<th scope="col" class="num">D/E</th>'
+            '<th scope="col" class="num">FCF/NI</th>'
+            '<th scope="col">Health</th>'
+            "</tr></thead>\n<tbody>\n"
+            + "\n".join(rows)
+            + "\n</tbody></table>\n"
+        )
+
+        sector_parts.append(
+            f'<div style="margin-bottom:20px">'
+            f"<p><strong>{html.escape(index)}</strong>"
+            f" {health_badge}{etf_badge}</p>"
+            f"{table}"
+            f"</div>",
+        )
+
+    if not sector_parts:
+        return ""
+
+    return (
+        '<section id="fundamentals">\n'
+        f"<h2>{_section_icon('monitoring')}"
+        f"Sector Fundamentals</h2>\n"
+        '<div class="card">\n'
+        '<p class="kicker">Financial Health from SEC Filings</p>'
+        "<p>Income statement, balance sheet, and cash flow "
+        "metrics from actual 10-K/10-Q XBRL filings. "
+        "Arrows show YoY margin trends.</p>\n"
+        + "\n".join(sector_parts)
+        + "\n</div>\n"
+        "</section>\n"
+    )
+
+
+def _fmt_growth(val: float | None) -> str:
+    """Format a growth percentage with color."""
+    if val is None:
+        return '<span class="text-muted">&mdash;</span>'
+    cls = "pct-up" if val >= 0 else "pct-down"
+    return f'<span class="{cls}">{val:+.0%}</span>'
+
+
 # --- Congress trading section ---
 
 
@@ -2263,6 +2471,121 @@ def _section_congress(outputs: dict[str, str]) -> str:
     )
 
 
+# --- Prediction markets section ---
+
+
+def _section_polymarket(outputs: dict[str, str]) -> str:
+    """Render Polymarket prediction markets section."""
+    data = _parse_output(outputs.get("polymarket.summary", ""))
+    if not isinstance(data, dict):
+        return ""
+
+    parts: list[str] = []
+
+    # Overall signal + counts
+    overall = str(data.get("overall_signal", "NEUTRAL"))
+    total = data.get("total_markets", 0)
+    relevant = data.get("relevant_markets", 0)
+    fav = data.get("favorable_count", 0)
+    unfav = data.get("unfavorable_count", 0)
+
+    parts.append(
+        f"<p>Overall: {_badge(overall)}</p>"
+        f'<p class="text-muted" style="font-size:12px">'
+        f"{total} markets tracked &bull; {relevant} with signals "
+        f"&bull; {fav} favorable &bull; {unfav} unfavorable</p>"
+    )
+
+    # Category breakdown
+    cats = data.get("markets_by_category", {})
+    if isinstance(cats, dict) and cats:
+        cat_rows: list[str] = []
+        for cat, count in sorted(cats.items()):
+            label = cat.replace("_", " ").title()
+            cat_rows.append(f"<tr><td>{html.escape(label)}</td>"
+                            f'<td class="num">{count}</td></tr>')
+        if cat_rows:
+            parts.append(
+                '<div style="overflow-x:auto; margin-top:12px">'
+                "<table><thead><tr>"
+                "<th>Category</th>"
+                '<th class="num">Markets</th>'
+                "</tr></thead>"
+                f"<tbody>{''.join(cat_rows)}</tbody>"
+                "</table></div>"
+            )
+
+    # Sector signals
+    sectors = data.get("affected_sectors", {})
+    if isinstance(sectors, dict) and sectors:
+        sec_rows: list[str] = []
+        for sector, sig in sorted(sectors.items()):
+            label = sector.replace("_", " ").title()
+            sec_rows.append(f"<tr><td>{html.escape(label)}</td>"
+                            f"<td>{_badge(str(sig))}</td></tr>")
+        if sec_rows:
+            parts.append(
+                '<div style="overflow-x:auto; margin-top:12px">'
+                "<table><thead><tr>"
+                "<th>Sector</th><th>Signal</th>"
+                "</tr></thead>"
+                f"<tbody>{''.join(sec_rows)}</tbody>"
+                "</table></div>"
+            )
+
+    # Top markets
+    top = data.get("top_markets", [])
+    if isinstance(top, list) and top:
+        mkt_rows: list[str] = []
+        for m in top[:10]:
+            if not isinstance(m, dict):
+                continue
+            q = html.escape(str(m.get("question", ""))[:80])
+            cat = html.escape(
+                str(m.get("category", "")).replace("_", " ").title()
+            )
+            sig = str(m.get("signal", "NEUTRAL"))
+            prob = m.get("probability", 0)
+            prob_pct = f"{prob:.0%}" if isinstance(prob, (int, float)) else str(prob)
+            # Probability bar
+            bar_w = int(float(prob) * 100) if isinstance(prob, (int, float)) else 50
+            bar_color = (
+                "var(--accent-green)" if sig == "FAVORABLE"
+                else "var(--accent-red)" if sig == "UNFAVORABLE"
+                else "var(--text-muted)"
+            )
+            bar_html = (
+                f'<div style="background:var(--bg-secondary);border-radius:4px;'
+                f'height:8px;width:80px;display:inline-block;vertical-align:middle">'
+                f'<div style="background:{bar_color};height:100%;'
+                f'width:{bar_w}%;border-radius:4px"></div></div>'
+                f' <span style="font-size:11px">{prob_pct}</span>'
+            )
+            mkt_rows.append(
+                f"<tr><td>{q}</td><td>{cat}</td>"
+                f"<td>{_badge(sig)}</td><td>{bar_html}</td></tr>"
+            )
+        if mkt_rows:
+            parts.append(
+                '<div style="overflow-x:auto; margin-top:12px">'
+                "<table><thead><tr>"
+                "<th>Market</th><th>Category</th>"
+                "<th>Signal</th><th>Probability</th>"
+                "</tr></thead>"
+                f"<tbody>{''.join(mkt_rows)}</tbody>"
+                "</table></div>"
+            )
+
+    if not parts:
+        return ""
+    return (
+        '<section id="predictions">\n'
+        f"<h2>{_section_icon('predictions')}Prediction Markets</h2>\n"
+        '<div class="card">\n' + "\n".join(parts) + "\n</div>\n"
+        "</section>\n"
+    )
+
+
 # --- Module status ---
 
 
@@ -2360,33 +2683,141 @@ def _section_strategy_research(outputs: dict[str, str]) -> str:
     )
 
 
+def _section_strategy_summary_card(
+    outputs: dict[str, str],
+    date: str,
+) -> str:
+    """Render a compact strategy summary card linking to the Strategies page."""
+    data = _parse_output(outputs.get("strategy.proposals", ""))
+    if not isinstance(data, list) or not data:
+        return ""
+    n_proposals = len(data)
+    tickers: set[str] = set()
+    for p in data:
+        if isinstance(p, dict):
+            tk = str(p.get("leveraged_ticker", ""))
+            if tk:
+                tickers.add(tk)
+    detail = f"{n_proposals} proposals across {len(tickers)} ETFs"
+    href = html.escape(f"strategies-{date}.html")
+    return (
+        f'<a class="summary-link-card" href="{href}">\n'
+        '<div class="card-title">Strategy Proposals</div>\n'
+        f'<div class="card-detail">{html.escape(detail)}</div>\n'
+        '<div class="card-cta">View details &rarr;</div>\n'
+        "</a>\n"
+    )
+
+
+def _section_research_summary_card(
+    outputs: dict[str, str],
+    date: str,
+) -> str:
+    """Render a compact research summary card linking to the Research page."""
+    research_data = _parse_output(outputs.get("research.summary", ""))
+    detail = "Research pipeline and documents"
+    if isinstance(research_data, dict):
+        docs = research_data.get("documents", [])
+        if isinstance(docs, list) and docs:
+            detail = f"{len(docs)} research documents available"
+    href = html.escape(f"research-{date}.html")
+    return (
+        f'<a class="summary-link-card" href="{href}">\n'
+        '<div class="card-title">Strategy Research</div>\n'
+        f'<div class="card-detail">{html.escape(detail)}</div>\n'
+        '<div class="card-cta">View details &rarr;</div>\n'
+        "</a>\n"
+    )
+
+
+_NAV_ITEMS: list[dict[str, object]] = [
+    {"key": "dashboard", "label": "Dashboard", "prefix": ""},
+    {
+        "key": "trading",
+        "label": "Trading",
+        "dropdown": True,
+        "children": [
+            {"key": "forecasts", "label": "Forecasts", "prefix": "forecasts-"},
+            {"key": "strategies", "label": "Strategies", "prefix": "strategies-"},
+            {"key": "trade-log", "label": "Trade Log", "prefix": "trade-log-"},
+        ],
+    },
+    {"key": "financials", "label": "Financials", "prefix": "financials-"},
+    {
+        "key": "operations",
+        "label": "Operations",
+        "dropdown": True,
+        "children": [
+            {
+                "key": "sprint-board",
+                "label": "Sprint Board",
+                "prefix": "sprint-board-",
+            },
+            {"key": "roadmap", "label": "Roadmap", "prefix": "roadmap-"},
+            {
+                "key": "system-health",
+                "label": "System Health",
+                "prefix": "system-health-",
+            },
+        ],
+    },
+    {"key": "research", "label": "Research", "prefix": "research-"},
+    {"key": "about", "label": "About", "prefix": "about-"},
+]
+
+
 def _page_header_bar(
     date: str,
     active_page: str,
     report_dates: list[str] | None = None,
+    *,
+    page_prefix: str = "",
 ) -> str:
     """Render a unified navy top bar with title, navigation, and date picker.
 
     Args:
         date: Report date string (YYYY-MM-DD) for building page hrefs.
-        active_page: One of "dashboard", "trade-logs", "forecasts".
+        active_page: Key identifying the current page (e.g. "dashboard").
         report_dates: Available report dates (newest first) for the picker.
+        page_prefix: File prefix for the current page (for date picker nav).
     """
-    pages = [
-        (f"{date}.html", "Market Report", "dashboard"),
-        (f"trade-logs-{date}.html", "Trade Logs", "trade-logs"),
-        (f"forecasts-{date}.html", "Forecasts", "forecasts"),
-        (f"strategies-{date}.html", "Strategies", "strategies"),
-        (f"financials-{date}.html", "Financials", "financials"),
-        (f"company-{date}.html", "Company", "company"),
-        (f"about-{date}.html", "About", "about"),
-    ]
-    page_items = []
-    for href, label, key in pages:
-        cls = ' class="nav-active"' if key == active_page else ""
-        page_items.append(f'<a href="{html.escape(href)}"{cls}>{label}</a>')
+    nav_html_parts: list[str] = []
+    for item in _NAV_ITEMS:
+        if item.get("dropdown"):
+            children = item.get("children", [])
+            assert isinstance(children, list)
+            # Check if any child is the active page
+            child_active = any(
+                c.get("key") == active_page  # type: ignore[union-attr]
+                for c in children
+            )
+            btn_cls = ' nav-active' if child_active else ""
+            child_links = []
+            for child in children:
+                assert isinstance(child, dict)
+                href = f"{child['prefix']}{date}.html"
+                a_cls = ' class="nav-active"' if child["key"] == active_page else ""
+                child_links.append(
+                    f'<a href="{html.escape(href)}"{a_cls}>'
+                    f'{child["label"]}</a>',
+                )
+            menu_html = "".join(child_links)
+            nav_html_parts.append(
+                f'<div class="nav-dropdown">'
+                f'<button class="nav-dropdown-btn{btn_cls}" '
+                f'aria-haspopup="true" aria-expanded="false">'
+                f'{item["label"]}</button>'
+                f'<div class="nav-dropdown-menu">{menu_html}</div>'
+                f"</div>",
+            )
+        else:
+            href = f"{item['prefix']}{date}.html"
+            cls = ' class="nav-active"' if item["key"] == active_page else ""
+            nav_html_parts.append(
+                f'<a href="{html.escape(href)}"{cls}>{item["label"]}</a>',
+            )
 
-    parts = "".join(page_items)
+    parts = "".join(nav_html_parts)
 
     # Section anchors as dropdown on dashboard page
     if active_page == "dashboard":
@@ -2397,9 +2828,7 @@ def _page_header_bar(
             ("#risks", "Risks"),
             ("#geopolitical", "Geopolitical"),
             ("#congress", "Congress"),
-            ("#strategy", "Strategy"),
-            ("#research", "Research"),
-            ("#modules", "Modules"),
+            ("#predictions", "Predictions"),
         ]
         section_items = "".join(
             f'<a href="{href}">{label}</a>' for href, label in section_links
@@ -2414,7 +2843,7 @@ def _page_header_bar(
             "</div>"
         )
 
-    # Date picker dropdown
+    # Date picker dropdown — navigates to same page type for selected date
     date_picker = ""
     if report_dates and len(report_dates) > 1:
         options = []
@@ -2425,11 +2854,12 @@ def _page_header_bar(
                 f'<option value="{escaped}"{selected}>{escaped}</option>',
             )
         opts_html = "".join(options)
+        pfx_escaped = html.escape(page_prefix)
         date_picker = (
             '<select class="nav-date-picker" '
             'aria-label="Select report date" '
-            'onchange="window.location.href='
-            "this.value+'.html'\">"
+            f"onchange=\"window.location.href='{pfx_escaped}'"
+            "+this.value+'.html'\">"
             f"{opts_html}</select>\n"
         )
 
@@ -2470,12 +2900,15 @@ def build_html_report(
     conditions = _section_market_conditions(outputs)
     market_risks = _section_market_risks(outputs)
     geopolitical = _section_geopolitical(outputs)
+    fundamentals = _section_fundamentals(outputs)
     congress = _section_congress(outputs)
-    strategy = _section_strategy(outputs)
-    research = _section_strategy_research(outputs)
-    modules = _section_module_status(run)
+    predictions = _section_polymarket(outputs)
+    strategy_card = _section_strategy_summary_card(outputs, report_date)
+    research_card = _section_research_summary_card(outputs, report_date)
 
-    top_bar = _page_header_bar(report_date, "dashboard", report_dates)
+    top_bar = _page_header_bar(
+        report_date, "dashboard", report_dates, page_prefix="",
+    )
 
     header = (
         '<header class="header">\n'
@@ -2526,18 +2959,19 @@ def build_html_report(
         *grid_widgets,
         "</div>\n",
         market_risks,
+        fundamentals,
         congress,
-        strategy,
-        research,
-        modules,
+        predictions,
+        strategy_card,
+        research_card,
         "</div>\n",
         "</main>\n",
         footer,
     ]
     return _html_page(
-        title=f"Market Report {report_date}",
+        title=f"Dashboard {report_date}",
         body="\n".join(p for p in body_parts if p),
-        description=f"Daily leveraged ETF swing trading report for {report_date}",
+        description=f"Daily leveraged ETF swing trading dashboard for {report_date}",
     )
 
 
@@ -2553,12 +2987,17 @@ _ETF_WATCHLIST: list[tuple[str, str]] = [
 ]
 
 _SUB_PAGES: list[tuple[str, str, str]] = [
-    # (prefix, label, icon — used as tab text)
-    ("", "Report", "report"),
-    ("trade-logs-", "Trades", "trades"),
+    # (prefix, label, icon -- used as tab text)
+    ("", "Dashboard", "dashboard"),
     ("forecasts-", "Forecasts", "fcst"),
     ("strategies-", "Strategies", "strat"),
-    ("company-", "Company", "co"),
+    ("trade-log-", "Trade Log", "trades"),
+    ("financials-", "Financials", "fin"),
+    ("sprint-board-", "Sprint Board", "sprint"),
+    ("roadmap-", "Roadmap", "roadmap"),
+    ("system-health-", "System Health", "health"),
+    ("research-", "Research", "research"),
+    ("about-", "About", "about"),
 ]
 
 
@@ -2868,13 +3307,13 @@ _CHART_COLORS: list[str] = [
 ]
 
 
-def build_trade_logs_html(
+def build_trade_log_html(
     outputs: dict[str, str],
     *,
     date: str = "",
     report_dates: list[str] | None = None,
 ) -> str:
-    """Build trade logs page with Chart.js equity curve."""
+    """Build trade log page with Chart.js equity curve and trade history."""
     report_date = date or datetime.now(tz=_ISRAEL_TZ).strftime("%Y-%m-%d")
     report_time = datetime.now(tz=_ISRAEL_TZ).strftime("%H:%M IST")
 
@@ -3043,7 +3482,9 @@ def build_trade_logs_html(
         "</script>\n"
     )
 
-    top_bar = _page_header_bar(report_date, "trade-logs", report_dates)
+    top_bar = _page_header_bar(
+        report_date, "trade-log", report_dates, page_prefix="trade-log-",
+    )
 
     header = (
         '<header class="header">\n'
@@ -3119,10 +3560,13 @@ def build_trade_logs_html(
         "</footer>\n"
     )
 
+    portfolio_trades = _section_trade_history()
+
     body_parts = [
         top_bar,
         header,
         '<main id="main-content">\n',
+        portfolio_trades,
         chart_section,
         summary_table,
         trade_table,
@@ -3138,9 +3582,9 @@ def build_trade_logs_html(
     # Insert Chart.js CDN before </head> and chart script before </body>
     return (
         _html_page(
-            title=f"Trade Logs {report_date}",
+            title=f"Trade Log {report_date}",
             body="\n".join(p for p in body_parts if p),
-            description="Backtest trade logs and equity curves",
+            description="Trade history, backtest logs and equity curves",
         )
         .replace("</head>", f"{chart_cdn}</head>", 1)
         .replace("</body>", f"{chart_js}</body>", 1)
@@ -3178,10 +3622,27 @@ def build_forecasts_html(
     if isinstance(accuracy_raw, dict):
         accuracy = accuracy_raw
 
-    # Build accuracy KPI strip
+    # Build accuracy KPI strip — or disclaimer if no verified trades yet
     accuracy_section = ""
     tv_raw = accuracy.get("total_verifications", 0)
     total_verif = int(tv_raw) if isinstance(tv_raw, (int, float)) else 0
+    if total_verif == 0:
+        accuracy_section = (
+            "<section>\n"
+            '<div style="background:var(--warning-bg);border:1px solid var(--warning);'
+            "border-radius:8px;padding:16px 20px;margin-bottom:24px;"
+            'display:flex;align-items:flex-start;gap:12px;">\n'
+            '<span style="font-size:20px;line-height:1;">&#9888;</span>\n'
+            "<div>\n"
+            '<strong style="color:var(--warning);">No verified trades yet</strong>'
+            '<p style="margin:4px 0 0;color:var(--text-secondary);font-size:14px;">'
+            "Forecast accuracy requires real trade outcomes to measure against. "
+            "The probabilities below are model estimates based on signal state, "
+            "backtest win rates, and confidence factors &mdash; they have not been "
+            "validated with actual trades. Accuracy metrics will appear here "
+            "once positions are opened and resolved.</p>\n"
+            "</div>\n</div>\n</section>\n"
+        )
     if total_verif > 0:
         hr_raw = accuracy.get("hit_rate", 0)
         hit_rate = float(hr_raw) if isinstance(hr_raw, (int, float)) else 0.0
@@ -3274,7 +3735,9 @@ def build_forecasts_html(
             f"</tr>",
         )
 
-    top_bar = _page_header_bar(report_date, "forecasts", report_dates)
+    top_bar = _page_header_bar(
+        report_date, "forecasts", report_dates, page_prefix="forecasts-",
+    )
 
     header = (
         '<header class="header">\n'
@@ -3372,8 +3835,11 @@ def _section_sprint_board() -> str:
     # Group tasks by status
     by_status: dict[str, list[str]] = {c: [] for c in _KANBAN_COLS}
     for task in sprint.tasks:
-        col = task.status.value if task.status.value in by_status else "TODO"
-        prio_val = task.priority.value if hasattr(task.priority, "value") else "medium"
+        ts = task.status
+        status_val = ts.value if hasattr(ts, "value") else str(ts)
+        col = status_val if status_val in by_status else "TODO"
+        tp = task.priority
+        prio_val = tp.value if hasattr(tp, "value") else str(tp)
         prio = prio_val.lower()
         card = (
             f'<div class="kanban-card priority-{html.escape(prio)}">'
@@ -3394,7 +3860,10 @@ def _section_sprint_board() -> str:
             f'<div class="kanban-column"><h3>{html.escape(label)}</h3>{cards}</div>\n'
         )
 
-    task_done = sum(1 for t in sprint.tasks if t.status.value == "DONE")
+    task_done = sum(
+        1 for t in sprint.tasks
+        if (t.status.value if hasattr(t.status, "value") else str(t.status)) == "DONE"
+    )
     task_total = len(sprint.tasks)
 
     return (
@@ -3410,38 +3879,6 @@ def _section_sprint_board() -> str:
         f'<div class="kanban-board">{cols_html}</div>\n'
         "</div>\n</section>\n"
     )
-
-
-def _section_roadmap() -> str:
-    """Render company roadmap with OKR progress bars."""
-    roadmap = load_roadmap()
-    if not roadmap.okrs:
-        return (
-            "<section>\n<h2>Roadmap</h2>\n"
-            '<div class="card"><p class="text-muted">'
-            "No roadmap defined</p></div>\n</section>\n"
-        )
-
-    cards: list[str] = []
-    for okr in roadmap.okrs:
-        pct = okr.progress_pct
-        bar_cls = "green" if pct >= 66 else "yellow" if pct >= 33 else "red"
-        kr_items = "".join(f"<li>{html.escape(kr)}</li>" for kr in okr.key_results)
-        cards.append(
-            f'<div class="okr-card">'
-            f"<h3>"
-            f'<span class="okr-id">{html.escape(okr.id)}</span>'
-            f"{html.escape(okr.objective)}"
-            f'<span class="okr-pct">{pct:.0f}%</span>'
-            f"</h3>"
-            f'<div class="progress-bar">'
-            f'<div class="progress-fill {bar_cls}" '
-            f'style="width:{max(pct, 2):.0f}%"></div></div>'
-            f'<ul class="kr-list">{kr_items}</ul>'
-            f"</div>",
-        )
-
-    return "<section>\n<h2>Roadmap &amp; OKRs</h2>\n" + "".join(cards) + "</section>\n"
 
 
 def _section_ceremonies() -> str:
@@ -3667,22 +4104,21 @@ def _section_pipeline_health() -> str:
     )
 
 
-def build_company_html(
+def build_sprint_board_html(
     *,
     date: str = "",
     report_dates: list[str] | None = None,
 ) -> str:
-    """Build company operations page with sprint, roadmap, and ops data."""
+    """Build sprint board page with kanban board and ceremonies."""
     report_date = date or datetime.now(tz=_ISRAEL_TZ).strftime("%Y-%m-%d")
     report_time = datetime.now(tz=_ISRAEL_TZ).strftime("%H:%M IST")
 
     sprint_board = _section_sprint_board()
-    roadmap = _section_roadmap()
     ceremonies = _section_ceremonies()
-    token_budget = _section_token_budget()
-    pipeline = _section_pipeline_health()
 
-    top_bar = _page_header_bar(report_date, "company", report_dates)
+    top_bar = _page_header_bar(
+        report_date, "sprint-board", report_dates, page_prefix="sprint-board-",
+    )
 
     header = (
         '<header class="header">\n'
@@ -3695,7 +4131,7 @@ def build_company_html(
         '<footer class="footer">\n'
         f"<span>Generated {html.escape(report_date)} "
         f"{html.escape(report_time)} &mdash; "
-        "company operations dashboard.</span>\n"
+        "sprint board &amp; ceremonies.</span>\n"
         "</footer>\n"
     )
 
@@ -3704,18 +4140,66 @@ def build_company_html(
         header,
         '<main id="main-content">\n',
         sprint_board,
-        roadmap,
         ceremonies,
-        token_budget,
-        pipeline,
         "</main>\n",
         footer,
     ]
 
     return _html_page(
-        title=f"Company {report_date}",
+        title=f"Sprint Board {report_date}",
         body="\n".join(p for p in body_parts if p),
-        description=f"Company operations dashboard for {report_date}",
+        description=f"Sprint board and ceremonies for {report_date}",
+    )
+
+
+def build_system_health_html(
+    run: SchedulerRun | None = None,
+    *,
+    date: str = "",
+    report_dates: list[str] | None = None,
+) -> str:
+    """Build system health page with pipeline and token budget."""
+    report_date = date or datetime.now(tz=_ISRAEL_TZ).strftime("%Y-%m-%d")
+    report_time = datetime.now(tz=_ISRAEL_TZ).strftime("%H:%M IST")
+
+    pipeline = _section_pipeline_health()
+    token_budget = _section_token_budget()
+    modules = _section_module_status(run) if run else ""
+
+    top_bar = _page_header_bar(
+        report_date, "system-health", report_dates, page_prefix="system-health-",
+    )
+
+    header = (
+        '<header class="header">\n'
+        f"<span>{html.escape(report_date)} &bull; "
+        f"{html.escape(report_time)}</span>\n"
+        "</header>\n"
+    )
+
+    footer = (
+        '<footer class="footer">\n'
+        f"<span>Generated {html.escape(report_date)} "
+        f"{html.escape(report_time)} &mdash; "
+        "system health &amp; operations.</span>\n"
+        "</footer>\n"
+    )
+
+    body_parts = [
+        top_bar,
+        header,
+        '<main id="main-content">\n',
+        pipeline,
+        token_budget,
+        modules,
+        "</main>\n",
+        footer,
+    ]
+
+    return _html_page(
+        title=f"System Health {report_date}",
+        body="\n".join(p for p in body_parts if p),
+        description=f"System health and operations for {report_date}",
     )
 
 
@@ -4065,7 +4549,9 @@ def build_strategies_html(
     chart_section, chart_js = _section_strategy_equity_curves(data)
     rankings = _section_strategy_rankings(data)
 
-    top_bar = _page_header_bar(report_date, "strategies", report_dates)
+    top_bar = _page_header_bar(
+        report_date, "strategies", report_dates, page_prefix="strategies-",
+    )
 
     header = (
         '<header class="header">\n'
@@ -4427,7 +4913,9 @@ def _section_monthly_summary() -> str:
         return ""
 
     # Group snapshots by month
-    months: dict[str, list[object]] = {}
+    from app.portfolio.tracker import PortfolioSnapshot
+
+    months: dict[str, list[PortfolioSnapshot]] = {}
     for s in history:
         month_key = s.date[:7]  # YYYY-MM
         months.setdefault(month_key, []).append(s)
@@ -4436,10 +4924,10 @@ def _section_monthly_summary() -> str:
     prev_end_value = 10_000.0
     for month_key in sorted(months):
         snaps = months[month_key]
-        start_val = snaps[0].total_value  # type: ignore[union-attr]
-        end_val = snaps[-1].total_value  # type: ignore[union-attr]
-        end_costs = snaps[-1].operating_costs_cumulative  # type: ignore[union-attr]
-        end_realized = snaps[-1].realized_pl_cumulative  # type: ignore[union-attr]
+        start_val = snaps[0].total_value
+        end_val = snaps[-1].total_value
+        end_costs = snaps[-1].operating_costs_cumulative
+        end_realized = snaps[-1].realized_pl_cumulative
         change = end_val - prev_end_value
         change_pct = change / prev_end_value if prev_end_value > 0 else 0
         change_cls = "pct-up" if change >= 0 else "pct-down"
@@ -4480,10 +4968,11 @@ def build_financials_html(
     kpis = _section_portfolio_kpis()
     equity_html, equity_js = _section_equity_curve()
     costs = _section_operating_costs()
-    trades = _section_trade_history()
     monthly = _section_monthly_summary()
 
-    top_bar = _page_header_bar(report_date, "financials", report_dates)
+    top_bar = _page_header_bar(
+        report_date, "financials", report_dates, page_prefix="financials-",
+    )
 
     header = (
         '<header class="header">\n'
@@ -4507,7 +4996,6 @@ def build_financials_html(
         kpis,
         equity_html,
         costs,
-        trades,
         monthly,
         "</main>\n",
         footer,
@@ -4882,7 +5370,9 @@ def build_about_html(
     sources = _section_about_data_sources()
     schedule = _section_about_schedule()
 
-    top_bar = _page_header_bar(report_date, "about", report_dates)
+    top_bar = _page_header_bar(
+        report_date, "about", report_dates, page_prefix="about-",
+    )
 
     header = (
         '<header class="header">\n'
@@ -4916,4 +5406,496 @@ def build_about_html(
         title=f"About {report_date}",
         body="\n".join(p for p in body_parts if p),
         description="System overview, trading strategy, and team structure",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Roadmap page — quarterly OKRs, sprint timeline, progress tracking
+# ---------------------------------------------------------------------------
+
+
+def _section_roadmap_header() -> str:
+    """Render the quarter header with overall progress."""
+    roadmap = load_roadmap()
+    if not roadmap.okrs:
+        return ""
+    total_pct = sum(o.progress_pct for o in roadmap.okrs) / len(roadmap.okrs)
+    bar_cls = "green" if total_pct >= 66 else "yellow" if total_pct >= 33 else "red"
+    return (
+        "<section>\n"
+        "<h2>Q1 2026 Roadmap &mdash; Feb 16 to May 15</h2>\n"
+        '<div class="card">\n'
+        f'<p><strong>Overall progress: {total_pct:.0f}%</strong></p>\n'
+        f'<div class="progress-bar" style="height:8px">'
+        f'<div class="progress-fill {bar_cls}" '
+        f'style="width:{max(total_pct, 2):.0f}%"></div></div>\n'
+        f"<p style=\"font-size:12px;color:var(--text-muted);margin-top:8px\">"
+        f"{len(roadmap.okrs)} objectives &bull; "
+        f"13 sprints (Sprint 4&ndash;17)</p>\n"
+        "</div>\n</section>\n"
+    )
+
+
+def _section_sprint_timeline() -> str:
+    """Render a horizontal sprint timeline for the quarter."""
+    from app.agile.store import load_sprints
+
+    sprints = load_sprints()
+    # Quarter sprints: 4 through 17.
+    quarter_sprints = [s for s in sprints if 4 <= s.number <= 17]
+
+    cells: list[str] = []
+    for i in range(4, 18):
+        sp = next((s for s in quarter_sprints if s.number == i), None)
+        if sp:
+            st = sp.status.value if hasattr(sp.status, "value") else str(sp.status)
+            if st == "ACTIVE":
+                cls = "background:var(--accent);color:#fff"
+            elif st == "COMPLETED":
+                cls = "background:var(--success);color:#fff"
+            else:
+                cls = "background:var(--bg-secondary);color:var(--text-muted)"
+            label = f"S{i}"
+            tip = f"{sp.start_date}"
+        else:
+            cls = "background:var(--bg-secondary);color:var(--text-muted)"
+            label = f"S{i}"
+            tip = "planned"
+
+        cells.append(
+            f'<div style="display:inline-block;padding:4px 8px;margin:2px;'
+            f"border-radius:4px;font-size:11px;font-family:var(--font-mono);"
+            f'{cls}" title="{html.escape(tip)}">{label}</div>'
+        )
+
+    return (
+        "<section>\n<h2>Sprint Timeline</h2>\n"
+        '<div class="card">\n'
+        '<div style="display:flex;flex-wrap:wrap;gap:2px">\n'
+        + "\n".join(cells)
+        + "\n</div>\n</div>\n</section>\n"
+    )
+
+
+def _section_roadmap_okrs() -> str:
+    """Render detailed OKR cards with target sprint and status."""
+    roadmap = load_roadmap()
+    if not roadmap.okrs:
+        return ""
+    current = roadmap.current_sprint
+
+    cards: list[str] = []
+    for okr in roadmap.okrs:
+        pct = okr.progress_pct
+        bar_cls = "green" if pct >= 66 else "yellow" if pct >= 33 else "red"
+        target = okr.target_sprint or 17
+
+        # Status based on timeline progress.
+        quarter_progress = max((current - 4) / 13 * 100, 0) if current >= 4 else 0
+        if pct >= quarter_progress - 10:
+            status_badge = '<span class="badge badge-green">On Track</span>'
+        elif pct >= quarter_progress - 30:
+            status_badge = '<span class="badge badge-yellow">At Risk</span>'
+        else:
+            status_badge = '<span class="badge badge-red">Behind</span>'
+
+        kr_items = ""
+        for kr in okr.key_results:
+            kr_items += f"<li>{html.escape(kr)}</li>\n"
+
+        cards.append(
+            f'<div class="okr-card">\n'
+            f"<h3>"
+            f'<span class="okr-id">{html.escape(okr.id)}</span>'
+            f"{html.escape(okr.objective)} "
+            f"{status_badge}"
+            f'<span class="okr-pct">{pct:.0f}%</span>'
+            f"</h3>\n"
+            f'<div class="progress-bar">'
+            f'<div class="progress-fill {bar_cls}" '
+            f'style="width:{max(pct, 2):.0f}%"></div></div>\n'
+            f'<ul class="kr-list">{kr_items}</ul>\n'
+            f'<p style="font-size:11px;color:var(--text-muted);margin-top:8px">'
+            f"Target: Sprint {target}</p>\n"
+            f"</div>\n",
+        )
+
+    body = "".join(cards)
+    return (
+        "<section>\n<h2>Objectives &amp; Key Results</h2>\n"
+        f"{body}</section>\n"
+    )
+
+
+def _section_research_progress() -> str:
+    """Render research document progress widget on roadmap page."""
+    try:
+        from app.research.store import list_documents
+
+        docs = list_documents()
+        complete = sum(1 for d in docs if d.status.value == "COMPLETE")
+        in_prog = sum(1 for d in docs if d.status.value == "IN_PROGRESS")
+        ideas = sum(1 for d in docs if d.status.value == "IDEA")
+        total_target = 15
+
+        pct = min(complete / total_target * 100, 100) if total_target else 0
+        bar_cls = "green" if pct >= 66 else "yellow" if pct >= 33 else "red"
+
+        return (
+            "<section>\n<h2>Research Pipeline Progress</h2>\n"
+            '<div class="card">\n'
+            f"<p><strong>{complete}/{total_target}</strong> "
+            f"research documents complete "
+            f"&bull; {in_prog} in-progress &bull; {ideas} ideas</p>\n"
+            f'<div class="progress-bar" style="height:8px">'
+            f'<div class="progress-fill {bar_cls}" '
+            f'style="width:{max(pct, 2):.0f}%"></div></div>\n'
+            f"</div>\n</section>\n"
+        )
+    except Exception:
+        return ""
+
+
+def build_roadmap_html(
+    *,
+    date: str = "",
+    report_dates: list[str] | None = None,
+) -> str:
+    """Build roadmap page with quarterly OKRs, sprint timeline, and progress."""
+    report_date = date or datetime.now(tz=_ISRAEL_TZ).strftime("%Y-%m-%d")
+    report_time = datetime.now(tz=_ISRAEL_TZ).strftime("%H:%M IST")
+
+    roadmap_header = _section_roadmap_header()
+    timeline = _section_sprint_timeline()
+    okrs = _section_roadmap_okrs()
+    research_progress = _section_research_progress()
+
+    top_bar = _page_header_bar(
+        report_date, "roadmap", report_dates, page_prefix="roadmap-",
+    )
+
+    header = (
+        '<header class="header">\n'
+        f"<span>{html.escape(report_date)} &bull; "
+        f"{html.escape(report_time)}</span>\n"
+        "</header>\n"
+    )
+
+    footer = (
+        '<footer class="footer">\n'
+        f"<span>Generated {html.escape(report_date)} "
+        f"{html.escape(report_time)} &mdash; "
+        "quarterly roadmap &amp; OKR tracking.</span>\n"
+        "</footer>\n"
+    )
+
+    body_parts = [
+        top_bar,
+        header,
+        '<main id="main-content">\n',
+        roadmap_header,
+        timeline,
+        okrs,
+        research_progress,
+        "</main>\n",
+        footer,
+    ]
+
+    return _html_page(
+        title=f"Roadmap {report_date}",
+        body="\n".join(p for p in body_parts if p),
+        description=f"Q1 2026 quarterly roadmap and OKR progress for {report_date}",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Research page — research document library
+# ---------------------------------------------------------------------------
+
+
+_STATUS_COLORS: dict[str, str] = {
+    "IDEA": "var(--text-muted)",
+    "IN_PROGRESS": "var(--accent)",
+    "DRAFT": "var(--warning)",
+    "COMPLETE": "var(--success)",
+    "ARCHIVED": "var(--text-muted)",
+}
+
+_TYPE_LABELS: dict[str, str] = {
+    "NEW_STRATEGY": "New Strategy",
+    "NEW_ETF": "New ETF",
+    "MARKET_ANOMALY": "Market Anomaly",
+    "RISK_MANAGEMENT": "Risk Management",
+}
+
+
+def _section_research_status() -> str:
+    """Render research pipeline status header."""
+    try:
+        from app.research.store import get_sprint_progress, list_documents, load_state
+
+        state = load_state()
+        docs = list_documents()
+        completed, target = get_sprint_progress(state.current_sprint)
+        in_prog = sum(1 for d in docs if d.status.value == "IN_PROGRESS")
+        ideas = sum(1 for d in docs if d.status.value == "IDEA")
+        total_complete = sum(1 for d in docs if d.status.value == "COMPLETE")
+
+        pct = min(completed / target * 100, 100) if target else 0
+        bar_cls = "green" if pct >= 66 else "yellow" if pct >= 33 else "red"
+
+        return (
+            "<section>\n<h2>Research Pipeline</h2>\n"
+            '<div class="card">\n'
+            f"<p><strong>{total_complete}</strong> complete &bull; "
+            f"<strong>{in_prog}</strong> in-progress &bull; "
+            f"<strong>{ideas}</strong> ideas &bull; "
+            f"Sprint {state.current_sprint} target: "
+            f"<strong>{completed}/{target}</strong></p>\n"
+            f'<div class="progress-bar" style="height:6px;margin-top:8px">'
+            f'<div class="progress-fill {bar_cls}" '
+            f'style="width:{max(pct, 2):.0f}%"></div></div>\n'
+            f"</div>\n</section>\n"
+        )
+    except Exception:
+        return (
+            "<section>\n<h2>Research Pipeline</h2>\n"
+            '<div class="card"><p class="text-muted">'
+            "No research data available</p></div>\n</section>\n"
+        )
+
+
+def _render_section_dots(doc: object) -> str:
+    """Render 9 section progress dots for a research document."""
+    dots: list[str] = []
+    sections = getattr(doc, "sections", [])
+    for s in sections:
+        status = s.status.value if hasattr(s.status, "value") else str(s.status)
+        if status == "COMPLETE":
+            color = "var(--success)"
+        elif status == "DRAFT":
+            color = "var(--warning)"
+        else:
+            color = "var(--bg-dark)"
+        tip = html.escape(f"{s.title}: {status}")
+        dots.append(
+            f'<span style="display:inline-block;width:10px;height:10px;'
+            f"border-radius:50%;background:{color};margin-right:3px;"
+            f'border:1px solid var(--border-light)" title="{tip}"></span>'
+        )
+    return "".join(dots)
+
+
+def _hypothesis_html(hypothesis: str) -> str:
+    """Render hypothesis paragraph if present."""
+    if not hypothesis:
+        return ""
+    escaped = html.escape(hypothesis[:200])
+    return (
+        '<p style="font-size:12px;color:var(--text-secondary);'
+        f'margin-top:4px;font-style:italic">{escaped}</p>'
+    )
+
+
+def _doc_body(section_html: str) -> str:
+    """Return section HTML or a placeholder."""
+    if section_html:
+        return section_html
+    return '<p class="text-muted">No content yet</p>'
+
+
+def _render_document_card(doc: object) -> str:
+    """Render a single research document card."""
+    doc_id = getattr(doc, "id", "?")
+    title = getattr(doc, "title", "Untitled")
+    status = getattr(doc, "status", "")
+    status_val = status.value if hasattr(status, "value") else str(status)
+    rt = getattr(doc, "research_type", "")
+    type_val = rt.value if hasattr(rt, "value") else str(rt)
+    priority = getattr(doc, "priority", "MEDIUM")
+    sprint = getattr(doc, "sprint_number", 0)
+    updated = getattr(doc, "updated_date", "")[:10]
+    hypothesis = getattr(doc, "hypothesis", "")
+    tags = getattr(doc, "tags", [])
+
+    status_color = _STATUS_COLORS.get(status_val, "var(--text-muted)")
+    type_label = _TYPE_LABELS.get(type_val, type_val)
+
+    # Section progress.
+    sections = getattr(doc, "sections", [])
+    filled = sum(1 for s in sections if s.status.value != "EMPTY")
+    complete = sum(1 for s in sections if s.status.value == "COMPLETE")
+
+    dots = _render_section_dots(doc)
+    tag_badges = " ".join(
+        f'<span class="sector-badge">{html.escape(t)}</span>' for t in tags[:5]
+    )
+
+    # Build section content for expandable view.
+    section_html = ""
+    for s in sections:
+        s_status = s.status.value if hasattr(s.status, "value") else str(s.status)
+        if s.content:
+            # Simple markdown-to-HTML: paragraphs and code blocks.
+            content_escaped = html.escape(s.content)
+            content_formatted = content_escaped.replace(
+                "\n\n", "</p><p>",
+            ).replace("\n", "<br>")
+            section_html += (
+                f'<div style="margin-bottom:16px">'
+                f'<h4 style="font-size:13px;'
+                f'color:var(--text-primary);margin-bottom:4px">'
+                f'{html.escape(s.title)} '
+                f'<span style="font-size:11px;'
+                f'color:{_STATUS_COLORS.get(s_status, "var(--text-muted)")}">'
+                f'[{s_status}]</span></h4>'
+                f'<div style="font-size:13px;color:var(--text-secondary);'
+                f'line-height:1.6"><p>{content_formatted}</p></div>'
+                f"</div>"
+            )
+        elif s_status != "EMPTY":
+            section_html += (
+                f'<div style="margin-bottom:8px">'
+                f'<h4 style="font-size:13px;color:var(--text-muted)">'
+                f"{html.escape(s.title)} [{s_status}]</h4>"
+                f"</div>"
+            )
+
+    expanded = status_val == "COMPLETE"
+    prio_cls = {
+        "HIGH": "red", "MEDIUM": "yellow",
+    }.get(priority, "green")
+    meta = f"S{sprint} &bull; {html.escape(updated)}"
+    open_attr = ' open' if expanded else ''
+    id_span = (
+        f'<span style="font-family:var(--font-mono);'
+        f'font-size:12px;color:var(--text-muted)">'
+        f"{html.escape(doc_id)}</span>"
+    )
+    progress_span = (
+        f'<span style="font-size:11px;'
+        f'color:var(--text-muted)">'
+        f"{complete}/{filled}/9</span>"
+    )
+    summary_style = (
+        "font-size:12px;color:var(--accent);"
+        "cursor:pointer;margin-top:8px"
+    )
+
+    return (
+        f'<div class="card" style="margin-bottom:12px">\n'
+        f'<div style="display:flex;'
+        f'justify-content:space-between;'
+        f'align-items:center">\n'
+        f"<div>\n"
+        f"{id_span}\n"
+        f'<strong style="margin-left:8px">'
+        f"{html.escape(title)}</strong>\n"
+        f'<span class="badge" style="'
+        f"background:{status_color};color:#fff;"
+        f'margin-left:8px">{status_val}</span>\n'
+        f'<span class="sector-badge"'
+        f' style="margin-left:4px">'
+        f"{html.escape(type_label)}</span>\n"
+        f'<span class="badge badge-{prio_cls}"'
+        f' style="margin-left:4px">'
+        f"{html.escape(priority)}</span>\n"
+        f"</div>\n"
+        f'<div style="font-size:11px;'
+        f'color:var(--text-muted)">{meta}</div>\n'
+        f"</div>\n"
+        f'<div style="margin:8px 0">{dots} '
+        f"{progress_span}</div>\n"
+        f'{f"<div>{tag_badges}</div>" if tag_badges else ""}'
+        f"{_hypothesis_html(hypothesis)}\n"
+        f"<details{open_attr}>\n"
+        f'<summary style="{summary_style}">'
+        f"View full document</summary>\n"
+        f'<div style="padding:12px 0">'
+        f"{_doc_body(section_html)}"
+        f"</div>\n</details>\n"
+        f"</div>\n"
+    )
+
+
+def _section_research_documents() -> str:
+    """Render all research documents as cards."""
+    try:
+        from app.research.models import DocumentStatus
+        from app.research.store import list_documents
+
+        docs = list_documents()
+        if not docs:
+            return (
+                "<section>\n<h2>Research Documents</h2>\n"
+                '<div class="card"><p class="text-muted">'
+                "No research documents yet. The researcher will create "
+                "documents during scheduled runs.</p></div>\n</section>\n"
+            )
+
+        # Sort: COMPLETE first, then IN_PROGRESS, then DRAFT, then IDEA.
+        order = {
+            DocumentStatus.COMPLETE: 0,
+            DocumentStatus.DRAFT: 1,
+            DocumentStatus.IN_PROGRESS: 2,
+            DocumentStatus.IDEA: 3,
+            DocumentStatus.ARCHIVED: 4,
+        }
+        docs.sort(key=lambda d: (order.get(d.status, 9), d.id))
+
+        cards = "".join(_render_document_card(d) for d in docs)
+        n = len(docs)
+        return (
+            f"<section>\n<h2>Research Documents ({n})"
+            f"</h2>\n{cards}</section>\n"
+        )
+    except Exception:
+        return ""
+
+
+def build_research_html(
+    *,
+    date: str = "",
+    report_dates: list[str] | None = None,
+) -> str:
+    """Build research documents page with document library and progress."""
+    report_date = date or datetime.now(tz=_ISRAEL_TZ).strftime("%Y-%m-%d")
+    report_time = datetime.now(tz=_ISRAEL_TZ).strftime("%H:%M IST")
+
+    status = _section_research_status()
+    documents = _section_research_documents()
+
+    top_bar = _page_header_bar(
+        report_date, "research", report_dates, page_prefix="research-",
+    )
+
+    header = (
+        '<header class="header">\n'
+        f"<span>{html.escape(report_date)} &bull; "
+        f"{html.escape(report_time)}</span>\n"
+        "</header>\n"
+    )
+
+    footer = (
+        '<footer class="footer">\n'
+        f"<span>Generated {html.escape(report_date)} "
+        f"{html.escape(report_time)} &mdash; "
+        "strategy research document library.</span>\n"
+        "</footer>\n"
+    )
+
+    body_parts = [
+        top_bar,
+        header,
+        '<main id="main-content">\n',
+        status,
+        documents,
+        "</main>\n",
+        footer,
+    ]
+
+    return _html_page(
+        title=f"Research {report_date}",
+        body="\n".join(p for p in body_parts if p),
+        description=f"Strategy research documents for {report_date}",
     )

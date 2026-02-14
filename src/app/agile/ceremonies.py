@@ -49,12 +49,26 @@ def generate_standup(
     )
 
     # Research department.
+    research_today = "Analyze macro conditions, strategy proposals"
+    research_yesterday = _module_summary(pipeline_run, "macro.", "research.")
+    try:
+        from app.research.store import get_sprint_progress, load_state
+
+        state = load_state()
+        completed, target = get_sprint_progress(state.current_sprint)
+        in_prog = sum(1 for d in state.documents if d.status == "IN_PROGRESS")
+        research_today = (
+            f"Continue strategy research ({completed}/{target} docs complete, "
+            f"{in_prog} in-progress)"
+        )
+    except Exception:  # noqa: S110
+        pass
     entries.append(
         StandupEntry(
             department="research",
-            agent="research-macro",
-            yesterday=_module_summary(pipeline_run, "macro."),
-            today="Analyze macro conditions, strategy proposals",
+            agent="research-strategy-researcher",
+            yesterday=research_yesterday,
+            today=research_today,
             blockers="",
         ),
     )
@@ -278,8 +292,10 @@ def _standup_summary(entries: list[StandupEntry], sprint: Sprint) -> str:
 def _okr_department(okr_id: str) -> str:
     """Map OKR to responsible department."""
     mapping: dict[str, str] = {
-        "OKR-1": "trading",
-        "OKR-2": "operations",
-        "OKR-3": "intelligence",
+        "OKR-1": "research",
+        "OKR-2": "trading",
+        "OKR-3": "operations",
+        "OKR-4": "intelligence",
+        "OKR-5": "operations",
     }
     return mapping.get(okr_id, "research")

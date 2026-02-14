@@ -39,6 +39,9 @@
 ## Congress Module
 - `uv run python -m app.congress trades|members|sectors|summary`
 
+## Polymarket Module
+- `uv run python -m app.polymarket markets|summary`
+
 ## Scheduler Module
 - `uv run python -m app.scheduler daily|test-run|publish|pre-market|post-market|status|ceremonies`
 

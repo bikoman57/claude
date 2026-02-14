@@ -15,6 +15,7 @@ from app.strategy.backtest import (
     _compute_bollinger,
     _compute_ma,
     _compute_rsi,
+    _recency_weight,
     run_backtest,
 )
 
@@ -459,3 +460,53 @@ def test_run_backtest_win_rate(mock_ticker_cls):
     assert result is not None
     if result.trades:
         assert result.win_rate is not None
+
+
+# --- Recency weighting tests ---
+
+
+def test_recency_weight_most_recent():
+    """Most recent trade (entry_day == total_days) gets weight ~1.0."""
+    w = _recency_weight(entry_day=1000, total_days=1000)
+    assert abs(w - 1.0) < 0.01
+
+
+def test_recency_weight_half_life():
+    """Trade exactly half-life ago gets weight ~0.5."""
+    half_life_days = int(3.0 * 252)  # 756 trading days
+    w = _recency_weight(entry_day=0, total_days=half_life_days)
+    assert abs(w - 0.5) < 0.01
+
+
+def test_recency_weight_old_trade():
+    """Trade from 15 years ago gets very low weight."""
+    total_days = 15 * 252  # 3780 trading days
+    w = _recency_weight(entry_day=0, total_days=total_days)
+    assert w < 0.05  # 5 half-lives → 1/32 ≈ 0.031
+
+
+def test_recency_weight_zero_total_days():
+    """Edge case: total_days=0 returns 1.0."""
+    assert _recency_weight(0, 0) == 1.0
+
+
+@patch("app.strategy.backtest.yf.Ticker")
+def test_run_backtest_produces_weighted_metrics(mock_ticker_cls):
+    """Backtest results include weighted Sharpe and win rate."""
+    prices = (
+        [100.0 + i for i in range(11)]  # 100→110
+        + [110.0 - i for i in range(1, 17)]  # 109→94
+        + [94.0 + i * 1.5 for i in range(1, 25)]  # 95.5→130
+    )
+    mock_t = MagicMock()
+    mock_t.history.return_value = _mock_history(prices)
+    mock_ticker_cls.return_value = mock_t
+
+    config = _make_config(entry_threshold=0.10)
+    result = run_backtest(config)
+
+    assert result is not None
+    assert len(result.trades) >= 1
+    # Weighted metrics should be populated when there are trades
+    assert result.weighted_win_rate is not None
+    assert 0.0 <= result.weighted_win_rate <= 1.0

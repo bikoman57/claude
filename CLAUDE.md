@@ -58,6 +58,7 @@ Geopolitical event categories: TRADE_WAR/TARIFF → tech, semis (TQQQ, SOXL, TEC
 - `src/app/statistics/` — Sector rotation, market breadth, cross-asset correlations, risk indicators
 - `src/app/strategy/` — Backtesting engine, threshold optimization, strategy proposals
 - `src/app/congress/` — Congressional stock trade disclosures (STOCK Act), member performance ratings, sector aggregation
+- `src/app/polymarket/` — Polymarket prediction markets, crowd-sourced probability signals for Fed/geopolitical/economic events
 - `src/app/scheduler/` — Daily runner, scheduled pre/post-market runs, HTML report publishing (GitHub Pages), Telegram delivery, Agile ceremony orchestration
 - `src/app/agile/` — Sprint management, ceremonies (standup/planning/retro), roadmap OKRs, postmortem system
 - `src/app/finops/` — Token cost tracking per agent, department budgets ($100/week), ROI analysis, reallocation suggestions
@@ -77,7 +78,7 @@ See `.claude/references/cli-commands.md` for the full list. Key commands:
 - **Operations**: ops-code-reviewer (haiku), ops-design-reviewer, ops-security-reviewer (haiku), ops-token-optimizer (haiku), ops-devops (haiku)
 
 ### Skills
-- `.claude/skills/` — unified-report, team-report, analyze-etf, scan-opportunities, market-report, self-improve, fix-issue, new-module, telegram-notify, telegram-ask, telegram-setup
+- `.claude/skills/` — unified-report, team-report, analyze-etf, scan-opportunities, market-report, intel-briefing, macro-check, risk-check, strategy-lab, research, ops-health, self-improve, fix-issue, new-module, telegram-notify, telegram-ask, telegram-setup
 
 ### Agent Teams (Experimental)
 - Requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in `.claude/settings.json` (already enabled)
@@ -90,7 +91,7 @@ See `.claude/references/cli-commands.md` for the full list. Key commands:
 
 ### Data & State
 - Signal lifecycle: WATCH → ALERT → SIGNAL → ACTIVE → TARGET
-- Confidence scoring: 12 factors → HIGH/MEDIUM/LOW (drawdown, VIX, Fed, yields, SEC, earnings, geopolitical, social, news, statistics, congress, portfolio risk)
+- Confidence scoring: 14 factors → HIGH/MEDIUM/LOW (drawdown, VIX, Fed, yields, SEC, fundamentals, prediction markets, earnings, geopolitical, social, news, statistics, congress, portfolio risk)
 - Factor weight learning: track trade outcomes, compute predictive weights over time
 - Runtime state persisted in `data/` (gitignored): signals.json, outcomes.json, history/, backtests/, scheduler_status.json, agile/, finops/, devops/, postmortems/
 - Configuration via environment variables (see `.env`)
@@ -107,7 +108,7 @@ See `.claude/references/cli-commands.md` for the full list. Key commands:
 - `uv run python -m app.telegram listen` starts the long-polling listener
 - `--timeout SECONDS` sets Claude command timeout (default: 600s)
 - `--claude PATH` overrides claude CLI path
-- Commands: `/analyze <TICKER>`, `/report`, `/screen [TICKERS]`, `/help`, `/status`
+- Commands: `/analyze <TICKER>`, `/report`, `/scan` (`/screen`), `/intel`, `/macro`, `/risk` (`/portfolio`), `/strategy [TICKER]`, `/research`, `/ops` (`/health`), `/help`, `/status`
 - Free-form text is passed directly to `claude -p` for AI-powered handling
 - Only processes messages from the configured `TELEGRAM_CHAT_ID` (security)
 - Processes one command at a time; rejects concurrent with "still working" message

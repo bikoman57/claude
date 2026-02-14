@@ -157,19 +157,34 @@ def generate_forecast(
     date = datetime.now(tz=_ISRAEL_TZ).strftime("%Y-%m-%d")
 
     # Build backtest lookup: underlying_ticker -> best result
+    # Prefer weighted_sharpe_ratio (recency-biased), fall back to sharpe_ratio
     bt_lookup: dict[str, dict[str, object]] = {}
     if backtest_data:
         for bt in backtest_data:
             if not isinstance(bt, dict):
                 continue
             underlying = str(bt.get("underlying_ticker", ""))
+            w_sharpe = bt.get("weighted_sharpe_ratio")
             sharpe = bt.get("sharpe_ratio")
+            score = (
+                float(w_sharpe)
+                if isinstance(w_sharpe, (int, float))
+                else (float(sharpe) if isinstance(sharpe, (int, float)) else -999.0)
+            )
             existing = bt_lookup.get(underlying)
             if existing is None:
                 bt_lookup[underlying] = bt
-            elif isinstance(sharpe, (int, float)):
-                ex_sharpe = existing.get("sharpe_ratio")
-                if not isinstance(ex_sharpe, (int, float)) or sharpe > ex_sharpe:
+            else:
+                ex_w = existing.get("weighted_sharpe_ratio")
+                ex_s = existing.get("sharpe_ratio")
+                ex_score = (
+                    float(ex_w)
+                    if isinstance(ex_w, (int, float))
+                    else (
+                        float(ex_s) if isinstance(ex_s, (int, float)) else -999.0
+                    )
+                )
+                if score > ex_score:
                     bt_lookup[underlying] = bt
 
     forecasts: list[ETFForecast] = []
@@ -200,9 +215,10 @@ def generate_forecast(
                         if name:
                             factor_scores[name] = assessment
 
-        # Get backtest stats for this underlying
+        # Get backtest stats for this underlying (prefer weighted metrics)
         bt = bt_lookup.get(underlying, {})
-        win_rate = bt.get("win_rate")
+        w_wr = bt.get("weighted_win_rate")
+        win_rate = w_wr if w_wr is not None else bt.get("win_rate")
         avg_gain = bt.get("avg_gain")
         avg_loss = bt.get("avg_loss")
         best_strategy = str(bt.get("strategy_type", "ath_mean_reversion"))

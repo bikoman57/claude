@@ -150,6 +150,56 @@ def assess_sec_sentiment(
     )
 
 
+def assess_fundamentals_health(health: str) -> FactorResult:
+    """Assess fundamental financial health of sector holdings from SEC filings.
+
+    Based on income statement, balance sheet, and cash flow analysis
+    from actual SEC EDGAR XBRL data (10-K/10-Q filings).
+    """
+    if health == "STRONG":
+        return FactorResult(
+            "fundamentals_health",
+            FactorAssessment.FAVORABLE,
+            "Strong fundamentals — revenue growing, healthy margins",
+        )
+    if health in ("WEAK", "DETERIORATING"):
+        return FactorResult(
+            "fundamentals_health",
+            FactorAssessment.UNFAVORABLE,
+            f"Fundamentals {health.lower()} — financial weakness in sector",
+        )
+    return FactorResult(
+        "fundamentals_health",
+        FactorAssessment.NEUTRAL,
+        "Fundamentals stable",
+    )
+
+
+def assess_prediction_markets(signal: str) -> FactorResult:
+    """Assess prediction market signal (NOT contrarian: markets are efficient).
+
+    Prediction markets aggregate crowd wisdom on economic, geopolitical,
+    and political events. FAVORABLE signals support leveraged ETF entries.
+    """
+    if signal == "FAVORABLE":
+        return FactorResult(
+            "prediction_markets",
+            FactorAssessment.FAVORABLE,
+            "Prediction markets support entry conditions",
+        )
+    if signal == "UNFAVORABLE":
+        return FactorResult(
+            "prediction_markets",
+            FactorAssessment.UNFAVORABLE,
+            "Prediction markets signal adverse conditions",
+        )
+    return FactorResult(
+        "prediction_markets",
+        FactorAssessment.NEUTRAL,
+        "Prediction markets neutral",
+    )
+
+
 def assess_earnings_risk(
     upcoming_count: int,
     imminent_count: int,
@@ -317,12 +367,12 @@ def compute_confidence(
 ) -> ConfidenceScore:
     """Compute overall confidence from factor assessments.
 
-    HIGH: 9+/12 favorable, MEDIUM: 5-8, LOW: 0-4.
+    HIGH: 10+/14 favorable, MEDIUM: 5-9, LOW: 0-4.
     """
     favorable = sum(1 for f in factors if f.assessment == FactorAssessment.FAVORABLE)
     total = len(factors)
 
-    if favorable >= 9:
+    if favorable >= 10:
         level = ConfidenceLevel.HIGH
     elif favorable >= 5:
         level = ConfidenceLevel.MEDIUM

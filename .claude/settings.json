@@ -35,7 +35,8 @@
       "Bash(uv run python -m app.congress*)",
       "Bash(uv run python -m app.agile*)",
       "Bash(uv run python -m app.finops*)",
-      "Bash(uv run python -m app.devops*)"
+      "Bash(uv run python -m app.devops*)",
+      "Bash(uv run python -m app.polymarket*)"
     ],
     "deny": []
   }

@@ -63,7 +63,7 @@ def _cmd_backtest(args: list[str]) -> int:
     threshold = _parse_float_arg(args, "--threshold", 0.05)
     target = _parse_float_arg(args, "--target", 0.10)
     stop = _parse_float_arg(args, "--stop", 0.15)
-    period = _parse_str_arg(args, "--period", "2y")
+    period = _parse_str_arg(args, "--period", "15y")
     strategy = _parse_str_arg(
         args,
         "--strategy",
@@ -171,7 +171,7 @@ def _cmd_compare(args: list[str]) -> int:
 
 def _cmd_backtest_all(args: list[str]) -> int:
     """Run backtests for all ETFs across all strategies."""
-    period = _parse_str_arg(args, "--period", "2y")
+    period = _parse_str_arg(args, "--period", "15y")
 
     results: list[dict[str, object]] = []
     for mapping in ETF_UNIVERSE:
@@ -274,6 +274,16 @@ def _cmd_backtest_all(args: list[str]) -> int:
                         else None
                     ),
                     "trade_count": len(result.trades),
+                    "weighted_sharpe_ratio": (
+                        round(result.weighted_sharpe_ratio, 3)
+                        if result.weighted_sharpe_ratio is not None
+                        else None
+                    ),
+                    "weighted_win_rate": (
+                        round(result.weighted_win_rate, 3)
+                        if result.weighted_win_rate is not None
+                        else None
+                    ),
                     "trades": trades_data,
                     "equity_curve": [round(e, 2) for e in equity],
                 }

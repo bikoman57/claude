@@ -6,12 +6,13 @@ from pathlib import Path
 from unittest.mock import patch
 
 from app.scheduler.html_report import (
-    build_company_html,
     build_forecasts_html,
     build_html_report,
     build_index_html,
+    build_sprint_board_html,
     build_strategies_html,
-    build_trade_logs_html,
+    build_system_health_html,
+    build_trade_log_html,
 )
 from app.scheduler.publisher import (
     _discover_report_dates,
@@ -81,7 +82,7 @@ def test_build_html_report_has_dashboard_css():
 def test_build_html_report_header():
     run = _make_run([_ok("etf.signals", "[]"), _fail("macro.dashboard")])
     html = build_html_report(run, date="2026-01-15")
-    assert "Market Report" in html
+    assert "Dashboard" in html
     assert ">1</span>/2 OK" in html
     assert ">1</span> failed" in html
     assert "top-bar" in html
@@ -442,7 +443,8 @@ def test_build_html_report_officials_tone():
     assert "CONTRACTIONARY" in html
 
 
-def test_build_html_report_strategy():
+def test_build_html_report_strategy_summary_card():
+    """Dashboard shows strategy summary card linking to Strategies page."""
     data = json.dumps(
         [
             {
@@ -456,11 +458,10 @@ def test_build_html_report_strategy():
     )
     run = _make_run([_ok("strategy.proposals", data)])
     html = build_html_report(run, date="2026-01-15")
-    assert "SOXL" in html
-    assert "Better Sharpe" in html
-    assert "2.15" in html
-    assert "75.0%" in html
-    assert "+42.0%" in html
+    assert "summary-link-card" in html
+    assert "Strategy Proposals" in html
+    assert "strategies-2026-01-15.html" in html
+    assert "1 proposals across 1 ETFs" in html
 
 
 def test_build_html_report_market_conditions():
@@ -489,16 +490,6 @@ def test_build_html_report_market_conditions():
     assert "DXY" in html
     assert "DECOUPLING" in html
     assert "SPY-IWM" in html
-
-
-def test_build_html_report_module_status_pills():
-    run = _make_run([_ok("etf.signals", "[]"), _fail("macro.dashboard")])
-    html = build_html_report(run, date="2026-01-15")
-    assert "module-grid" in html
-    assert "module-pill-ok" in html
-    assert "module-pill-fail" in html
-    assert "etf.signals" in html
-    assert "macro.dashboard" in html
 
 
 def test_build_html_report_xss_safety():
@@ -647,12 +638,12 @@ def test_build_html_report_all_sections():
     html = build_html_report(run, date="2026-02-01")
     assert "CALM" in html
     assert "TQQQ" in html
-    assert "SOXL" in html
-    assert "Market Report" in html
+    # SOXL now in summary card, not full table
+    assert "Strategy Proposals" in html
+    assert "Dashboard" in html
     assert "exec-summary" in html
     assert "kpi-strip" in html
     assert "grid-2col" in html
-    assert "module-grid" in html
     assert "signal-card" in html
 
 
@@ -886,112 +877,53 @@ def test_build_html_report_congress_empty():
     assert 'id="congress"' not in html
 
 
-def test_build_html_report_strategy_detail_columns():
-    """Strategy table has Trades and Max DD columns."""
+def test_build_html_report_strategy_card_multiple():
+    """Strategy summary card counts multiple proposals and tickers."""
     data = json.dumps(
         [
             {
                 "leveraged_ticker": "SOXL",
                 "improvement_reason": "Better Sharpe",
-                "backtest_sharpe": 1.80,
-                "backtest_win_rate": 0.70,
-                "backtest_total_return": 0.35,
-                "backtest_trade_count": 12,
-                "backtest_max_drawdown": -0.18,
-                "backtest_period": "2y",
-                "backtest_avg_gain": 0.12,
-                "backtest_avg_loss": -0.06,
-            }
-        ]
-    )
-    run = _make_run([_ok("strategy.proposals", data)])
-    html = build_html_report(run, date="2026-01-15")
-    assert "Trades" in html
-    assert "Max DD" in html
-    assert "12" in html
-    assert "-18.0%" in html
-    assert "2y" in html
-    assert "Sharpe ratio" in html
-    assert "avg gain" in html
-    assert "avg loss" in html
-
-
-def test_build_html_report_strategy_low_trade_count_warning():
-    """Strategy table warns when trade count is low."""
-    data = json.dumps(
-        [
+            },
             {
-                "leveraged_ticker": "SOXL",
-                "improvement_reason": "Test entry",
-                "backtest_sharpe": 1.0,
-                "backtest_win_rate": 0.5,
-                "backtest_total_return": 0.1,
-                "backtest_trade_count": 3,
-            }
+                "leveraged_ticker": "TQQQ",
+                "improvement_reason": "Lower DD",
+            },
         ]
     )
     run = _make_run([_ok("strategy.proposals", data)])
     html = build_html_report(run, date="2026-01-15")
-    assert "trade-count-warn" in html
-
-
-def test_build_html_report_strategy_entry_exit_details():
-    """Strategy table shows entry/exit strategy and avg hold duration."""
-    data = json.dumps(
-        [
-            {
-                "leveraged_ticker": "SOXL",
-                "strategy_type": "rsi_oversold",
-                "strategy_description": "Buy when RSI(14) drops below threshold",
-                "threshold_label": "RSI level",
-                "improvement_reason": "Better Sharpe",
-                "backtest_sharpe": 1.80,
-                "backtest_win_rate": 0.70,
-                "backtest_total_return": 0.35,
-                "backtest_trade_count": 12,
-                "backtest_max_drawdown": -0.18,
-                "backtest_total_days": 480,
-                "proposed_threshold": 30.0,
-                "current_threshold": 0.05,
-                "proposed_target": 0.15,
-                "current_target": 0.10,
-            }
-        ]
-    )
-    run = _make_run([_ok("strategy.proposals", data)])
-    html = build_html_report(run, date="2026-01-15")
-    assert "Avg Hold" in html
-    assert "~40d" in html  # 480 / 12 = 40 days
-    assert "strategy-entry-exit" in html
-    assert "RSI level" in html
-    assert "RSI" in html
-    assert "+15% profit target" in html
-    assert "current: +10%" in html
+    assert "2 proposals across 2 ETFs" in html
+    assert "View details" in html
 
 
 def test_build_html_report_nav_menu():
-    """Report includes unified nav with cross-page links and section dropdown."""
+    """Report includes unified nav with dropdown menus and section dropdown."""
     run = _make_run()
     html = build_html_report(run, date="2026-01-15")
     assert "nav-menu" in html
-    # Cross-page links
-    assert "2026-01-15.html" in html
-    assert "trade-logs-2026-01-15.html" in html
+    # Direct links
+    assert "2026-01-15.html" in html  # Dashboard
+    assert "financials-2026-01-15.html" in html
+    assert "research-2026-01-15.html" in html
+    # Dropdown children
     assert "forecasts-2026-01-15.html" in html
+    assert "trade-log-2026-01-15.html" in html
+    assert "sprint-board-2026-01-15.html" in html
+    assert "system-health-2026-01-15.html" in html
     # Dashboard should be active
     assert "nav-active" in html
+    # Dropdown structure for Trading and Operations
+    assert "Trading" in html
+    assert "Operations" in html
     # Section anchors inside dropdown (only on dashboard)
-    assert "nav-dropdown" in html
-    assert "nav-dropdown-btn" in html
     assert "Sections" in html
     assert 'href="#signals"' in html
     assert 'href="#sentiment"' in html
     assert 'href="#market"' in html
     assert 'href="#geopolitical"' in html
     assert 'href="#congress"' in html
-    assert 'href="#strategy"' in html
-    assert 'href="#research"' in html
-    assert 'href="#modules"' in html
+    assert 'href="#predictions"' in html
     assert 'aria-label="Report navigation"' in html
 
 
@@ -1070,36 +1002,23 @@ def test_build_html_report_section_ids():
     assert 'id="market"' in html
     assert 'id="geopolitical"' in html
     assert 'id="congress"' in html
-    assert 'id="strategy"' in html
-    assert 'id="research"' in html
-    assert 'id="modules"' in html
 
 
-def test_build_html_report_strategy_research_section():
-    """Strategy research section summarizes optimization exploration."""
-    data = json.dumps(
+def test_build_html_report_research_summary_card():
+    """Dashboard shows research summary card linking to Research page."""
+    run = _make_run(
         [
-            {
-                "leveraged_ticker": "SOXL",
-                "improvement_reason": "Better Sharpe",
-                "proposed_threshold": 0.10,
-                "proposed_target": 0.15,
-            },
-            {
-                "leveraged_ticker": "TQQQ",
-                "improvement_reason": "Lower DD",
-                "proposed_threshold": 0.07,
-                "proposed_target": 0.10,
-            },
+            _ok(
+                "research.summary",
+                json.dumps({"documents": [{"id": "doc1"}, {"id": "doc2"}]}),
+            ),
         ]
     )
-    run = _make_run([_ok("strategy.proposals", data)])
     html = build_html_report(run, date="2026-01-15")
+    assert "summary-link-card" in html
     assert "Strategy Research" in html
-    assert "2 ETF(s)" in html
-    assert "SOXL" in html
-    assert "TQQQ" in html
-    assert "sector-badge" in html
+    assert "research-2026-01-15.html" in html
+    assert "2 research documents available" in html
 
 
 def test_build_html_report_israel_timezone():
@@ -1157,10 +1076,10 @@ def test_build_index_html_layout_structure():
 
 
 def test_build_index_html_sub_pages():
-    sub = {"2026-01-15": ["", "trade-logs-"], "2026-01-14": [""]}
+    sub = {"2026-01-15": ["", "trade-log-"], "2026-01-14": [""]}
     html = build_index_html(["2026-01-15", "2026-01-14"], sub_pages=sub)
-    assert 'href="reports/trade-logs-2026-01-15.html"' in html
-    assert "Trades" in html
+    assert 'href="reports/trade-log-2026-01-15.html"' in html
+    assert "Trade Log" in html
 
 
 def test_build_index_html_etf_watchlist():
@@ -1268,7 +1187,7 @@ def test_nojekyll_created(tmp_path, monkeypatch):
 # --- Trade logs page tests ---
 
 
-def test_build_trade_logs_html_with_data():
+def test_build_trade_log_html_with_data():
     """Trade logs page generates with equity chart and trade table."""
     backtest_data = json.dumps(
         [
@@ -1312,7 +1231,7 @@ def test_build_trade_logs_html_with_data():
         ]
     )
     outputs = {"strategy.backtest-all": backtest_data}
-    result = build_trade_logs_html(outputs, date="2026-01-15")
+    result = build_trade_log_html(outputs, date="2026-01-15")
     assert "<!DOCTYPE html>" in result
     assert "equityChart" in result
     assert "chart.js" in result.lower() or "Chart" in result
@@ -1321,19 +1240,19 @@ def test_build_trade_logs_html_with_data():
     assert "$450.00" in result
     assert "$470.00" in result
     assert "TARGET" in result
-    assert "Trade Logs" in result
+    assert "Trade Log" in result
     assert "Equity Curve" in result
     assert "10000" in result
     assert "11200" in result
 
 
-def test_build_trade_logs_html_empty():
+def test_build_trade_log_html_empty():
     """Trade logs returns empty string when no backtest data."""
-    result = build_trade_logs_html({}, date="2026-01-15")
+    result = build_trade_log_html({}, date="2026-01-15")
     assert result == ""
 
 
-def test_build_trade_logs_html_summary_table():
+def test_build_trade_log_html_summary_table():
     """Trade logs page has a summary table with key metrics."""
     backtest_data = json.dumps(
         [
@@ -1356,7 +1275,7 @@ def test_build_trade_logs_html_summary_table():
         ]
     )
     outputs = {"strategy.backtest-all": backtest_data}
-    result = build_trade_logs_html(outputs, date="2026-01-15")
+    result = build_trade_log_html(outputs, date="2026-01-15")
     assert "Strategy Performance Summary" in result
     assert "UPRO" in result
     assert "SPY" in result
@@ -1365,7 +1284,7 @@ def test_build_trade_logs_html_summary_table():
     assert "+25.0%" in result  # total return
 
 
-def test_build_trade_logs_html_multiple_etfs():
+def test_build_trade_log_html_multiple_etfs():
     """Trade logs page shows multiple ETF equity curves."""
     backtest_data = json.dumps(
         [
@@ -1404,7 +1323,7 @@ def test_build_trade_logs_html_multiple_etfs():
         ]
     )
     outputs = {"strategy.backtest-all": backtest_data}
-    result = build_trade_logs_html(outputs, date="2026-01-15")
+    result = build_trade_log_html(outputs, date="2026-01-15")
     assert "TQQQ" in result
     assert "SOXL" in result
     # Both should be in chart datasets
@@ -1455,19 +1374,19 @@ def test_build_html_report_nav_has_risks_link():
     assert 'href="#risks"' in html
 
 
-def test_build_html_report_trade_logs_link():
-    """Nav includes link to trade logs page."""
+def test_build_html_report_trade_log_link():
+    """Nav includes link to trade log page."""
     run = _make_run()
     html = build_html_report(run, date="2026-01-15")
-    assert "trade-logs-2026-01-15.html" in html
-    assert "Trade Logs" in html
+    assert "trade-log-2026-01-15.html" in html
+    assert "Trade Log" in html
 
 
 # --- Publisher trade logs test ---
 
 
-def test_write_report_generates_trade_logs(tmp_path, monkeypatch):
-    """Publisher generates trade-logs HTML alongside the report."""
+def test_write_report_generates_trade_log(tmp_path, monkeypatch):
+    """Publisher generates trade-log HTML alongside the report."""
     monkeypatch.setattr(
         "app.scheduler.publisher._DOCS_DIR",
         tmp_path / "docs",
@@ -1499,9 +1418,9 @@ def test_write_report_generates_trade_logs(tmp_path, monkeypatch):
     run = _make_run([_ok("strategy.backtest-all", backtest_data)])
     write_report(run, date="2026-01-15")
 
-    trade_logs_path = tmp_path / "docs" / "reports" / "trade-logs-2026-01-15.html"
-    assert trade_logs_path.exists()
-    content = trade_logs_path.read_text()
+    trade_log_path = tmp_path / "docs" / "reports" / "trade-log-2026-01-15.html"
+    assert trade_log_path.exists()
+    content = trade_log_path.read_text()
     assert "TQQQ" in content
     assert "equityChart" in content
 
@@ -1536,7 +1455,7 @@ def test_git_publish_failure(monkeypatch):
 # --- Trade logs nav bar test ---
 
 
-def test_build_trade_logs_html_has_nav():
+def test_build_trade_log_html_has_nav():
     """Trade logs page should include unified nav bar."""
     data = json.dumps(
         [
@@ -1572,7 +1491,7 @@ def test_build_trade_logs_html_has_nav():
         ]
     )
     outputs = {"strategy.backtest-all": data}
-    html = build_trade_logs_html(outputs, date="2026-02-12")
+    html = build_trade_log_html(outputs, date="2026-02-12")
     assert html
     assert "nav-menu" in html
     assert "2026-02-12.html" in html  # Dashboard link
@@ -1720,54 +1639,67 @@ def test_write_report_generates_forecasts(tmp_path, monkeypatch):
     assert "TQQQ" in content
 
 
-# --- Company page tests ---
+# --- Sprint Board page tests ---
 
 
-def test_build_company_html_renders():
-    """Company page renders with no data (fallback messages)."""
-    html = build_company_html(date="2026-02-12")
+def test_build_sprint_board_html_renders():
+    """Sprint board page renders with no data (fallback messages)."""
+    html = build_sprint_board_html(date="2026-02-12")
     assert "<!DOCTYPE html>" in html
-    assert "Company" in html
-    assert "nav-menu" in html
-    assert "company-2026-02-12.html" in html
     assert "Sprint Board" in html
-    assert "Roadmap" in html
-    assert "Pipeline Health" in html
+    assert "nav-menu" in html
+    assert "sprint-board-2026-02-12.html" in html
 
 
-def test_build_company_html_has_nav_links():
-    """Company page nav includes all 5 page links."""
-    html = build_company_html(date="2026-02-12")
-    assert "2026-02-12.html" in html  # Market Report
-    assert "trade-logs-2026-02-12.html" in html
-    assert "forecasts-2026-02-12.html" in html
-    assert "strategies-2026-02-12.html" in html
-    assert "company-2026-02-12.html" in html
-    assert "Market Report" in html
+def test_build_sprint_board_html_has_nav_links():
+    """Sprint board page nav includes page links."""
+    html = build_sprint_board_html(date="2026-02-12")
+    assert "2026-02-12.html" in html  # Dashboard
+    assert "roadmap-2026-02-12.html" in html
+    assert "Dashboard" in html
 
 
-def test_build_company_html_sprint_board_no_data():
+def test_build_sprint_board_html_sprint_no_data():
     """Sprint board shows message when no sprint data."""
-    html = build_company_html(date="2026-02-12")
+    html = build_sprint_board_html(date="2026-02-12")
     assert "No active sprint" in html or "Sprint Board" in html
 
 
-def test_build_company_html_roadmap_default():
-    """Roadmap renders default OKRs or 'no roadmap' message."""
-    html = build_company_html(date="2026-02-12")
-    assert "Roadmap" in html
-
-
-def test_build_company_html_ceremonies_empty():
-    """Ceremonies section shows empty message when no data."""
-    html = build_company_html(date="2026-02-12")
+def test_build_sprint_board_html_ceremonies():
+    """Sprint board includes ceremonies section."""
+    html = build_sprint_board_html(date="2026-02-12")
     assert "Ceremonies" in html
 
 
-def test_build_company_html_css_classes():
-    """Company page CSS includes new classes."""
-    html = build_company_html(date="2026-02-12")
-    assert "kanban" in html or "progress-bar" in html or "health" in html
+# --- System Health page tests ---
+
+
+def test_build_system_health_html_renders():
+    """System health page renders with pipeline and token budget."""
+    html = build_system_health_html(date="2026-02-12")
+    assert "<!DOCTYPE html>" in html
+    assert "System Health" in html
+    assert "nav-menu" in html
+    assert "Pipeline Health" in html
+
+
+def test_build_system_health_html_with_run():
+    """System health page shows module status when run is provided."""
+    run = _make_run([_ok("etf.signals", "[]"), _fail("macro.dashboard")])
+    html = build_system_health_html(run, date="2026-02-12")
+    assert "module-grid" in html
+    assert "module-pill-ok" in html
+    assert "module-pill-fail" in html
+    assert "etf.signals" in html
+    assert "macro.dashboard" in html
+
+
+def test_build_system_health_html_has_nav_links():
+    """System health page nav includes page links."""
+    html = build_system_health_html(date="2026-02-12")
+    assert "2026-02-12.html" in html  # Dashboard
+    assert "sprint-board-2026-02-12.html" in html
+    assert "Dashboard" in html
 
 
 # --- Strategies page tests ---
@@ -1863,24 +1795,25 @@ def test_build_strategies_html_has_nav_links():
     outputs = {"strategy.backtest-all": _BACKTEST_DATA}
     html = build_strategies_html(outputs, date="2026-02-12")
     assert "2026-02-12.html" in html
-    assert "trade-logs-2026-02-12.html" in html
+    assert "trade-log-2026-02-12.html" in html
     assert "strategies-2026-02-12.html" in html
-    assert "company-2026-02-12.html" in html
+    assert "sprint-board-2026-02-12.html" in html
 
 
 # --- Navigation tests for new pages ---
 
 
 def test_build_html_report_nav_has_all_pages():
-    """Main report nav includes all 5 page links."""
+    """Main report nav includes all page links with dropdown structure."""
     run = _make_run()
     html = build_html_report(run, date="2026-02-12")
     assert "strategies-2026-02-12.html" in html
-    assert "company-2026-02-12.html" in html
-    assert "Market Report" in html
+    assert "sprint-board-2026-02-12.html" in html
+    assert "system-health-2026-02-12.html" in html
+    assert "Dashboard" in html
 
 
-def test_trade_logs_equity_curve_first():
+def test_trade_log_equity_curve_first():
     """Equity curve appears before summary table on Trade Logs page."""
     data = json.dumps(
         [
@@ -1899,7 +1832,7 @@ def test_trade_logs_equity_curve_first():
         ]
     )
     outputs = {"strategy.backtest-all": data}
-    html = build_trade_logs_html(outputs, date="2026-02-12")
+    html = build_trade_log_html(outputs, date="2026-02-12")
     # Equity Curve section should appear before Strategy Performance Summary
     curve_pos = html.index("Equity Curve")
     summary_pos = html.index("Strategy Performance Summary")
@@ -1929,8 +1862,8 @@ def test_write_report_generates_strategies(tmp_path, monkeypatch):
     assert "SOXL" in content
 
 
-def test_write_report_generates_company(tmp_path, monkeypatch):
-    """Publisher generates company HTML alongside the report."""
+def test_write_report_generates_sprint_board(tmp_path, monkeypatch):
+    """Publisher generates sprint-board HTML alongside the report."""
     monkeypatch.setattr(
         "app.scheduler.publisher._DOCS_DIR",
         tmp_path / "docs",
@@ -1942,8 +1875,26 @@ def test_write_report_generates_company(tmp_path, monkeypatch):
     run = _make_run()
     write_report(run, date="2026-01-15")
 
-    company_path = tmp_path / "docs" / "reports" / "company-2026-01-15.html"
-    assert company_path.exists()
-    content = company_path.read_text()
+    sprint_path = tmp_path / "docs" / "reports" / "sprint-board-2026-01-15.html"
+    assert sprint_path.exists()
+    content = sprint_path.read_text()
     assert "Sprint Board" in content
-    assert "Roadmap" in content
+
+
+def test_write_report_generates_system_health(tmp_path, monkeypatch):
+    """Publisher generates system-health HTML alongside the report."""
+    monkeypatch.setattr(
+        "app.scheduler.publisher._DOCS_DIR",
+        tmp_path / "docs",
+    )
+    monkeypatch.setattr(
+        "app.scheduler.publisher._REPORTS_DIR",
+        tmp_path / "docs" / "reports",
+    )
+    run = _make_run([_ok("etf.signals", "[]")])
+    write_report(run, date="2026-01-15")
+
+    health_path = tmp_path / "docs" / "reports" / "system-health-2026-01-15.html"
+    assert health_path.exists()
+    content = health_path.read_text()
+    assert "System Health" in content

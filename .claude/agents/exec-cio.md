@@ -202,22 +202,24 @@ for sym, name in [('SPY','S&P 500'),('QQQ','Nasdaq-100'),('IWM','Russell 2000'),
 
 ## Confidence Scoring
 
-For each ETF signal in SIGNAL state, assess 12 factors:
+For each ETF signal in SIGNAL state, assess 14 factors:
 
 1. **Drawdown Depth**: FAVORABLE if >1.5x threshold, NEUTRAL at threshold, UNFAVORABLE below
 2. **VIX Regime**: FAVORABLE if ELEVATED/EXTREME, NEUTRAL if NORMAL, UNFAVORABLE if LOW
 3. **Fed Regime**: FAVORABLE if CUTTING, NEUTRAL if PAUSING, UNFAVORABLE if HIKING
 4. **Yield Curve**: FAVORABLE if NORMAL, NEUTRAL if FLAT, UNFAVORABLE if INVERTED
 5. **SEC Sentiment**: FAVORABLE if no material negative filings, UNFAVORABLE if many
-6. **Earnings Risk**: FAVORABLE if no imminent earnings, UNFAVORABLE if imminent/miss pattern
-7. **Geopolitical Risk**: FAVORABLE if LOW, NEUTRAL if MEDIUM, UNFAVORABLE if HIGH
-8. **Social Sentiment**: FAVORABLE if BEARISH (contrarian), NEUTRAL otherwise
-9. **News Sentiment**: FAVORABLE if BEARISH (contrarian), NEUTRAL otherwise
-10. **Market Statistics**: FAVORABLE if RISK_OFF (contrarian), NEUTRAL otherwise
-11. **Congress Sentiment**: FAVORABLE if BULLISH (NOT contrarian — smart money), UNFAVORABLE if BEARISH
-12. **Portfolio Risk**: FAVORABLE if within all limits, UNFAVORABLE if position would exceed limits (VETO)
+6. **Fundamentals Health**: FAVORABLE if STRONG, NEUTRAL if MIXED, UNFAVORABLE if WEAK
+7. **Prediction Markets**: FAVORABLE if markets support entry conditions, UNFAVORABLE if adverse
+8. **Earnings Risk**: FAVORABLE if no imminent earnings, UNFAVORABLE if imminent/miss pattern
+9. **Geopolitical Risk**: FAVORABLE if LOW, NEUTRAL if MEDIUM, UNFAVORABLE if HIGH
+10. **Social Sentiment**: FAVORABLE if BEARISH (contrarian), NEUTRAL otherwise
+11. **News Sentiment**: FAVORABLE if BEARISH (contrarian), NEUTRAL otherwise
+12. **Market Statistics**: FAVORABLE if RISK_OFF (contrarian), NEUTRAL otherwise
+13. **Congress Sentiment**: FAVORABLE if BULLISH (NOT contrarian — smart money), UNFAVORABLE if BEARISH
+14. **Portfolio Risk**: FAVORABLE if within all limits, UNFAVORABLE if position would exceed limits (VETO)
 
-Score: **HIGH** (9+/12 favorable), **MEDIUM** (5-8), **LOW** (0-4)
+Score: **HIGH** (10+/14 favorable), **MEDIUM** (5-9), **LOW** (0-4)
 
 ## Cross-Reference Rules
 
@@ -279,9 +281,10 @@ Top rated members: [name] ([tier]) bought [tickers]
 
 ENTRY SIGNALS
 [1] BUY TQQQ -- QQQ down 5.2% from ATH
-    CONFIDENCE: HIGH (9/12 factors)
-    Drawdown: FAV | VIX: FAV | Fed: FAV | Yields: FAV | SEC: NEU | Earnings: FAV
-    Geopolitical: FAV | Social: FAV | News: FAV | Stats: NEU | Congress: FAV | Risk: FAV
+    CONFIDENCE: HIGH (10/14 factors)
+    Drawdown: FAV | VIX: FAV | Fed: FAV | Yields: FAV | SEC: NEU | Fundamentals: FAV
+    Prediction Mkts: FAV | Earnings: FAV | Geopolitical: FAV | Social: FAV
+    News: FAV | Stats: NEU | Congress: FAV | Risk: FAV
     Suggested position: $X (Y% of portfolio)
 
 BLOCKED SIGNALS (risk veto)
@@ -311,7 +314,7 @@ This is not financial advice.
 
 1. Produce exactly ONE report combining all data sources
 2. Cross-reference findings — explain tensions between domains
-3. Include confidence scores (12 factors) for every entry signal
+3. Include confidence scores (14 factors) for every entry signal
 4. **Apply risk-manager VETOs** — blocked signals are reported but not recommended
 5. Include position sizing from risk-portfolio
 6. Include learning insights if available

@@ -23,6 +23,12 @@ from app.etf.universe import (
     get_mapping_by_underlying,
 )
 from app.history.outcomes import record_entry, record_exit
+from app.portfolio.sizing import fixed_fraction_size
+from app.portfolio.tracker import (
+    PortfolioConfig,
+    close_position,
+    enter_position,
+)
 
 USAGE = """\
 Usage:
@@ -163,8 +169,22 @@ def cmd_enter(ticker: str, price: str) -> int:
         entry_price=float(price),
         factors=factors,
     )
+
+    # Update portfolio: deduct position value from cash
+    config = PortfolioConfig.load()
+    sizing = fixed_fraction_size(
+        config.total_value, risk_pct=0.02, leverage=3, entry_price=float(price)
+    )
+    enter_position(
+        config,
+        ticker=ticker.upper(),
+        underlying=found_sig.underlying_ticker,
+        entry_price=float(price),
+        position_value=sizing.position_value,
+    )
     print(  # noqa: T201
-        f"Entered {ticker.upper()} at ${price} (outcome recorded)",
+        f"Entered {ticker.upper()} at ${price}"
+        f" (${sizing.position_value:,.0f} position, outcome recorded)",
     )
     return 0
 
@@ -186,13 +206,21 @@ def cmd_close(ticker: str, exit_price: str | None = None) -> int:
     # Record trade exit for learning
     if exit_price is not None:
         result = record_exit(ticker.upper(), float(exit_price))
+
+        # Update portfolio: realize P&L
+        config = PortfolioConfig.load()
+        config, _portfolio_pl = close_position(
+            config, ticker.upper(), float(exit_price)
+        )
+
         if result and result.pl_pct is not None:
             print(  # noqa: T201
-                f"Closed {ticker.upper()} at ${exit_price} (P/L: {result.pl_pct:+.1%})",
+                f"Closed {ticker.upper()} at ${exit_price}"
+                f" (P/L: {result.pl_pct:+.1%}, portfolio updated)",
             )
         else:
             print(  # noqa: T201
-                f"Closed {ticker.upper()} at ${exit_price}",
+                f"Closed {ticker.upper()} at ${exit_price} (portfolio updated)",
             )
     else:
         print(  # noqa: T201

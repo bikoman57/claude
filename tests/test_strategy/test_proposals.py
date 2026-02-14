@@ -39,6 +39,8 @@ def _make_result(
     total_return: float = 0.25,
     trade_count: int = 5,
     strategy_type: str = StrategyType.ATH_MEAN_REVERSION,
+    weighted_sharpe: float | None = None,
+    weighted_win_rate: float | None = None,
 ) -> BacktestResult:
     config = BacktestConfig(
         underlying_ticker="QQQ",
@@ -46,7 +48,7 @@ def _make_result(
         entry_threshold=threshold,
         profit_target=target,
         stop_loss=0.15,
-        period="2y",
+        period="15y",
         strategy_type=strategy_type,
     )
     trades = tuple(
@@ -71,6 +73,12 @@ def _make_result(
         avg_gain=0.08,
         avg_loss=-0.03,
         total_days=500,
+        weighted_sharpe_ratio=(
+            weighted_sharpe if weighted_sharpe is not None else sharpe
+        ),
+        weighted_win_rate=(
+            weighted_win_rate if weighted_win_rate is not None else win_rate
+        ),
     )
 
 
@@ -93,7 +101,7 @@ def test_proposal_dataclass():
         backtest_total_days=500,
         backtest_avg_gain=0.08,
         backtest_avg_loss=-0.03,
-        backtest_period="2y",
+        backtest_period="15y",
     )
     assert p.proposed_threshold == 0.07
     assert p.strategy_type == "ath_mean_reversion"
@@ -236,3 +244,32 @@ def test_optimize_all_none(mock_run):
     assert breakdown.best_threshold is None
     assert breakdown.best_strategy_type is None
     assert len(breakdown.results) == 0
+
+
+@patch("app.strategy.proposals.run_backtest")
+def test_optimize_prefers_weighted_sharpe(mock_run):
+    """Optimizer selects by weighted Sharpe, not raw Sharpe."""
+    # Higher raw Sharpe but lower weighted Sharpe (old trades inflating it)
+    old_biased = _make_result(
+        threshold=0.05,
+        sharpe=3.0,
+        weighted_sharpe=0.8,
+    )
+    # Lower raw Sharpe but higher weighted Sharpe (recent trades doing well)
+    recent_biased = _make_result(
+        threshold=30.0,
+        sharpe=1.5,
+        weighted_sharpe=2.0,
+        strategy_type=StrategyType.RSI_OVERSOLD,
+    )
+
+    results_iter = iter([old_biased, recent_biased] + [None] * 100)
+    mock_run.side_effect = lambda cfg: next(results_iter)
+
+    mapping = _make_mapping()
+    breakdown = optimize_single_etf(mapping)
+
+    assert breakdown.best_result is not None
+    # Should pick the one with higher weighted Sharpe
+    assert breakdown.best_result.weighted_sharpe_ratio == 2.0
+    assert breakdown.best_strategy_type == "rsi_oversold"

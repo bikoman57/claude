@@ -16,7 +16,12 @@ from app.sec.earnings import (
     fetch_earnings_calendar,
 )
 from app.sec.filings import fetch_recent_filings
+from app.sec.fundamentals import (
+    fetch_all_fundamentals,
+    fetch_and_analyze,
+)
 from app.sec.holdings import (
+    INDEX_HOLDINGS,
     get_all_unique_holdings,
     get_holding_by_ticker,
 )
@@ -30,6 +35,8 @@ Usage:
   uv run python -m app.sec earnings <ticker>     Earnings calendar and history
   uv run python -m app.sec earnings-calendar     Upcoming earnings for all holdings
   uv run python -m app.sec earnings-summary      Recent earnings beats/misses
+  uv run python -m app.sec fundamentals <ticker> Financial analysis from SEC XBRL
+  uv run python -m app.sec fundamentals-summary  Health classification for all holdings
 """
 
 
@@ -188,6 +195,65 @@ def cmd_earnings_summary() -> int:
     return 0
 
 
+def cmd_fundamentals(ticker: str) -> int:
+    """Show fundamental financial analysis for one stock from SEC XBRL."""
+    email = _get_email()
+    if not email:
+        print(  # noqa: T201
+            "SEC_EDGAR_EMAIL not set.",
+            file=sys.stderr,
+        )
+        return 1
+    holding = get_holding_by_ticker(ticker.upper())
+    if holding is None:
+        print(  # noqa: T201
+            f"Unknown ticker: {ticker}",
+            file=sys.stderr,
+        )
+        return 1
+    try:
+        analysis = fetch_and_analyze(holding.ticker, holding.cik, email)
+        print(  # noqa: T201
+            json.dumps(asdict(analysis), indent=2, default=str),
+        )
+        return 0
+    except Exception as e:
+        print(  # noqa: T201
+            f"Error fetching fundamentals: {e}",
+            file=sys.stderr,
+        )
+        return 1
+
+
+def cmd_fundamentals_summary() -> int:
+    """Show fundamental health classification for all holdings by sector."""
+    email = _get_email()
+    if not email:
+        print(  # noqa: T201
+            "SEC_EDGAR_EMAIL not set.",
+            file=sys.stderr,
+        )
+        return 1
+    from app.sec.fundamentals import classify_sector_health
+
+    print("Fundamental health by sector:")  # noqa: T201
+    for index, holdings in INDEX_HOLDINGS.items():
+        if not holdings:
+            continue
+        analyses = fetch_all_fundamentals(holdings, email)
+        if not analyses:
+            print(f"  {index}: NO DATA")  # noqa: T201
+            continue
+        sector_health = classify_sector_health(analyses)
+        details = []
+        for a in analyses:
+            details.append(f"{a.ticker}={a.health}")
+        print(  # noqa: T201
+            f"  {index:>5s}: {sector_health:<15s} ({', '.join(details)})",
+        )
+    return 0
+
+
 def main() -> None:
     load_dotenv()
     if len(sys.argv) < 2:
@@ -209,6 +275,10 @@ def main() -> None:
             exit_code = cmd_earnings_calendar()
         case "earnings-summary":
             exit_code = cmd_earnings_summary()
+        case "fundamentals" if len(sys.argv) >= 3:
+            exit_code = cmd_fundamentals(sys.argv[2])
+        case "fundamentals-summary":
+            exit_code = cmd_fundamentals_summary()
         case _:
             print(  # noqa: T201
                 f"Unknown command: {command}",

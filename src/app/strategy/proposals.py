@@ -14,7 +14,7 @@ from app.strategy.backtest import (
 )
 
 _STOP_LOSS = 0.15
-_PERIOD = "2y"
+_PERIOD = "15y"
 
 # Per-strategy parameter grids
 # entry_threshold values to test per strategy type
@@ -111,14 +111,22 @@ def optimize_single_etf(
                 if result is not None and result.trades:
                     results.append(result)
 
-    # Find best by Sharpe ratio, falling back to win rate
+    # Find best by weighted Sharpe ratio (recency-biased), falling back to unweighted
     best: BacktestResult | None = None
     for r in results:
         if best is None:
             best = r
             continue
-        r_sharpe = r.sharpe_ratio if r.sharpe_ratio is not None else -999.0
-        b_sharpe = best.sharpe_ratio if best.sharpe_ratio is not None else -999.0
+        r_sharpe = (
+            r.weighted_sharpe_ratio
+            if r.weighted_sharpe_ratio is not None
+            else (r.sharpe_ratio if r.sharpe_ratio is not None else -999.0)
+        )
+        b_sharpe = (
+            best.weighted_sharpe_ratio
+            if best.weighted_sharpe_ratio is not None
+            else (best.sharpe_ratio if best.sharpe_ratio is not None else -999.0)
+        )
         if r_sharpe > b_sharpe:
             best = r
 

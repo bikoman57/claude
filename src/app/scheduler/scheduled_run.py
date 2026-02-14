@@ -244,6 +244,36 @@ def _continuity_forecast_accuracy(config: SchedulerConfig) -> list[str]:
         return []
 
 
+def _continuity_research() -> list[str]:
+    """Summarize research pipeline status."""
+    try:
+        from app.research.models import DocumentStatus
+        from app.research.store import get_sprint_progress, load_state
+
+        state = load_state()
+        if not state.documents:
+            return []
+        completed, target = get_sprint_progress(state.current_sprint)
+        in_progress = [
+            d for d in state.documents
+            if d.status == DocumentStatus.IN_PROGRESS
+        ]
+        ideas = [d for d in state.documents if d.status == DocumentStatus.IDEA]
+        lines = [
+            f"### Research Pipeline (Sprint {state.current_sprint})",
+            f"- Progress: {completed}/{target} documents complete",
+            f"- In progress: {len(in_progress)}, Ideas: {len(ideas)}",
+        ]
+        for d in in_progress[:3]:
+            lines.append(f"  - {d.id}: {d.title}")
+        if state.continuation_notes:
+            lines.append(f"- Last notes: {state.continuation_notes[:200]}")
+        return ["\n".join(lines)]
+    except Exception:
+        logger.debug("Could not load research state", exc_info=True)
+        return []
+
+
 def _build_continuity_context(
     session: RunSession,
     config: SchedulerConfig,
@@ -262,6 +292,7 @@ def _build_continuity_context(
     sections.extend(_continuity_standup(today_str))
     sections.extend(_continuity_signals(config))
     sections.extend(_continuity_forecast_accuracy(config))
+    sections.extend(_continuity_research())
 
     if not sections:
         return ""
@@ -313,7 +344,9 @@ Module summary:
    macro, technical, geopolitical, social, and news data. Flag contradictions.
 
 4. **Assess entry signals**: For ETFs in SIGNAL or ALERT state, compute
-   confidence scores using all 12 factors. Note specific entry price levels.
+   confidence scores using all 14 factors (drawdown, VIX, Fed, yields, SEC,
+   fundamentals, prediction markets, earnings, geopolitical, social, news,
+   statistics, congress, portfolio risk). Note specific entry price levels.
 
 5. **Strategy insights**: From the strategy.proposals, strategy.forecast, and
    strategy.verify pipeline outputs, summarize top strategies and parameter
@@ -374,6 +407,34 @@ Send a Telegram summary of key findings when done using: \
 `uv run python -m app.telegram notify "your summary here"`
 """
 
+_RESEARCH_PROMPT = """\
+You are the strategy researcher running the {session} research session for {date}.
+
+## Current Research State
+{research_state}
+
+## Instructions
+
+1. Start by reading your current state above. Your continuation notes tell you \
+exactly what to work on.
+
+2. Follow the decision tree:
+   - If you have an IN_PROGRESS document → continue filling in sections
+   - If no in-progress docs and sprint target not met → create a new document
+   - If sprint target met → polish existing drafts
+
+3. Do real research: use WebSearch for academic papers and strategy articles, \
+use Python/yfinance for data analysis with proper statistical methods.
+
+4. Write each section following the 9-section template in your agent prompt. \
+Pipe content to: `uv run python -m app.research update <ID> <section> --status DRAFT`
+
+5. Before stopping, ALWAYS save continuation notes:
+   `uv run python -m app.research notes --text "..." --session {session}`
+
+Sprint target: complete 3-5 research documents by end of sprint.
+"""
+
 
 @dataclass
 class ScheduledRunResult:
@@ -388,6 +449,7 @@ class ScheduledRunResult:
     publish_success: bool
     claude_success: bool
     claude_output: str
+    research_success: bool
     telegram_success: bool
 
 
@@ -565,6 +627,115 @@ def _run_claude_analysis(
         duration = time.monotonic() - start_time
         logger.exception("Unexpected error running Claude CLI")
         return False, str(exc), "", duration
+
+
+def _get_research_state_text() -> str:
+    """Get current research state for the researcher prompt."""
+    try:
+        from app.research.store import load_state
+
+        state = load_state()
+        lines = [
+            f"Sprint: {state.current_sprint}",
+            f"Documents: {len(state.documents)}",
+            f"Target: {state.sprint_target} per sprint",
+        ]
+        if state.continuation_notes:
+            lines.append(
+                f"Continuation notes ({state.last_run_session}):"
+                f" {state.continuation_notes}"
+            )
+        else:
+            lines.append("No continuation notes — this may be the first run.")
+        return "\n".join(lines)
+    except Exception:
+        return "Research state unavailable — this may be the first run."
+
+
+def _run_research_analysis(
+    config: SchedulerConfig,
+    session: RunSession,
+) -> tuple[bool, str, float]:
+    """Phase 3b: Invoke Claude CLI for strategy research continuation.
+
+    Returns (success, stderr, duration_seconds).
+    """
+    date_str = datetime.now(tz=_ISRAEL_TZ).strftime("%Y-%m-%d")
+    research_state = _get_research_state_text()
+
+    prompt = _RESEARCH_PROMPT.format(
+        date=date_str,
+        session=session.value,
+        research_state=research_state,
+    )
+
+    logger.info(
+        "Phase 3b: Starting research analysis (timeout: %ds)...",
+        config.research_timeout,
+    )
+
+    research_stdout_log = config.logs_dir / f"{date_str}_{session.value}_research.log"
+    research_stderr_log = (
+        config.logs_dir / f"{date_str}_{session.value}_research_verbose.log"
+    )
+
+    start_time = time.monotonic()
+
+    try:
+        env = os.environ.copy()
+        env.setdefault("CLAUDE_CODE_GIT_BASH_PATH", r"D:\Git\bin\bash.exe")
+
+        cmd = [str(config.claude_executable), "-p", prompt, "--verbose"]
+        cmd.extend(_build_allowed_tools_args())
+
+        timed_out = False
+
+        with (
+            research_stdout_log.open("wb") as f_out,
+            research_stderr_log.open("wb") as f_err,
+        ):
+            proc = subprocess.Popen(  # noqa: S603
+                cmd,
+                stdout=f_out,
+                stderr=f_err,
+                cwd=str(config.project_dir),
+                env=env,
+            )
+            try:
+                proc.wait(timeout=config.research_timeout)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+                proc.wait()
+                timed_out = True
+
+        duration = time.monotonic() - start_time
+        stderr = research_stderr_log.read_text(
+            encoding="utf-8", errors="replace",
+        ).strip()
+
+        if timed_out:
+            logger.error(
+                "Research analysis timed out after %ds",
+                config.research_timeout,
+            )
+            return False, stderr, duration
+
+        if proc.returncode != 0:
+            logger.warning("Research exited with code %d", proc.returncode)
+            return False, stderr, duration
+
+        logger.info("Research analysis complete (%.1fs)", duration)
+        return True, stderr, duration
+
+    except FileNotFoundError:
+        duration = time.monotonic() - start_time
+        logger.error("Claude CLI not found at: %s", config.claude_executable)
+        return False, "", duration
+
+    except Exception:
+        duration = time.monotonic() - start_time
+        logger.exception("Unexpected error running research analysis")
+        return False, "", duration
 
 
 async def _send_telegram_summary(
@@ -755,6 +926,38 @@ def _record_token_usage(
         logger.exception("Token usage recording failed (non-fatal)")
 
 
+def _record_token_usage_research(
+    session: RunSession,
+    stderr: str,
+    duration: float,
+) -> None:
+    """Phase 5: Record token usage from research analysis."""
+    from app.finops.tracker import parse_claude_output_tokens, record_usage
+
+    try:
+        input_tokens, output_tokens = parse_claude_output_tokens(stderr)
+        if input_tokens > 0 or output_tokens > 0:
+            today_str = datetime.now(tz=UTC).date().isoformat()
+            record = record_usage(
+                agent_name="research-strategy-researcher",
+                session=session.value,
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+                duration_seconds=duration,
+                run_id=f"{today_str}_{session.value}_research",
+            )
+            logger.info(
+                "Research token usage: %d input, %d output, $%.4f",
+                record.input_tokens,
+                record.output_tokens,
+                record.cost_usd,
+            )
+        else:
+            logger.info("No token data found in research stderr")
+    except Exception:
+        logger.exception("Research token usage recording failed (non-fatal)")
+
+
 def _record_pipeline_health(
     pipeline_run: SchedulerRun,
     session: RunSession,
@@ -776,7 +979,8 @@ def run_scheduled(session: RunSession) -> ScheduledRunResult:
       0: Ceremonies (standup, Monday planning)
       1: Data pipeline
       2: Publish HTML report
-      3: Claude analysis
+      3a: Claude CIO analysis
+      3b: Claude research analysis
       4: Telegram summary
       5: Record token usage + pipeline health
       6-8: Post-ceremonies (Friday retro, sprint advance)
@@ -802,11 +1006,17 @@ def run_scheduled(session: RunSession) -> ScheduledRunResult:
     # Phase 2: Publish HTML report
     publish_ok = _publish_report(pipeline_run)
 
-    # Phase 3: Claude analysis — reads pipeline data and synthesizes.
+    # Phase 3a: Claude CIO analysis — reads pipeline data and synthesizes.
     claude_ok, claude_output, claude_stderr, claude_duration = _run_claude_analysis(
         config,
         session,
         pipeline_run,
+    )
+
+    # Phase 3b: Claude research analysis — continues strategy research.
+    research_ok, research_stderr, research_duration = _run_research_analysis(
+        config,
+        session,
     )
 
     # Phase 4: Telegram summary
@@ -821,6 +1031,7 @@ def run_scheduled(session: RunSession) -> ScheduledRunResult:
 
     # Phase 5: Record token usage and pipeline health
     _record_token_usage(session, claude_stderr, claude_duration)
+    _record_token_usage_research(session, research_stderr, research_duration)
     _record_pipeline_health(pipeline_run, session)
 
     # Phase 6-8: Post-analysis ceremonies (Friday retro + sprint advance)
@@ -831,11 +1042,12 @@ def run_scheduled(session: RunSession) -> ScheduledRunResult:
     logger.info("=" * 60)
     logger.info("SCHEDULED RUN COMPLETE: %s", finished)
     logger.info(
-        "Pipeline: %d/%d | Publish: %s | Claude: %s | Telegram: %s",
+        "Pipeline: %d/%d | Publish: %s | Claude: %s | Research: %s | Telegram: %s",
         pipeline_run.succeeded,
         pipeline_run.total_modules,
         "OK" if publish_ok else "FAIL",
         "OK" if claude_ok else "FAIL",
+        "OK" if research_ok else "FAIL",
         "OK" if telegram_ok else "FAIL",
     )
     logger.info("=" * 60)
@@ -849,6 +1061,7 @@ def run_scheduled(session: RunSession) -> ScheduledRunResult:
         pipeline_modules_total=pipeline_run.total_modules,
         publish_success=publish_ok,
         claude_success=claude_ok,
+        research_success=research_ok,
         claude_output=claude_output[:10000],
         telegram_success=telegram_ok,
     )

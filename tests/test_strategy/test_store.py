@@ -137,3 +137,70 @@ def test_roundtrip_preserves_none_sharpe(tmp_path, monkeypatch):
     loaded = load_backtest(path)
     assert loaded.sharpe_ratio is None
     assert loaded.win_rate is None
+
+
+def test_roundtrip_weighted_fields(tmp_path, monkeypatch):
+    """Weighted metrics survive save/load roundtrip."""
+    monkeypatch.setattr(
+        "app.strategy.store._DATA_DIR",
+        tmp_path / "backtests",
+    )
+    result = BacktestResult(
+        config=BacktestConfig(
+            underlying_ticker="QQQ",
+            leverage=3.0,
+            entry_threshold=0.05,
+            profit_target=0.10,
+            stop_loss=0.15,
+            period="15y",
+        ),
+        trades=(),
+        total_return=0.0,
+        sharpe_ratio=1.0,
+        max_drawdown=0.1,
+        win_rate=0.6,
+        avg_gain=0.08,
+        avg_loss=-0.03,
+        total_days=3780,
+        weighted_sharpe_ratio=1.35,
+        weighted_win_rate=0.72,
+    )
+    path = save_backtest(result)
+    loaded = load_backtest(path)
+    assert loaded.weighted_sharpe_ratio == 1.35
+    assert loaded.weighted_win_rate == 0.72
+
+
+def test_load_legacy_json_without_weighted_fields(tmp_path, monkeypatch):
+    """Old JSON files without weighted fields load with None defaults."""
+    import json
+
+    monkeypatch.setattr(
+        "app.strategy.store._DATA_DIR",
+        tmp_path / "backtests",
+    )
+    (tmp_path / "backtests").mkdir(parents=True, exist_ok=True)
+    legacy = {
+        "config": {
+            "underlying_ticker": "QQQ",
+            "leverage": 3.0,
+            "entry_threshold": 0.05,
+            "profit_target": 0.10,
+            "stop_loss": 0.15,
+            "period": "2y",
+            "strategy_type": "ath_mean_reversion",
+        },
+        "trades": [],
+        "total_return": 0.0,
+        "sharpe_ratio": 1.0,
+        "max_drawdown": 0.05,
+        "win_rate": 0.5,
+        "avg_gain": 0.08,
+        "avg_loss": -0.03,
+        "total_days": 500,
+    }
+    path = tmp_path / "backtests" / "QQQ_5pct_2025-01-01.json"
+    path.write_text(json.dumps(legacy))
+    loaded = load_backtest(path)
+    assert loaded.weighted_sharpe_ratio is None
+    assert loaded.weighted_win_rate is None

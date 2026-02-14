@@ -175,7 +175,7 @@ class TestRetroPersistence:
 class TestRoadmapPersistence:
     def test_default_roadmap(self) -> None:
         roadmap = default_roadmap()
-        assert len(roadmap.okrs) == 3
+        assert len(roadmap.okrs) == 5
         assert roadmap.okrs[0].id == "OKR-1"
 
     def test_save_and_load(self, tmp_path: Path) -> None:
@@ -185,15 +185,15 @@ class TestRoadmapPersistence:
 
         save_roadmap(roadmap, roadmap_path)
         loaded = load_roadmap(roadmap_path)
-        assert len(loaded.okrs) == 3
+        assert len(loaded.okrs) == 5
 
 
 class TestInitAgile:
     def test_init_creates_sprint_and_roadmap(self, tmp_path: Path) -> None:
         # init_agile uses default paths, so we test the default_roadmap instead.
         roadmap = default_roadmap()
-        assert len(roadmap.okrs) == 3
-        assert roadmap.current_sprint == 1
+        assert len(roadmap.okrs) == 5
+        assert roadmap.current_sprint == 4
 
 
 class TestIsSprintOver:

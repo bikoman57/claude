@@ -19,6 +19,7 @@ class SchedulerConfig:
     claude_executable: Path
     claude_timeout: int  # seconds for Claude CLI analysis
     logs_dir: Path
+    research_timeout: int = 600  # seconds for research CLI analysis
 
     @classmethod
     def from_env(cls) -> SchedulerConfig:
@@ -48,6 +49,10 @@ class SchedulerConfig:
             os.environ.get("CLAUDE_ANALYSIS_TIMEOUT", "3600"),
         )
 
+        research_timeout = int(
+            os.environ.get("RESEARCH_ANALYSIS_TIMEOUT", "600"),
+        )
+
         logs_dir = project_dir / "data" / "logs"
 
         return cls(
@@ -55,6 +60,7 @@ class SchedulerConfig:
             uv_executable=uv_executable,
             claude_executable=claude_executable,
             claude_timeout=claude_timeout,
+            research_timeout=research_timeout,
             logs_dir=logs_dir,
         )
 

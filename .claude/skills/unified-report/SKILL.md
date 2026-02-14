@@ -4,7 +4,7 @@ description: Generate the complete unified daily swing trading report with all d
 disable-model-invocation: true
 metadata:
   author: bikoman57
-  version: 2.0.0
+  version: 3.0.0
   category: financial-analysis
 ---
 
@@ -37,6 +37,13 @@ uv run python -m app.history summary
 uv run python -m app.risk dashboard
 uv run python -m app.portfolio dashboard
 uv run python -m app.quant summary
+uv run python -m app.congress summary
+uv run python -m app.polymarket summary
+uv run python -m app.strategy forecast
+uv run python -m app.strategy verify
+uv run python -m app.sec earnings-calendar
+uv run python -m app.sec fundamentals-summary
+uv run python -m app.research status
 ```
 
 ### Step 2: Broad Market Context
@@ -56,10 +63,12 @@ for sym, name in [('SPY','S&P 500'),('QQQ','Nasdaq-100'),('IWM','Russell 2000'),
 ### Step 3: Synthesize with CIO
 
 Use the `exec-cio` agent to:
-- Cross-reference all data sources (ETF + macro + SEC + geopolitical + social + news + statistics + strategy + risk + portfolio + quant)
-- Compute confidence scores (12 factors) for each entry signal
+- Cross-reference all data sources (ETF + macro + SEC + geopolitical + social + news + statistics + strategy + risk + portfolio + quant + congress + polymarket)
+- Compute confidence scores (14 factors) for each entry signal
 - Apply risk-manager veto logic for portfolio limit breaches
 - Identify tensions between domains (e.g., bad macro but deep drawdown, high geopolitical risk but bearish sentiment)
+- Include forecast accuracy from strategy verify results
+- Note research pipeline progress
 - Produce the unified report in the format below
 
 ### Step 4: Send via Telegram
@@ -91,18 +100,31 @@ NEWS SENTIMENT
 Overall: [sentiment] ([N] articles)
 - [top headline with sector relevance]
 
+CONGRESSIONAL ACTIVITY
+Net flow: $[val] ([N] trades, last 30 days)
+Top buying: [sectors] | Top selling: [sectors]
+- [notable member trades with sector relevance]
+
+PREDICTION MARKETS
+Fed rate cut by [date]: [probability]%
+Recession 2026: [probability]%
+- [other relevant markets with probabilities]
+
 MARKET STATISTICS
 Rotation: [RISK_ON/RISK_OFF] | Put/Call: [val] | VIX Term: [structure]
 Gold: $[price] ({%}) | DXY: [val] ({%})
 
 SEC FILINGS (last 7 days)
 - [ticker] [form_type] filed [date]: [materiality]
+Fundamentals: [sector health classification from fundamentals-summary]
+Earnings risk: [upcoming earnings within 14 days]
 
 ENTRY SIGNALS
 [1] BUY TQQQ — QQQ down 5.2% from ATH
-    CONFIDENCE: HIGH (7/9 factors)
-    Drawdown: FAV | VIX: FAV | Fed: FAV | Yields: FAV | SEC: NEU
-    Geopolitical: FAV | Social: FAV | News: FAV | Stats: NEU
+    CONFIDENCE: HIGH (10/14 factors)
+    Drawdown: FAV | VIX: FAV | Fed: FAV | Yields: FAV | SEC: NEU | Fundamentals: FAV
+    Earnings: FAV | Geopolitical: FAV | Social: FAV | News: FAV | Stats: NEU
+    Congress: FAV | Portfolio Risk: FAV | Prediction Markets: FAV
 
 ACTIVE POSITIONS
 | ETF  | Entry  | Current | P/L   | Target | Days |
@@ -110,10 +132,17 @@ ACTIVE POSITIONS
 STRATEGY INSIGHTS
 - [backtest-based proposals for parameter changes]
 
+FORECAST ACCURACY
+Verified [N] past forecasts: [accuracy]%
+Active forecasts: [list with direction and confidence]
+
 LEARNING INSIGHTS
 Based on N past trades:
 - Top factor: Drawdown depth (weight: 0.35)
 - Win rate: X% | Avg P/L: Y%
+
+RESEARCH STATUS
+Sprint [N]: [completed]/[target] documents | In-progress: [titles]
 
 This is not financial advice.
 ```

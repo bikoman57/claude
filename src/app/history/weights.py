@@ -16,6 +16,8 @@ FACTOR_NAMES = [
     "market_statistics",
     "congress_sentiment",
     "portfolio_risk",
+    "fundamentals_health",
+    "prediction_markets",
 ]
 
 

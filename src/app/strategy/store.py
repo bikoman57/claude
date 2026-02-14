@@ -62,6 +62,8 @@ def load_backtest(path: Path) -> BacktestResult:
         avg_gain=data["avg_gain"],
         avg_loss=data["avg_loss"],
         total_days=data["total_days"],
+        weighted_sharpe_ratio=data.get("weighted_sharpe_ratio"),
+        weighted_win_rate=data.get("weighted_win_rate"),
     )
 
 

@@ -153,9 +153,11 @@ def test_continuity_empty_no_data(
     monkeypatch: object,
 ) -> None:
     import app.agile.store as store
+    import app.scheduler.scheduled_run as sched
 
     monkeypatch.setattr(store, "get_current_sprint", lambda **kw: None)  # type: ignore[attr-defined]
     monkeypatch.setattr(store, "load_standup", lambda *a, **kw: None)  # type: ignore[attr-defined]
+    monkeypatch.setattr(sched, "_continuity_research", lambda: [])  # type: ignore[attr-defined]
     config = _make_config(tmp_path)
     result = _build_continuity_context(RunSession.PRE_MARKET, config)
     assert result == ""

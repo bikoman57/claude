@@ -4,7 +4,7 @@ description: Scan all leveraged ETFs for mean-reversion entry and exit opportuni
 disable-model-invocation: true
 metadata:
   author: bikoman57
-  version: 1.0.0
+  version: 1.1.0
   category: financial-analysis
 ---
 
@@ -19,11 +19,13 @@ Scan all leveraged ETFs for mean-reversion opportunities. $ARGUMENTS
 uv run python -m app.etf scan
 ```
 
-### Step 2: Macro + SEC Context
+### Step 2: Macro + SEC + Intel Context
 ```bash
 uv run python -m app.macro dashboard
 uv run python -m app.macro yields
 uv run python -m app.sec recent
+uv run python -m app.congress summary
+uv run python -m app.polymarket summary
 ```
 
 ### Step 3: Deep Dive on Signals
@@ -45,10 +47,12 @@ Macro: VIX [val] [{regime}] | Fed [{trajectory}] | Yields [{curve}]
 ACTION REQUIRED:
 [SIGNAL] [ticker] — [underlying] down [X]% (threshold: [Y]%)
   CONFIDENCE: [HIGH/MEDIUM/LOW] ([N]/5 factors)
+  Congress: [BUYING/SELLING/NEUTRAL] | Polymarket: [relevant signal or N/A]
 [TARGET] [ticker] — profit target hit, up [X]% from entry
 
 WATCHING:
 [ALERT] [ticker] — [underlying] down [X]% (threshold: [Y]%)
+  Congress confluence: [yes/no — congress buying in this sector?]
 
 ACTIVE POSITIONS: [count]
 [ticker]: entry $[X] → current $[Y] (P/L: [Z]%)

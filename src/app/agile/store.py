@@ -246,38 +246,64 @@ def save_roadmap(roadmap: Roadmap, path: Path | None = None) -> None:
 
 
 def default_roadmap() -> Roadmap:
-    """Create default company roadmap with initial OKRs."""
+    """Create Q1 2026 company roadmap (Feb 16 - May 15, Sprints 4-17)."""
     return Roadmap(
         okrs=[
             OKR(
                 id="OKR-1",
-                objective="Achieve consistent trading signal accuracy",
+                objective="Build a data-driven strategy research pipeline",
                 key_results=[
-                    "Signal accuracy >60% over 30 days",
-                    "All 12 confidence factors contributing to predictions",
-                    "Factor weight learning from >10 completed trades",
+                    "Complete 15+ research documents with full statistical analysis",
+                    "Backtest 5+ new strategy types discovered through research",
+                    "Integrate 2+ validated strategies into the live signal system",
                 ],
+                target_sprint=17,
             ),
             OKR(
                 id="OKR-2",
-                objective="Optimize operational costs",
+                objective="Achieve reliable trading signal accuracy",
                 key_results=[
-                    "Weekly token spend under budget for all departments",
-                    "Pipeline success rate >95%",
-                    "All modules running under 60s average",
+                    "Maintain signal accuracy >60% over trailing 30 days",
+                    "All 12 confidence factors actively contributing to predictions",
+                    "Factor weight learning calibrated from >10 completed trades",
                 ],
+                target_sprint=12,
             ),
             OKR(
                 id="OKR-3",
-                objective="Maximize intelligence gathering value",
+                objective="Operational excellence and cost efficiency",
                 key_results=[
-                    "Correlate intelligence factors with trade outcomes",
-                    "Congress trading signal accuracy >50%",
-                    "Geopolitical risk properly reflected in sector signals",
+                    "Pipeline success rate >95% sustained for 4+ consecutive weeks",
+                    "Weekly token spend within department budgets ($100/week)",
+                    "Zero critical postmortems for 4+ consecutive weeks",
+                    "All scheduled runs executing on time (>95% uptime)",
                 ],
+                target_sprint=10,
+            ),
+            OKR(
+                id="OKR-4",
+                objective="Maximize intelligence signal value",
+                key_results=[
+                    "Correlate each intelligence factor with actual trade outcomes",
+                    "Congress trading signal accuracy >50% verified",
+                    "Geopolitical events correctly reflected in sector signals",
+                    "News sentiment contrarian signal validated via backtest",
+                ],
+                target_sprint=14,
+            ),
+            OKR(
+                id="OKR-5",
+                objective="Platform maturity and reporting",
+                key_results=[
+                    "Research documents published and accessible on website",
+                    "Roadmap with OKR progress visible on website",
+                    "Forecast accuracy tracking with trend visualization",
+                    "Achieve 99% scheduled run success rate",
+                ],
+                target_sprint=17,
             ),
         ],
-        current_sprint=1,
+        current_sprint=4,
         last_updated=datetime.now(tz=UTC).isoformat(timespec="seconds"),
     )
 
