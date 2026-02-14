@@ -97,6 +97,8 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
   border-bottom-color: #fff; text-decoration: none; }
 .nav-menu a.nav-active { color: #fff;
   border-bottom-color: #fff; }
+.nav-dropdown-btn.nav-active { color: #fff;
+  border-bottom: 2px solid #fff; }
 .nav-menu .nav-divider { width: 1px; background: rgba(255,255,255,0.2);
   margin: 12px 0; flex-shrink: 0; }
 
@@ -126,6 +128,21 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
 .nav-dropdown-menu a:hover, .nav-dropdown-menu a:focus {
   background: rgba(255,255,255,0.08); color: #fff;
   border-bottom: none; text-decoration: none; }
+
+/* Summary link cards (dashboard → sub-page teasers) */
+.summary-link-card { display: block; padding: 16px 20px;
+  background: var(--bg-secondary); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px; text-decoration: none; transition: border-color 0.15s;
+  margin-bottom: 12px; }
+.summary-link-card:hover { border-color: rgba(255,255,255,0.2);
+  text-decoration: none; }
+.summary-link-card .card-title { font-family: var(--font-serif);
+  font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.summary-link-card .card-detail { font-size: 13px;
+  color: var(--text-muted); margin-top: 4px; }
+.summary-link-card .card-cta { font-family: var(--font-mono);
+  font-size: 11px; color: var(--accent); margin-top: 8px;
+  text-transform: uppercase; letter-spacing: 0.08em; }
 
 /* Report date picker */
 .nav-date-picker { font-family: var(--font-mono); font-size: 11px;
@@ -805,12 +822,12 @@ a:focus-visible, summary:focus-visible {
 <div class="idx-featured-kicker">Latest Report</div>
 <h2><a href="reports/2026-02-14.html">Market Report &mdash; 2026-02-14</a></h2>
 <div class="idx-featured-meta">2026-02-14 &middot; 4 report(s) available</div>
-<div class="idx-featured-tabs"><a href="reports/2026-02-14.html" class="idx-tab">Report</a><a href="reports/forecasts-2026-02-14.html" class="idx-tab">Forecasts</a><a href="reports/financials-2026-02-14.html" class="idx-tab">Financials</a><a href="reports/company-2026-02-14.html" class="idx-tab">Company</a><a href="reports/roadmap-2026-02-14.html" class="idx-tab">Roadmap</a><a href="reports/research-2026-02-14.html" class="idx-tab">Research</a><a href="reports/about-2026-02-14.html" class="idx-tab">About</a></div>
+<div class="idx-featured-tabs"><a href="reports/2026-02-14.html" class="idx-tab">Dashboard</a><a href="reports/forecasts-2026-02-14.html" class="idx-tab">Forecasts</a><a href="reports/financials-2026-02-14.html" class="idx-tab">Financials</a><a href="reports/roadmap-2026-02-14.html" class="idx-tab">Roadmap</a><a href="reports/research-2026-02-14.html" class="idx-tab">Research</a><a href="reports/about-2026-02-14.html" class="idx-tab">About</a></div>
 </div>
 <div class="idx-section-head">Previous Reports</div>
-<div class="idx-report-row"><span class="idx-report-date"><a href="reports/2026-02-13.html">2026-02-13</a></span><div class="idx-report-pages"><a href="reports/2026-02-13.html" class="idx-page-link">Report</a><a href="reports/trade-logs-2026-02-13.html" class="idx-page-link">Trades</a><a href="reports/forecasts-2026-02-13.html" class="idx-page-link">Forecasts</a><a href="reports/strategies-2026-02-13.html" class="idx-page-link">Strategies</a><a href="reports/financials-2026-02-13.html" class="idx-page-link">Financials</a><a href="reports/company-2026-02-13.html" class="idx-page-link">Company</a><a href="reports/about-2026-02-13.html" class="idx-page-link">About</a></div></div>
-<div class="idx-report-row"><span class="idx-report-date"><a href="reports/2026-02-12.html">2026-02-12</a></span><div class="idx-report-pages"><a href="reports/2026-02-12.html" class="idx-page-link">Report</a><a href="reports/trade-logs-2026-02-12.html" class="idx-page-link">Trades</a><a href="reports/forecasts-2026-02-12.html" class="idx-page-link">Forecasts</a><a href="reports/company-2026-02-12.html" class="idx-page-link">Company</a></div></div>
-<div class="idx-report-row"><span class="idx-report-date"><a href="reports/2026-02-11.html">2026-02-11</a></span><div class="idx-report-pages"><a href="reports/2026-02-11.html" class="idx-page-link">Report</a></div></div>
+<div class="idx-report-row"><span class="idx-report-date"><a href="reports/2026-02-13.html">2026-02-13</a></span><div class="idx-report-pages"><a href="reports/2026-02-13.html" class="idx-page-link">Dashboard</a><a href="reports/forecasts-2026-02-13.html" class="idx-page-link">Forecasts</a><a href="reports/strategies-2026-02-13.html" class="idx-page-link">Strategies</a><a href="reports/trade-log-2026-02-13.html" class="idx-page-link">Trade Log</a><a href="reports/financials-2026-02-13.html" class="idx-page-link">Financials</a><a href="reports/about-2026-02-13.html" class="idx-page-link">About</a></div></div>
+<div class="idx-report-row"><span class="idx-report-date"><a href="reports/2026-02-12.html">2026-02-12</a></span><div class="idx-report-pages"><a href="reports/2026-02-12.html" class="idx-page-link">Dashboard</a><a href="reports/forecasts-2026-02-12.html" class="idx-page-link">Forecasts</a><a href="reports/trade-log-2026-02-12.html" class="idx-page-link">Trade Log</a></div></div>
+<div class="idx-report-row"><span class="idx-report-date"><a href="reports/2026-02-11.html">2026-02-11</a></span><div class="idx-report-pages"><a href="reports/2026-02-11.html" class="idx-page-link">Dashboard</a></div></div>
 </div>
 <div class="idx-sidebar">
 <div class="idx-sb-section">

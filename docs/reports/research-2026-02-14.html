@@ -97,6 +97,8 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
   border-bottom-color: #fff; text-decoration: none; }
 .nav-menu a.nav-active { color: #fff;
   border-bottom-color: #fff; }
+.nav-dropdown-btn.nav-active { color: #fff;
+  border-bottom: 2px solid #fff; }
 .nav-menu .nav-divider { width: 1px; background: rgba(255,255,255,0.2);
   margin: 12px 0; flex-shrink: 0; }
 
@@ -126,6 +128,21 @@ h2 { font-family: var(--font-serif); color: var(--text-primary);
 .nav-dropdown-menu a:hover, .nav-dropdown-menu a:focus {
   background: rgba(255,255,255,0.08); color: #fff;
   border-bottom: none; text-decoration: none; }
+
+/* Summary link cards (dashboard → sub-page teasers) */
+.summary-link-card { display: block; padding: 16px 20px;
+  background: var(--bg-secondary); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px; text-decoration: none; transition: border-color 0.15s;
+  margin-bottom: 12px; }
+.summary-link-card:hover { border-color: rgba(255,255,255,0.2);
+  text-decoration: none; }
+.summary-link-card .card-title { font-family: var(--font-serif);
+  font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.summary-link-card .card-detail { font-size: 13px;
+  color: var(--text-muted); margin-top: 4px; }
+.summary-link-card .card-cta { font-family: var(--font-mono);
+  font-size: 11px; color: var(--accent); margin-top: 8px;
+  text-transform: uppercase; letter-spacing: 0.08em; }
 
 /* Report date picker */
 .nav-date-picker { font-family: var(--font-mono); font-size: 11px;
@@ -787,12 +804,12 @@ a:focus-visible, summary:focus-visible {
 <a href="#main-content" class="skip-nav">Skip to main content</a>
 <div class="top-bar">
 <h1><img src="../logo.png" alt="Be Him" class="top-bar-logo">Swing Trading Report</h1>
-<select class="nav-date-picker" aria-label="Select report date" onchange="window.location.href=this.value+'.html'"><option value="2026-02-14" selected>2026-02-14</option><option value="2026-02-13">2026-02-13</option><option value="2026-02-12">2026-02-12</option><option value="2026-02-11">2026-02-11</option></select>
-<nav class="nav-menu" aria-label="Report navigation"><a href="2026-02-14.html">Market Report</a><a href="trade-logs-2026-02-14.html">Trade Logs</a><a href="forecasts-2026-02-14.html">Forecasts</a><a href="strategies-2026-02-14.html">Strategies</a><a href="financials-2026-02-14.html">Financials</a><a href="company-2026-02-14.html">Company</a><a href="roadmap-2026-02-14.html">Roadmap</a><a href="research-2026-02-14.html" class="nav-active">Research</a><a href="about-2026-02-14.html">About</a></nav>
+<select class="nav-date-picker" aria-label="Select report date" onchange="window.location.href='research-'+this.value+'.html'"><option value="2026-02-14" selected>2026-02-14</option><option value="2026-02-13">2026-02-13</option><option value="2026-02-12">2026-02-12</option><option value="2026-02-11">2026-02-11</option></select>
+<nav class="nav-menu" aria-label="Report navigation"><a href="2026-02-14.html">Dashboard</a><div class="nav-dropdown"><button class="nav-dropdown-btn" aria-haspopup="true" aria-expanded="false">Trading</button><div class="nav-dropdown-menu"><a href="forecasts-2026-02-14.html">Forecasts</a><a href="strategies-2026-02-14.html">Strategies</a><a href="trade-log-2026-02-14.html">Trade Log</a></div></div><a href="financials-2026-02-14.html">Financials</a><div class="nav-dropdown"><button class="nav-dropdown-btn" aria-haspopup="true" aria-expanded="false">Operations</button><div class="nav-dropdown-menu"><a href="sprint-board-2026-02-14.html">Sprint Board</a><a href="roadmap-2026-02-14.html">Roadmap</a><a href="system-health-2026-02-14.html">System Health</a></div></div><a href="research-2026-02-14.html" class="nav-active">Research</a><a href="about-2026-02-14.html">About</a></nav>
 </div>
 
 <header class="header">
-<span>2026-02-14 &bull; 19:27 IST</span>
+<span>2026-02-14 &bull; 22:06 IST</span>
 </header>
 
 <main id="main-content">
@@ -830,7 +847,7 @@ a:focus-visible, summary:focus-visible {
 </main>
 
 <footer class="footer">
-<span>Generated 2026-02-14 19:27 IST &mdash; strategy research document library.</span>
+<span>Generated 2026-02-14 22:06 IST &mdash; strategy research document library.</span>
 </footer>
 
 <script>
