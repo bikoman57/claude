@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0b0f18">
-<meta name="description" content="Leveraged ETF swing trading dashboard reports">
-<title>Trading Reports</title>
+<meta name="description" content="System health and operations for 2026-02-14">
+<title>System Health 2026-02-14</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
@@ -803,51 +803,70 @@ a:focus-visible, summary:focus-visible {
 <body>
 <a href="#main-content" class="skip-nav">Skip to main content</a>
 <div class="top-bar">
-<h1><img src="logo.png" alt="Be Him" class="top-bar-logo">Swing Trading Report</h1>
-</div>
-<div class="idx-ticker-bar">
-<div class="idx-ticker"><span class="tk-sym">TQQQ</span><span class="tk-sector">Tech 3x</span></div>
-<div class="idx-ticker"><span class="tk-sym">TECL</span><span class="tk-sector">Tech 3x</span></div>
-<div class="idx-ticker"><span class="tk-sym">SOXL</span><span class="tk-sector">Semi 3x</span></div>
-<div class="idx-ticker"><span class="tk-sym">FAS</span><span class="tk-sector">Fin 3x</span></div>
-<div class="idx-ticker"><span class="tk-sym">UCO</span><span class="tk-sector">Oil 2x</span></div>
-<div class="idx-ticker"><span class="tk-sym">LABU</span><span class="tk-sector">Bio 3x</span></div>
-<div class="idx-ticker"><span class="tk-sym">UPRO</span><span class="tk-sector">S&P 3x</span></div>
-<div class="idx-ticker"><span class="tk-sym">TNA</span><span class="tk-sector">SmCap 3x</span></div>
-</div>
-<main id="main-content">
-<div class="idx-layout">
-<div class="idx-main">
-<div class="idx-featured">
-<div class="idx-featured-kicker">Latest Report</div>
-<h2><a href="reports/2026-02-14.html">Market Report &mdash; 2026-02-14</a></h2>
-<div class="idx-featured-meta">2026-02-14 &middot; 1 report(s) available</div>
-<div class="idx-featured-tabs"><a href="reports/2026-02-14.html" class="idx-tab">Dashboard</a><a href="reports/forecasts-2026-02-14.html" class="idx-tab">Forecasts</a><a href="reports/financials-2026-02-14.html" class="idx-tab">Financials</a><a href="reports/sprint-board-2026-02-14.html" class="idx-tab">Sprint Board</a><a href="reports/roadmap-2026-02-14.html" class="idx-tab">Roadmap</a><a href="reports/system-health-2026-02-14.html" class="idx-tab">System Health</a><a href="reports/research-2026-02-14.html" class="idx-tab">Research</a><a href="reports/about-2026-02-14.html" class="idx-tab">About</a></div>
+<h1><img src="../logo.png" alt="Be Him" class="top-bar-logo">Swing Trading Report</h1>
+<nav class="nav-menu" aria-label="Report navigation"><a href="2026-02-14.html">Dashboard</a><div class="nav-dropdown"><button class="nav-dropdown-btn" aria-haspopup="true" aria-expanded="false">Trading</button><div class="nav-dropdown-menu"><a href="forecasts-2026-02-14.html">Forecasts</a><a href="strategies-2026-02-14.html">Strategies</a><a href="trade-log-2026-02-14.html">Trade Log</a></div></div><a href="financials-2026-02-14.html">Financials</a><div class="nav-dropdown"><button class="nav-dropdown-btn nav-active" aria-haspopup="true" aria-expanded="false">Operations</button><div class="nav-dropdown-menu"><a href="sprint-board-2026-02-14.html">Sprint Board</a><a href="roadmap-2026-02-14.html">Roadmap</a><a href="system-health-2026-02-14.html" class="nav-active">System Health</a></div></div><a href="research-2026-02-14.html">Research</a><a href="about-2026-02-14.html">About</a></nav>
 </div>
 
+<header class="header">
+<span>2026-02-14 &bull; 22:29 IST</span>
+</header>
+
+<main id="main-content">
+
+<section>
+<h2>Pipeline Health</h2>
+<div class="card">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:16px"><span class="grade-badge grade-A">A</span><div><div style="font-size:18px;color:var(--text-primary)">System Health: 91%</div><div style="font-size:13px;color:var(--text-muted)">23 modules tracked</div></div></div><div class="health-grid"><div class="health-card trend-stable"><div class="module-name">congress.summary</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">etf.active</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">etf.signals</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">geopolitical.summary</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">history.summary</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">history.weights</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">macro.calendar</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-degrading"><div class="module-name">macro.dashboard</div><div class="health-stat"><span>Success (7d)</span><span class="val green">3330%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&darr; degrading</span></div></div><div class="health-card trend-stable"><div class="module-name">macro.rates</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-degrading"><div class="module-name">macro.yields</div><div class="health-stat"><span>Success (7d)</span><span class="val green">6670%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&darr; degrading</span></div></div><div class="health-card trend-stable"><div class="module-name">news.summary</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">portfolio.dashboard</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">portfolio.snapshot</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">quant.summary</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">risk.dashboard</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">sec.institutional</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">sec.recent</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">social.summary</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">statistics.dashboard</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">strategy.backtest-all</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">strategy.forecast</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">strategy.proposals</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div><div class="health-card trend-stable"><div class="module-name">strategy.verify</div><div class="health-stat"><span>Success (7d)</span><span class="val green">10000%</span></div><div class="health-stat"><span>Avg Duration</span><span class="val">0.0s</span></div><div class="health-stat"><span>Trend</span><span class="val">&rarr; stable</span></div></div></div>
 </div>
-<div class="idx-sidebar">
-<div class="idx-sb-section">
-<div class="idx-sb-title">Report Archive</div>
-<div class="idx-archive-item"><a href="reports/2026-02-14.html">2026-02-14</a> <span class="badge-latest">LATEST</span></div>
+</section>
+
+<section>
+<h2>Token Budget (Weekly)</h2>
+<div class="card">
+<div class="budget-row"><span class="dept-name">Executive <span class="badge badge-yellow">ALERT</span></span><span class="budget-bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:0%"></div></div></span><span class="budget-nums">$0.00 / $25.00 (0%)</span></div><div class="budget-row"><span class="dept-name">Trading <span class="badge badge-yellow">ALERT</span></span><span class="budget-bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:0%"></div></div></span><span class="budget-nums">$0.00 / $15.00 (0%)</span></div><div class="budget-row"><span class="dept-name">Research <span class="badge badge-gray">WATCH</span></span><span class="budget-bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:0%"></div></div></span><span class="budget-nums">$0.00 / $30.00 (0%)</span></div><div class="budget-row"><span class="dept-name">Intelligence <span class="badge badge-gray">WATCH</span></span><span class="budget-bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:0%"></div></div></span><span class="budget-nums">$0.00 / $15.00 (0%)</span></div><div class="budget-row"><span class="dept-name">Risk <span class="badge badge-yellow">ALERT</span></span><span class="budget-bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:0%"></div></div></span><span class="budget-nums">$0.00 / $10.00 (0%)</span></div><div class="budget-row"><span class="dept-name">Operations <span class="badge badge-green">TARGET</span></span><span class="budget-bar-wrap"><div class="progress-bar"><div class="progress-fill green" style="width:0%"></div></div></span><span class="budget-nums">$0.00 / $5.00 (0%)</span></div><div class="budget-row" style="border-top:2px solid var(--border-primary);margin-top:8px;padding-top:10px"><span class="dept-name"><strong>Total</strong></span><span class="budget-bar-wrap"></span><span class="budget-nums"><strong>$0.00 / $100.00 (0%)</strong></span></div>
 </div>
-<div class="idx-sb-section">
-<div class="idx-sb-title">ETF Watchlist</div>
-<div class="idx-etf-row"><span class="idx-etf-sym">TQQQ</span><span class="idx-etf-name">Tech 3x</span></div>
-<div class="idx-etf-row"><span class="idx-etf-sym">TECL</span><span class="idx-etf-name">Tech 3x</span></div>
-<div class="idx-etf-row"><span class="idx-etf-sym">SOXL</span><span class="idx-etf-name">Semi 3x</span></div>
-<div class="idx-etf-row"><span class="idx-etf-sym">FAS</span><span class="idx-etf-name">Fin 3x</span></div>
-<div class="idx-etf-row"><span class="idx-etf-sym">UCO</span><span class="idx-etf-name">Oil 2x</span></div>
-<div class="idx-etf-row"><span class="idx-etf-sym">LABU</span><span class="idx-etf-name">Bio 3x</span></div>
-<div class="idx-etf-row"><span class="idx-etf-sym">UPRO</span><span class="idx-etf-name">S&P 3x</span></div>
-<div class="idx-etf-row"><span class="idx-etf-sym">TNA</span><span class="idx-etf-name">SmCap 3x</span></div>
+</section>
+
+<section id="modules">
+<details>
+<summary><h2 style="display:inline">Module Status</h2> <span class="badge badge-red">21/24</span></summary>
+<div class="card">
+<div class="module-grid">
+<span class="module-pill module-pill-ok">&#10003; etf.signals <span class="pill-dur">0.9s</span></span>
+<span class="module-pill module-pill-ok">&#10003; etf.active <span class="pill-dur">0.8s</span></span>
+<span class="module-pill module-pill-fail">&#10007; macro.dashboard <span class="pill-dur">1.2s</span></span>
+<span class="module-pill module-pill-fail">&#10007; macro.yields <span class="pill-dur">1.1s</span></span>
+<span class="module-pill module-pill-ok">&#10003; macro.rates <span class="pill-dur">3.5s</span></span>
+<span class="module-pill module-pill-ok">&#10003; macro.calendar <span class="pill-dur">0.8s</span></span>
+<span class="module-pill module-pill-ok">&#10003; sec.recent <span class="pill-dur">35.4s</span></span>
+<span class="module-pill module-pill-ok">&#10003; sec.institutional <span class="pill-dur">3.1s</span></span>
+<span class="module-pill module-pill-ok">&#10003; geopolitical.summary <span class="pill-dur">92.4s</span></span>
+<span class="module-pill module-pill-ok">&#10003; social.summary <span class="pill-dur">0.9s</span></span>
+<span class="module-pill module-pill-ok">&#10003; news.summary <span class="pill-dur">5.2s</span></span>
+<span class="module-pill module-pill-ok">&#10003; statistics.dashboard <span class="pill-dur">2.5s</span></span>
+<span class="module-pill module-pill-ok">&#10003; strategy.proposals <span class="pill-dur">75.8s</span></span>
+<span class="module-pill module-pill-ok">&#10003; strategy.backtest-all <span class="pill-dur">8.9s</span></span>
+<span class="module-pill module-pill-ok">&#10003; strategy.forecast <span class="pill-dur">0.9s</span></span>
+<span class="module-pill module-pill-ok">&#10003; strategy.verify <span class="pill-dur">0.8s</span></span>
+<span class="module-pill module-pill-ok">&#10003; research.summary <span class="pill-dur">0.1s</span></span>
+<span class="module-pill module-pill-ok">&#10003; congress.summary <span class="pill-dur">0.2s</span></span>
+<span class="module-pill module-pill-ok">&#10003; risk.dashboard <span class="pill-dur">0.9s</span></span>
+<span class="module-pill module-pill-ok">&#10003; portfolio.dashboard <span class="pill-dur">0.8s</span></span>
+<span class="module-pill module-pill-ok">&#10003; portfolio.snapshot <span class="pill-dur">0.9s</span></span>
+<span class="module-pill module-pill-fail">&#10007; quant.summary <span class="pill-dur">1.2s</span></span>
+<span class="module-pill module-pill-ok">&#10003; history.weights <span class="pill-dur">0.1s</span></span>
+<span class="module-pill module-pill-ok">&#10003; history.summary <span class="pill-dur">0.1s</span></span>
 </div>
 </div>
-</div>
+</details>
+</section>
+
 </main>
+
 <footer class="footer">
-<span>Powered by <a href="https://github.com/bikoman57/claude">fin-agents</a></span>
+<span>Generated 2026-02-14 22:29 IST &mdash; system health &amp; operations.</span>
 </footer>
+
 <script>
 document.querySelectorAll('.nav-dropdown-btn').forEach(function(btn){
   btn.addEventListener('click',function(e){
