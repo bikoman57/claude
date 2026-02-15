@@ -127,6 +127,18 @@ CAVEAT: [Limitations]
 ACTIONABLE: [What this means for the trading system]
 ```
 
+## Academic Research (Google Scholar)
+
+Use Google Scholar (`https://scholar.google.com/`) to look up peer-reviewed papers and working papers for statistical methods, prior findings, and validation:
+```
+WebFetch: https://scholar.google.com/scholar?q=drawdown+recovery+distribution+equity+ETF
+WebFetch: https://scholar.google.com/scholar?q=regime+detection+hidden+markov+model+stock+market
+WebFetch: https://scholar.google.com/scholar?q=factor+significance+leveraged+ETF+mean+reversion
+```
+- Use academic findings to validate or challenge your statistical results
+- Reference relevant papers when reporting methodology choices
+- Prioritize papers with rigorous out-of-sample testing
+
 ## Guidelines
 
 1. **Numbers over narratives**: every claim must have a number attached

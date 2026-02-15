@@ -263,6 +263,17 @@ Current universe: TQQQ, UPRO, SOXL, TNA, TECL, FAS, LABU, UCO
 "sector rotation calendar effect statistical significance"
 ```
 
+### Academic Research (Google Scholar)
+Use Google Scholar (`https://scholar.google.com/`) to find peer-reviewed papers and working papers:
+```
+WebFetch: https://scholar.google.com/scholar?q=leveraged+ETF+mean+reversion+volatility+decay
+WebFetch: https://scholar.google.com/scholar?q=momentum+crash+risk+leveraged+funds
+WebFetch: https://scholar.google.com/scholar?q=VIX+regime+switching+trading+strategy
+```
+- Prioritize papers with statistical rigor (large samples, proper controls, out-of-sample tests)
+- Cite paper titles and authors in your research documents
+- Use findings to inform hypotheses and validate your own analysis
+
 ### Data-Driven Analysis
 ```bash
 uv run python -c "

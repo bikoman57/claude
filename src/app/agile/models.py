@@ -59,7 +59,7 @@ class SprintTask:
 
 @dataclass
 class Sprint:
-    """A one-week sprint (Monday through Friday)."""
+    """A one-week sprint (Monday through Sunday)."""
 
     number: int
     start_date: str  # ISO date YYYY-MM-DD

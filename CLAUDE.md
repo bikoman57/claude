@@ -32,14 +32,19 @@
 - **Org chart**: See `docs/org-chart.md` for full Mermaid diagram
 
 ### Sector-to-ETF Mapping
-| Sector | Tickers | Leveraged ETF |
-|--------|---------|---------------|
-| Tech | AAPL, MSFT, GOOGL, META | TQQQ, TECL |
-| Semiconductors | NVDA, AMD, AVGO | SOXL |
-| Finance | JPM, GS, BAC | FAS |
-| Energy | XOM, CVX | UCO |
-| Biotech/Healthcare | LLY, PFE, JNJ | LABU |
-| Broad Market / Small Cap | SPY, IWM | UPRO, TNA |
+| Sector | Underlying ETF | Holdings | Leveraged ETF | Source |
+|--------|---------------|----------|---------------|--------|
+| Tech (Nasdaq-100) | QQQ | 103 stocks | TQQQ (3x) | Invesco |
+| Tech (S&P Tech) | XLK | 72 stocks | TECL (3x) | SSGA |
+| Semiconductors | SOXX | 30 stocks | SOXL (3x) | iShares |
+| Finance | XLF | 77 stocks | FAS (3x) | SSGA |
+| Biotech | XBI | 144 stocks | LABU (3x) | SSGA |
+| Broad Market (S&P 500) | SPY | 503 stocks | UPRO (3x) | SSGA |
+| Small Cap (Russell 2000) | IWM | 1677 stocks | TNA (3x) | iShares |
+| Crude Oil | USO | Futures (no equities) | UCO (2x) | - |
+
+Full constituent lists with weights: `src/app/etf/constituents.py`
+Refresh data: `uv run python scripts/compile_constituents.py`
 
 Geopolitical event categories: TRADE_WAR/TARIFF → tech, semis (TQQQ, SOXL, TECL) | MILITARY/SANCTIONS → energy, finance (UCO, FAS) | ELECTIONS/POLICY → broad, finance (UPRO, TNA, FAS) | TERRITORIAL (Taiwan) → semis (SOXL)
 

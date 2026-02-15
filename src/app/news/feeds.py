@@ -86,6 +86,27 @@ FINANCIAL_FEEDS: list[RSSFeed] = [
         "?partnerId=wrss01&id=10000664",
         "finance",
     ),
+    RSSFeed(
+        "Flipboard Stock Markets",
+        "https://flipboard.com/topic/stockmarket.rss",
+        "general",
+    ),
+    RSSFeed(
+        "Seeking Alpha News",
+        "https://seekingalpha.com/market_currents.xml",
+        "general",
+    ),
+    RSSFeed(
+        "Seeking Alpha Top Articles",
+        "https://seekingalpha.com/listing/most-popular-articles.xml",
+        "finance",
+    ),
+    RSSFeed(
+        "Morningstar",
+        "https://news.google.com/rss/search"
+        "?q=site:morningstar.com+stocks&hl=en-US&gl=US&ceid=US:en",
+        "finance",
+    ),
 ]
 
 _DC_NAMESPACE = "{http://purl.org/dc/elements/1.1/}"

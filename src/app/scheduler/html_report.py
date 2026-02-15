@@ -3319,7 +3319,7 @@ def build_trade_log_html(
 
     data = _parse_output(outputs.get("strategy.backtest-all", ""))
     if not isinstance(data, list) or not data:
-        return ""
+        data = []
 
     # Build Chart.js datasets
     chart_datasets: list[str] = []
@@ -3427,61 +3427,6 @@ def build_trade_log_html(
                     f"</tr>",
                 )
 
-    if not chart_datasets:
-        return ""
-
-    # Find max labels length for chart
-    max_labels = 0
-    for etf in data:
-        if isinstance(etf, dict):
-            eq = etf.get("equity_curve", [])
-            if isinstance(eq, list) and len(eq) > max_labels:
-                max_labels = len(eq)
-    labels_json = json.dumps(list(range(max_labels)))
-
-    chart_js = (
-        "<script>\n"
-        "const ctx = document.getElementById('equityChart').getContext('2d');\n"
-        "new Chart(ctx, {\n"
-        "  type: 'line',\n"
-        "  data: {\n"
-        f"    labels: {labels_json},\n"
-        "    datasets: [\n      " + ",\n      ".join(chart_datasets) + "\n    ]\n"
-        "  },\n"
-        "  options: {\n"
-        "    responsive: true,\n"
-        "    maintainAspectRatio: false,\n"
-        "    interaction: { mode: 'index', intersect: false },\n"
-        "    plugins: {\n"
-        "      title: { display: true,"
-        " text: 'Equity Curve — $10,000 Starting Capital',"
-        " color: '#e6edf3',"
-        " font: { size: 16, family: 'Inter' } },\n"
-        "      tooltip: {\n"
-        "        callbacks: {\n"
-        "          label: function(ctx) {\n"
-        "            return ctx.dataset.label + ': $' +"
-        " ctx.parsed.y.toLocaleString();\n"
-        "          }\n"
-        "        }\n"
-        "      }\n"
-        "    },\n"
-        "    scales: {\n"
-        "      x: { title: { display: true, text: 'Trade #',"
-        " color: '#8b949e' },"
-        " ticks: { maxTicksLimit: 20, color: '#8b949e' },"
-        " grid: { color: '#2a3346' } },\n"
-        "      y: { title: { display: true, text: 'Portfolio Value ($)',"
-        " color: '#8b949e' },"
-        " ticks: { color: '#8b949e', callback: function(v) {"
-        " return '$' + v.toLocaleString(); } },"
-        " grid: { color: '#2a3346' } }\n"
-        "    }\n"
-        "  }\n"
-        "});\n"
-        "</script>\n"
-    )
-
     top_bar = _page_header_bar(
         report_date, "trade-log", report_dates, page_prefix="trade-log-",
     )
@@ -3491,65 +3436,6 @@ def build_trade_log_html(
         f"<span>{html.escape(report_date)} &bull; "
         f"{html.escape(report_time)}</span>\n"
         "</header>\n"
-    )
-
-    summary_table = (
-        "<section>\n"
-        "<h2>Strategy Performance Summary</h2>\n"
-        '<div class="card">\n'
-        "<p>Each ETF is backtested across 4 strategy types "
-        "(ATH mean-reversion, RSI oversold, Bollinger band, MA dip) "
-        "over 2 years of historical data. Exits at profit target or stop loss.</p>\n"
-        '<table class="mt-12">\n<thead><tr>'
-        '<th scope="col">ETF</th>'
-        '<th scope="col">Underlying</th>'
-        '<th scope="col">Strategy</th>'
-        '<th scope="col" class="num">Entry</th>'
-        '<th scope="col" class="num">Target</th>'
-        '<th scope="col" class="num">Trades</th>'
-        '<th scope="col" class="num">Sharpe</th>'
-        '<th scope="col" class="num">Win Rate</th>'
-        '<th scope="col" class="num">Return</th>'
-        '<th scope="col" class="num">Max DD</th>'
-        "</tr></thead>\n<tbody>\n"
-        + "\n".join(summary_rows)
-        + "\n</tbody></table>\n</div>\n</section>\n"
-    )
-
-    chart_section = (
-        "<section>\n"
-        "<h2>Equity Curve</h2>\n"
-        '<div class="card">\n'
-        '<div style="position:relative;height:450px">\n'
-        '<canvas id="equityChart"></canvas>\n'
-        "</div>\n</div>\n</section>\n"
-    )
-
-    trade_count = len(all_rows)
-    trade_table = (
-        "<section>\n"
-        "<details>\n"
-        "<summary>"
-        '<h2 style="display:inline">Individual Trade Log</h2> '
-        f'<span class="badge badge-gray">{trade_count} trades</span>'
-        "</summary>\n"
-        '<div class="card">\n'
-        '<table class="mt-12">\n<thead><tr>'
-        '<th scope="col">ETF</th>'
-        '<th scope="col">Strategy</th>'
-        '<th scope="col" class="num">#</th>'
-        '<th scope="col">Entry Date</th>'
-        '<th scope="col">Exit Date</th>'
-        '<th scope="col" class="num">Entry $</th>'
-        '<th scope="col" class="num">Exit $</th>'
-        '<th scope="col" class="num">DD at Entry</th>'
-        '<th scope="col" class="num">Return</th>'
-        '<th scope="col">Exit Reason</th>'
-        '<th scope="col">W/L</th>'
-        "</tr></thead>\n<tbody>\n"
-        + "\n".join(all_rows)
-        + "\n</tbody></table>\n</div>\n"
-        "</details>\n</section>\n"
     )
 
     footer = (
@@ -3562,11 +3448,147 @@ def build_trade_log_html(
 
     portfolio_trades = _section_trade_history()
 
+    # When we have backtest data, show equity curves and strategy tables
+    chart_js = ""
+    chart_section = ""
+    summary_table = ""
+    trade_table = ""
+
+    if chart_datasets:
+        # Find max labels length for chart
+        max_labels = 0
+        for etf in data:
+            if isinstance(etf, dict):
+                eq = etf.get("equity_curve", [])
+                if isinstance(eq, list) and len(eq) > max_labels:
+                    max_labels = len(eq)
+        labels_json = json.dumps(list(range(max_labels)))
+
+        chart_js = (
+            "<script>\n"
+            "const ctx = document.getElementById('equityChart')"
+            ".getContext('2d');\n"
+            "new Chart(ctx, {\n"
+            "  type: 'line',\n"
+            "  data: {\n"
+            f"    labels: {labels_json},\n"
+            "    datasets: [\n      "
+            + ",\n      ".join(chart_datasets)
+            + "\n    ]\n"
+            "  },\n"
+            "  options: {\n"
+            "    responsive: true,\n"
+            "    maintainAspectRatio: false,\n"
+            "    interaction: { mode: 'index', intersect: false },\n"
+            "    plugins: {\n"
+            "      title: { display: true,"
+            " text: 'Equity Curve — $10,000 Starting Capital',"
+            " color: '#e6edf3',"
+            " font: { size: 16, family: 'Inter' } },\n"
+            "      tooltip: {\n"
+            "        callbacks: {\n"
+            "          label: function(ctx) {\n"
+            "            return ctx.dataset.label + ': $' +"
+            " ctx.parsed.y.toLocaleString();\n"
+            "          }\n"
+            "        }\n"
+            "      }\n"
+            "    },\n"
+            "    scales: {\n"
+            "      x: { title: { display: true, text: 'Trade #',"
+            " color: '#8b949e' },"
+            " ticks: { maxTicksLimit: 20, color: '#8b949e' },"
+            " grid: { color: '#2a3346' } },\n"
+            "      y: { title: { display: true,"
+            " text: 'Portfolio Value ($)',"
+            " color: '#8b949e' },"
+            " ticks: { color: '#8b949e', callback: function(v) {"
+            " return '$' + v.toLocaleString(); } },"
+            " grid: { color: '#2a3346' } }\n"
+            "    }\n"
+            "  }\n"
+            "});\n"
+            "</script>\n"
+        )
+
+        summary_table = (
+            "<section>\n"
+            "<h2>Strategy Performance Summary</h2>\n"
+            '<div class="card">\n'
+            "<p>Each ETF is backtested across 4 strategy types "
+            "(ATH mean-reversion, RSI oversold, Bollinger band, MA dip) "
+            "over 2 years of historical data. "
+            "Exits at profit target or stop loss.</p>\n"
+            '<table class="mt-12">\n<thead><tr>'
+            '<th scope="col">ETF</th>'
+            '<th scope="col">Underlying</th>'
+            '<th scope="col">Strategy</th>'
+            '<th scope="col" class="num">Entry</th>'
+            '<th scope="col" class="num">Target</th>'
+            '<th scope="col" class="num">Trades</th>'
+            '<th scope="col" class="num">Sharpe</th>'
+            '<th scope="col" class="num">Win Rate</th>'
+            '<th scope="col" class="num">Return</th>'
+            '<th scope="col" class="num">Max DD</th>'
+            "</tr></thead>\n<tbody>\n"
+            + "\n".join(summary_rows)
+            + "\n</tbody></table>\n</div>\n</section>\n"
+        )
+
+        chart_section = (
+            "<section>\n"
+            "<h2>Equity Curve</h2>\n"
+            '<div class="card">\n'
+            '<div style="position:relative;height:450px">\n'
+            '<canvas id="equityChart"></canvas>\n'
+            "</div>\n</div>\n</section>\n"
+        )
+
+        trade_count = len(all_rows)
+        trade_table = (
+            "<section>\n"
+            "<details>\n"
+            "<summary>"
+            '<h2 style="display:inline">Individual Trade Log</h2> '
+            f'<span class="badge badge-gray">{trade_count} trades</span>'
+            "</summary>\n"
+            '<div class="card">\n'
+            '<table class="mt-12">\n<thead><tr>'
+            '<th scope="col">ETF</th>'
+            '<th scope="col">Strategy</th>'
+            '<th scope="col" class="num">#</th>'
+            '<th scope="col">Entry Date</th>'
+            '<th scope="col">Exit Date</th>'
+            '<th scope="col" class="num">Entry $</th>'
+            '<th scope="col" class="num">Exit $</th>'
+            '<th scope="col" class="num">DD at Entry</th>'
+            '<th scope="col" class="num">Return</th>'
+            '<th scope="col">Exit Reason</th>'
+            '<th scope="col">W/L</th>'
+            "</tr></thead>\n<tbody>\n"
+            + "\n".join(all_rows)
+            + "\n</tbody></table>\n</div>\n"
+            "</details>\n</section>\n"
+        )
+
+    no_data_section = ""
+    if not chart_datasets and not portfolio_trades:
+        no_data_section = (
+            "<section>\n<h2>Trade Log</h2>\n"
+            '<div class="card"><p class="text-muted">'
+            "No backtest or trade data available yet. "
+            "Run <code>uv run python -m app.strategy backtest-all</code> "
+            "to generate backtest results, or record trades with "
+            "<code>uv run python -m app.etf enter TICKER PRICE</code>."
+            "</p></div>\n</section>\n"
+        )
+
     body_parts = [
         top_bar,
         header,
         '<main id="main-content">\n',
         portfolio_trades,
+        no_data_section,
         chart_section,
         summary_table,
         trade_table,
@@ -3574,21 +3596,22 @@ def build_trade_log_html(
         footer,
     ]
 
-    chart_cdn = (
-        '<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist'
-        '/chart.umd.min.js"></script>\n'
+    result = _html_page(
+        title=f"Trade Log {report_date}",
+        body="\n".join(p for p in body_parts if p),
+        description="Trade history, backtest logs and equity curves",
     )
 
-    # Insert Chart.js CDN before </head> and chart script before </body>
-    return (
-        _html_page(
-            title=f"Trade Log {report_date}",
-            body="\n".join(p for p in body_parts if p),
-            description="Trade history, backtest logs and equity curves",
+    if chart_js:
+        chart_cdn = (
+            '<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist'
+            '/chart.umd.min.js"></script>\n'
         )
-        .replace("</head>", f"{chart_cdn}</head>", 1)
-        .replace("</body>", f"{chart_js}</body>", 1)
-    )
+        result = result.replace("</head>", f"{chart_cdn}</head>", 1).replace(
+            "</body>", f"{chart_js}</body>", 1
+        )
+
+    return result
 
 
 def build_forecasts_html(
@@ -4542,12 +4565,16 @@ def build_strategies_html(
     report_time = datetime.now(tz=_ISRAEL_TZ).strftime("%H:%M IST")
 
     data = _parse_backtest_data(outputs)
-    if not data:
-        return ""
 
-    comparison = _section_strategy_comparison(data)
-    chart_section, chart_js = _section_strategy_equity_curves(data)
-    rankings = _section_strategy_rankings(data)
+    if data:
+        comparison = _section_strategy_comparison(data)
+        chart_section, chart_js = _section_strategy_equity_curves(data)
+        rankings = _section_strategy_rankings(data)
+    else:
+        comparison = ""
+        chart_section = ""
+        chart_js = ""
+        rankings = ""
 
     top_bar = _page_header_bar(
         report_date, "strategies", report_dates, page_prefix="strategies-",
@@ -4568,10 +4595,22 @@ def build_strategies_html(
         "</footer>\n"
     )
 
+    no_data_section = ""
+    if not data:
+        no_data_section = (
+            "<section>\n<h2>Strategies</h2>\n"
+            '<div class="card"><p class="text-muted">'
+            "No backtest data available yet. "
+            "Run <code>uv run python -m app.strategy backtest-all</code> "
+            "to generate strategy performance comparisons."
+            "</p></div>\n</section>\n"
+        )
+
     body_parts = [
         top_bar,
         header,
         '<main id="main-content">\n',
+        no_data_section,
         comparison,
         chart_section,
         rankings,

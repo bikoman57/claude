@@ -108,12 +108,12 @@ def advance_sprint(path: Path | None = None) -> Sprint:
     today = datetime.now(tz=UTC).date()
     # Next sprint starts next Monday.
     next_monday = today if today.weekday() == 0 else _next_weekday(today, 0)
-    next_friday = next_monday + timedelta(days=4)
+    next_sunday = next_monday + timedelta(days=6)
 
     new_sprint = create_sprint(
         number=next_number,
         start=next_monday.isoformat(),
-        end=next_friday.isoformat(),
+        end=next_sunday.isoformat(),
     )
     sprints.append(new_sprint)
     save_sprints(sprints, path)
@@ -246,7 +246,7 @@ def save_roadmap(roadmap: Roadmap, path: Path | None = None) -> None:
 
 
 def default_roadmap() -> Roadmap:
-    """Create Q1 2026 company roadmap (Feb 16 - May 15, Sprints 4-17)."""
+    """Create Q1 2026 company roadmap (Feb 14 onwards, Sprints 1-14)."""
     return Roadmap(
         okrs=[
             OKR(
@@ -257,7 +257,7 @@ def default_roadmap() -> Roadmap:
                     "Backtest 5+ new strategy types discovered through research",
                     "Integrate 2+ validated strategies into the live signal system",
                 ],
-                target_sprint=17,
+                target_sprint=14,
             ),
             OKR(
                 id="OKR-2",
@@ -267,7 +267,7 @@ def default_roadmap() -> Roadmap:
                     "All 12 confidence factors actively contributing to predictions",
                     "Factor weight learning calibrated from >10 completed trades",
                 ],
-                target_sprint=12,
+                target_sprint=9,
             ),
             OKR(
                 id="OKR-3",
@@ -278,7 +278,7 @@ def default_roadmap() -> Roadmap:
                     "Zero critical postmortems for 4+ consecutive weeks",
                     "All scheduled runs executing on time (>95% uptime)",
                 ],
-                target_sprint=10,
+                target_sprint=7,
             ),
             OKR(
                 id="OKR-4",
@@ -289,7 +289,7 @@ def default_roadmap() -> Roadmap:
                     "Geopolitical events correctly reflected in sector signals",
                     "News sentiment contrarian signal validated via backtest",
                 ],
-                target_sprint=14,
+                target_sprint=11,
             ),
             OKR(
                 id="OKR-5",
@@ -300,10 +300,10 @@ def default_roadmap() -> Roadmap:
                     "Forecast accuracy tracking with trend visualization",
                     "Achieve 99% scheduled run success rate",
                 ],
-                target_sprint=17,
+                target_sprint=14,
             ),
         ],
-        current_sprint=4,
+        current_sprint=1,
         last_updated=datetime.now(tz=UTC).isoformat(timespec="seconds"),
     )
 
@@ -318,12 +318,12 @@ def init_agile(path: Path | None = None) -> tuple[Sprint, Roadmap]:
     today = datetime.now(tz=UTC).date()
     # Start sprint on current Monday (or today if Monday).
     monday = today if today.weekday() == 0 else today - timedelta(days=today.weekday())
-    friday = monday + timedelta(days=4)
+    sunday = monday + timedelta(days=6)
 
     sprint = Sprint(
         number=1,
         start_date=monday.isoformat(),
-        end_date=friday.isoformat(),
+        end_date=sunday.isoformat(),
         goals=[
             "Establish baseline pipeline reliability metrics",
             "Track token costs for one full week",

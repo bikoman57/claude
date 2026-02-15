@@ -193,7 +193,7 @@ class TestInitAgile:
         # init_agile uses default paths, so we test the default_roadmap instead.
         roadmap = default_roadmap()
         assert len(roadmap.okrs) == 5
-        assert roadmap.current_sprint == 4
+        assert roadmap.current_sprint == 1
 
 
 class TestIsSprintOver:

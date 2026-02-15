@@ -3,8 +3,8 @@
     Register Windows Scheduled Tasks for pre-market and post-market runs.
 .DESCRIPTION
     Creates two scheduled tasks under \FinAgents\:
-      - FinAgents-PreMarket:  Weekdays at 2:00 PM Israel time (= 7:00 AM ET)
-      - FinAgents-PostMarket: Weekdays at 11:30 PM Israel time (= 4:30 PM ET)
+      - FinAgents-PreMarket:  Daily at 2:00 PM Israel time (= 7:00 AM ET)
+      - FinAgents-PostMarket: Daily at 11:30 PM Israel time (= 4:30 PM ET)
     Times are Israel local time targeting US Eastern market hours.
     NOTE: DST transitions (US/Israel shift on different dates) can cause
     ~1 hour drift a few weeks per year. Adjust if needed.
@@ -69,10 +69,10 @@ foreach ($task in $tasks) {
         -Argument "-ExecutionPolicy Bypass -NoProfile -File `"$ScriptPath`" -Session $($task.Session)" `
         -WorkingDirectory $ProjectDir
 
-    # Trigger: Weekdays at specified time
+    # Trigger: Daily at specified time
     $trigger = New-ScheduledTaskTrigger `
         -Weekly `
-        -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday `
+        -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday `
         -At ("{0}:{1:D2}" -f $task.Hour, $task.Minute)
 
     # Settings
@@ -102,7 +102,7 @@ foreach ($task in $tasks) {
         -Description $task.Description `
         -Force
 
-    Write-Host "  Created: $($task.Name) at $($task.Hour):$("{0:D2}" -f $task.Minute) (weekdays)"
+    Write-Host "  Created: $($task.Name) at $($task.Hour):$("{0:D2}" -f $task.Minute) (daily)"
 }
 
 Write-Host ""

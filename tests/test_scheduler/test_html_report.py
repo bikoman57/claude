@@ -1247,9 +1247,10 @@ def test_build_trade_log_html_with_data():
 
 
 def test_build_trade_log_html_empty():
-    """Trade logs returns empty string when no backtest data."""
+    """Trade log returns placeholder page when no backtest data."""
     result = build_trade_log_html({}, date="2026-01-15")
-    assert result == ""
+    assert "<!DOCTYPE html>" in result
+    assert "Trade Log" in result
 
 
 def test_build_trade_log_html_summary_table():
@@ -1785,9 +1786,11 @@ def test_build_strategies_html_equity_curve():
 
 
 def test_build_strategies_html_empty():
-    """Strategies page returns empty when no data."""
+    """Strategies page returns placeholder page when no data."""
     html = build_strategies_html({}, date="2026-02-12")
-    assert html == ""
+    assert "<!DOCTYPE html>" in html
+    assert "Strategies" in html
+    assert "No backtest data" in html
 
 
 def test_build_strategies_html_has_nav_links():
